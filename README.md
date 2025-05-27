@@ -77,7 +77,7 @@ and the microlisp seems read the expression from stdin every single char,better 
 
 5. It's better be a chess and a go game,start it using (chess) and (go)
 
-6. There is other rpi4b function,like opengl,may be can try them
+6. There is other rpi4b function,like opengl,may be can try them.
 
 
 
