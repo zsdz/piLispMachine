@@ -5,7 +5,7 @@ piBareMetalLisp(Raspberry pi Bare metal Lisp) is a toy lisp interpreter based on
 ![1](./pic/2.jpg#pic_left) ![1](./pic/3.jpg#pic_right)
 
 ## Build
-you have to make circle and circle-stdlib well(you can test the samples,especially [circle-stdlib sample2 02-stdio-hello](https://github.com/smuehlst/circle-stdlib/tree/master/samples/02-stdio-hello)).If everything is fine,copy or clone the project under the circle-stdlib's sample folder(to use the makefile and environment) ,then make.The kernel8-rpi4.img is the result(I think you can use the kernel8-rpi4.img of the project directly)
+you have to make circle and circle-stdlib well(you can test the samples,especially [circle-stdlib sample2 02-stdio-hello](https://github.com/smuehlst/circle-stdlib/tree/master/samples/02-stdio-hello)).If everything is fine,copy or clone the project under the circle-stdlib's sample folder(to use the makefile and environment) ,then "make clean" to delete useless files(like kernel9-rpi4.map,kernel.d,main.d),then make.The kernel8-rpi4.img is the result(I think you can use the kernel8-rpi4.img of the project directly)
 
 ## Install
 
@@ -42,15 +42,6 @@ is in cmdline.txt(the default keymap of circle and circle-stdlib seems is DE).An
     width=640 height=480
 
 make the text look bigger,I suggest to add this option
-
-## IDE
-
-I edit&build the code using WSL and VSCode WSL plug in.If there is error report on vscode,such like can't find the include file,you may need edit the c/c++ plugin option using command(Ctrl+Shift+p):
-
-    C/C++: Edit configurations (UI)
-
-
-
 
 ## TODO list
 
