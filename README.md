@@ -45,7 +45,7 @@ make the text look bigger,I suggest to add this option
 
 ## IDE config
 
-I use vscode and vscode wsl plugin to edit the code.If vscode report it can't find the .h file(It seems if clone circle-stdlib progject use root,the vscode report no error,but if not root,vscode will report can't find .h file),you may need to edit the vscode c/c++ plugin's "Include path" option by enter "Ctrl+Shift+p"(change ... to your absolute path):
+I use vscode and vscode wsl plugin to edit the code.If vscode report it can't find the .h file(It seems if clone circle-stdlib project use root,the vscode report no error,but if not root,vscode will report can't find .h file),you may need to edit the vscode c/c++ plugin's "Include path" option by enter "Ctrl+Shift+p"(change ... to your absolute path):
 
 ```
 /.../circle-stdlib/include
