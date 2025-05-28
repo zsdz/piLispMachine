@@ -43,6 +43,15 @@ is in cmdline.txt(the default keymap of circle and circle-stdlib seems is DE).An
 
 make the text look bigger,I suggest to add this option
 
+## IDE
+
+I edit&build the code using WSL and VSCode WSL plug in.If there is error report on vscode,such like can't find the include file,you may need edit the c/c++ plugin option using command(Ctrl+Shift+p):
+
+    C/C++: Edit configurations (UI)
+
+
+
+
 ## TODO list
 
 There is two edition of microlisp:[scheme](https://github.com/lazear/microlisp/tree/master/scheme) and [scheme-gc](https://github.com/lazear/microlisp/tree/master/scheme-gc),I just copy the scheme code(it seems easier) to circle-stdlib kernel.cpp,fix some error that vscode (with WSL's vscode plugin),change the main function:

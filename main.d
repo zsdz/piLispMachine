@@ -124,7 +124,7 @@ main.o main.d: main.cpp kernel.h ../../include/circle_stdlib_app.h \
  ../../install/aarch64-none-circle/include/machine/ieeefp.h \
  ../../install/aarch64-none-circle/include/sys/reent.h \
  ../../install/aarch64-none-circle/include/_ansi.h \
- /home/wangkai/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stddef.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stddef.h \
  ../../install/aarch64-none-circle/include/sys/_types.h \
  ../../install/aarch64-none-circle/include/machine/_types.h \
  ../../install/aarch64-none-circle/include/sys/lock.h \
