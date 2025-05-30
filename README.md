@@ -2,7 +2,7 @@
 
 piBareMetalLisp(Raspberry pi Bare metal Lisp) is a toy lisp interpreter based on [Circle](https://github.com/rsta2/circle),[circle-stdlib](https://github.com/smuehlst/circle-stdlib) and [microlisp](https://github.com/lazear/microlisp):now it's only use circle-stdlib's IO function as the lisp REPL.The effect on my "rpi4b-notebook":
 
-![1](./pic/rpi4-notebook%20inside%20small.jpg#pic_left) ![1](./pic/lispMachine.jpg#pic_right)
+![1](./pic/rpi4b-notebook-inside-small.jpg#pic_left) ![1](./pic/lispMachine.jpg#pic_right)
 
 ## Build
 you have to make circle and circle-stdlib well(you can test the samples,especially [circle-stdlib sample2 02-stdio-hello](https://github.com/smuehlst/circle-stdlib/tree/master/samples/02-stdio-hello)).If everything is fine,copy or clone the project under the circle-stdlib's sample folder(to use the makefile and environment) ,first "make clean" to delete useless files(like kernel8-rpi4.map,kernel.d,main.d),then make.The kernel8-rpi4.img is the result(I think you can use the kernel8-rpi4.img of the project already build directly,you may rename it to kernel8.img)
