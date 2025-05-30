@@ -34,6 +34,7 @@ copy(or edit the options) the config.txt and cmdline.txt on the sd card's top fl
 Be carefull ! :
 
 the config.txt option are seperated line by line:
+
 https://www.raspberrypi.com/documentation/computers/config_txt.html
 
 but cmdline.txt option are seperated by space:
