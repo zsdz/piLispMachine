@@ -80,9 +80,11 @@ There is two edition of microlisp:[scheme](https://github.com/lazear/microlisp/t
 
 4. in this lisp on rpi4,some microlisp's buildin function like exit() obvious can't use now (I need to change function exit to poweroff later)
 
-then change the main function:
+5. copy microlisp's code in main function to circle-stdlib app's main routine:
 
     CStdlibApp::TShutdownMode CKernel::Run (void)
+
+man can decide if or not load lib.scm by command line option in microlisp,but I force to load it
 
 bing! it worked(lucky)
 
