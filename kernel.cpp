@@ -75,6 +75,8 @@ struct object {
 static struct object *ENV;
 static struct object *NIL;
 static struct object *EMPTY_LIST;
+
+//the circle already defined the macro TRUE and FALSE in types.h,so I change them (microlisp defined) to TRUEE and FALSEE
 static struct object *TRUEE;
 static struct object *FALSEE;
 static struct object *QUOTE;
@@ -119,6 +121,8 @@ static uint64_t hash(const char *s) {
 int ht_init(int size) {
     if (HTABLE || !(size % 2))
         error("Hash table already initialized or even # of entries");
+    
+    //circle use c++ while microlisp use c,it seems all the malloc need to casting 
     HTABLE = (struct htable *) malloc(sizeof(struct htable) * size);
     memset(HTABLE, 0, sizeof(struct htable) * size);
     HTABLE_SIZE = size;
