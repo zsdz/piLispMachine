@@ -105,7 +105,7 @@ bing! it worked(lucky)
 
 Here is the plan of future:
 
-- [*] try to create some file-system function,like (ls)
+- [x] try to create some file-system function,like (ls)
 (try to wrap the circle-stdlib's file opreation function)
 
 I have support (ls),(mkdir "dirName"),(cd "folderName"),(unlink "fileOrFolderName")
