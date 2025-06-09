@@ -5,7 +5,14 @@ piBareMetalLisp(Raspberry pi Bare metal Lisp) is a toy lisp interpreter based on
 ![1](./pic/rpi4bNotebookInsideBig.jpg#pic_left) ![1](./pic/lispMachineBig.jpg#pic_right)
 
 ## Build
-you have to make circle and circle-stdlib well(you can test the samples,especially [circle-stdlib sample2 02-stdio-hello](https://github.com/smuehlst/circle-stdlib/tree/master/samples/02-stdio-hello)).If everything is fine,copy or clone the project under the circle-stdlib's sample folder(to use the makefile and environment) ,first "make clean" to delete useless files(like kernel8-rpi4.map,kernel.d,main.d),then make.The kernel8-rpi4.img is the result(I think you can use the kernel8-rpi4.img of the project already build directly,you may rename it to kernel8.img)
+You have to make circle and circle-stdlib well(you can test the samples,especially [circle-stdlib sample2 02-stdio-hello](https://github.com/smuehlst/circle-stdlib/tree/master/samples/02-stdio-hello)).If everything is fine,copy or clone the project under the circle-stdlib's sample folder(to use the makefile and environment) ,first "make clean" to delete useless files(like kernel8-rpi4.map,kernel.d,main.d),then make.The kernel8-rpi4.img is the result(I think you can use the kernel8-rpi4.img of the project already build directly,you may rename it to kernel8.img)
+
+It seems rpi4 need kernel's name is kernel8.img.You may edit circle or circle-stdlib's makefile let the kernel file's name is kernel8.img which I have not do this.So you may need change kernel img's name from kernel8-rpi4.img to kernel8.img.(Maybe you can try set  
+
+    kernel=kernel8-rpi4.img
+
+in config.txt,I tryed but there is no effort
+)
 
 ## Install
 
@@ -57,6 +64,12 @@ And it seems the option
 
 make the text look bigger,I suggest to add this option
 
+when rpi4 start,you can see some log on screen first(make it more like an 'OS'),if set the option
+
+    logdev=ttyS1
+
+there info will not display,you will see the lisp repl first
+
 ## IDE config
 
 I use vscode and vscode wsl plugin to edit the code.If vscode report it can't find the .h file(It seems if clone circle-stdlib project use root,the vscode report no error,but if not root,vscode will report can't find .h file),you may need to edit the vscode c/c++ plugin's "Include path" option by enter "Ctrl+Shift+p"(change ... to your absolute path):
@@ -92,8 +105,12 @@ bing! it worked(lucky)
 
 Here is the plan of future:
 
-- [ ] try to create some file-system function,like (ls)
+- [*] try to create some file-system function,like (ls)
 (try to wrap the circle-stdlib's file opreation function)
+
+I have support (ls),(mkdir "dirName"),(cd "folderName"),(unlink "fileOrFolderName")
+(the parameter should be string in ""):
+![1](./pic/fileSystem1.jpg)
 
 - [ ] now the interpreter can only eval the single line expression,it's better there is a smallest editor that can edit the lisp code,so I can write more lines of lisp code,and save/reload it.The editor better look like the classic QBasic's IDE
 

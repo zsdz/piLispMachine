@@ -26,6 +26,11 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <string>
+#include <iostream>
+using namespace std;
 
 #define null(x) ((x) == NULL || (x) == NIL)
 #define EOL(x) (null((x)) || (x) == EMPTY_LIST)
@@ -108,7 +113,7 @@ struct htable {
 static struct htable *HTABLE = NULL;
 static int HTABLE_SIZE;
 
-static uint64_t hash(const char *s) {
+static uint64_t hashh(const char *s) {
     uint64_t h = 0;
     uint8_t *u = (uint8_t *)s;
     while (*u) {
@@ -130,12 +135,12 @@ int ht_init(int size) {
 }
 
 void ht_insert(struct object *key) {
-    uint64_t h = hash(key->string);
+    uint64_t h = hashh(key->string);
     HTABLE[h].key = key;
 }
 
 struct object *ht_lookup(char *s) {
-    uint64_t h = hash(s);
+    uint64_t h = hashh(s);
     return HTABLE[h].key;
 }
 
@@ -158,8 +163,9 @@ int __type_check(const char *func, struct object *obj, type_t type) {
         fprintf(stderr, "Invalid argument to function %s: NIL\n", func);
         exit(1);
     } else if (obj->type != type) {
-        char *types[6] = {"INTEGER", "SYMBOL",    "STRING",
-                          "LIST",    "PRIMITIVE", "VECTOR"};
+
+        const char *types[6] = {"INTEGER", "SYMBOL","STRING","LIST",    "PRIMITIVE", "VECTOR"};
+
         fprintf(stderr, "Invalid argument to function %s. Expected %s got %s\n",
                 func, types[type], types[obj->type]);
         exit(1);
@@ -911,7 +917,84 @@ struct object *prim_exec(struct object *args) {
     return NIL;
 }
 
+//Because I will display current floder name in every line of repl like linux shell,so I think there is no need of command pwd 
+/*
+struct object *pwd(struct object *args) {
+    char buf[1024];
 
+    getcwd(buf, sizeof(buf));
+    printf("%s\n",buf);
+    return NULL;
+}
+*/
+
+struct object *cd(struct object *args) {
+    
+    if (chdir((car(args))->string) != 0)
+    {
+        printf("cd failed unexpectedly\n");
+    } 
+
+    return NULL;
+}
+
+struct object *ls(struct object *args) {
+    char buf[1024];
+    getcwd(buf, sizeof(buf));
+    DIR * const dir=opendir(buf);;
+    char *foldername = car(args)->string;
+
+    //circle-stdlib's sample03 code
+    /*
+    while (true)
+    {
+        errno = 0;
+        struct dirent const * const dp = readdir (dir);
+        if (dp != nullptr)
+        {
+            printf ("\t%s\n", dp->d_name);
+        }
+        else
+        {
+            if (errno != 0 && errno != ENOENT)
+            {
+                fprintf (stderr,"readdir failed with errno %d\n",
+                errno);
+            }
+
+            break;
+        }
+    }
+    */
+    struct dirent * dp;
+
+    while ((dp = readdir(dir))!= nullptr)
+    {
+        printf ("\t%s\n", dp->d_name);
+    }
+
+    return NULL;
+}
+
+struct object *mkdir(struct object *args) {
+
+    if (mkdir((car(args))->string,0) != 0)
+    {
+        printf("mkdir failed unexpectedly\n");
+    }
+
+    return NULL;
+}
+
+struct object *unlinkk(struct object *args) {
+
+    if (unlink((car(args))->string) < 0)
+    {
+        printf("no such file\n");
+    }
+
+    return NULL;
+}
 
 /* Initialize the global environment, add primitive functions and symbols */
 void init_env() {
@@ -957,7 +1040,12 @@ void init_env() {
     add_prim(">", prim_gt);
 
     add_prim("type", prim_type);
-    add_prim("load", load_file);
+    //add_prim("load", load_file);
+    //add_prim("pwd", pwd);
+    add_prim("ls", ls);
+    add_prim("cd", cd);
+    add_prim("mkdir", mkdir);
+    add_prim("unlink", unlinkk);
     add_prim("print", prim_print);
     add_prim("get-global-environment", prim_get_env);
     add_prim("set-global-environment", prim_set_env);
@@ -970,6 +1058,7 @@ void init_env() {
 }
 
 /* Loads and evaluates a file containing lisp s-expressions */
+
 struct object *load_file(struct object *args) {
     struct object *exp;
     struct object *ret = NULL;
@@ -990,6 +1079,7 @@ for (;;) {
     fclose(fp);
     return ret;
 }
+
 
 /*
 int mainX(int argc, char **argv) {
@@ -1028,14 +1118,23 @@ CStdlibApp::TShutdownMode CKernel::Run (void)
     struct object *exp;
     int i;
     
-    
     printf(
         "Microlisp intrepreter - (c) Michael Lazear 2016-2019, MIT License\n");
-    //for (i = 1; i < argc; i++)
     load_file(cons(make_symbol("lib.scm"), NIL));
 
+    string prompt;
+    char buf[1024];
+
     for (;;) {
-        printf("user> ");
+        getcwd(buf, sizeof(buf));
+
+        prompt.clear();
+
+        prompt.append("[");
+        prompt.append(buf);
+        prompt.append("]> ");
+        //printf("user> ");
+        cout<<prompt;
         exp = eval(read_exp(stdin), ENV);
         if (!null(exp)) {
             print_exp("====>", exp);

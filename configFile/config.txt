@@ -1,3 +1,0 @@
-core_freq_min=500
-hdmi_group=1
-hdmi_mode=16
