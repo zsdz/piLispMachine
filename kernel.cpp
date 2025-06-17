@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+//#include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -164,7 +164,9 @@ int __type_check(const char *func, struct object *obj, type_t type) {
         exit(1);
     } else if (obj->type != type) {
 
-        const char *types[6] = {"INTEGER", "SYMBOL","STRING","LIST",    "PRIMITIVE", "VECTOR"};
+        //const char *types[6] = {"INTEGER", "SYMBOL","STRING","LIST","PRIMITIVE", "VECTOR"};
+
+        string types[6]= {"INTEGER", "SYMBOL","STRING","LIST","PRIMITIVE", "VECTOR"};
 
         fprintf(stderr, "Invalid argument to function %s. Expected %s got %s\n",
                 func, types[type], types[obj->type]);
@@ -320,6 +322,7 @@ struct object *prim_type(struct object *args) {
                       "list",    "primitive", "vector"};
     return make_symbol(types[car(args)->type]);
 }
+
 
 struct object *prim_get_env(struct object *args) {
     assert(null(args));
@@ -942,7 +945,6 @@ struct object *ls(struct object *args) {
     char buf[1024];
     getcwd(buf, sizeof(buf));
     DIR * const dir=opendir(buf);;
-    char *foldername = car(args)->string;
 
     //circle-stdlib's sample03 code
     /*
@@ -1120,7 +1122,15 @@ CStdlibApp::TShutdownMode CKernel::Run (void)
     
     printf(
         "Microlisp intrepreter - (c) Michael Lazear 2016-2019, MIT License\n");
+    
     load_file(cons(make_symbol("lib.scm"), NIL));
+
+    printf("\n");
+
+    printf("HELP:Use (ls),(cd \"folderName\"),(mkdir \"folderName\"),(unlink \"fileOrFolderName\") to manage FileSystem\n");
+    printf("(ls) can only display files in current folder.\"folderName\" should write in double quotation marks\n");
+
+    printf("\n");
 
     string prompt;
     char buf[1024];
