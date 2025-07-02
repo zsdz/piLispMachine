@@ -24,7 +24,29 @@ class CKernel : public CStdlibAppStdio
 public:
 	CKernel (void);
 
+	static CKernel *Get (void);
+
+	//CConsole have option CONSOLE_OPTION_ICANON and CONSOLE_OPTION_ECHO
+	
+	void setRaw(){
+		mConsole.SetOptions(CONSOLE_OPTION_ECHO);
+		//mConsole.SetOptions (mConsole.GetOptions () & ~CONSOLE_OPTION_ICANON);
+	}
+
+	int restoreMode()
+	{
+		mConsole.SetOptions(3);
+	}
+
+	void clear(){
+		char *a="\x1b[H\x1b[J";
+		mScreen.Write(a,strlen(a));
+	}
+
 	TShutdownMode Run (void);
+
+private:
+  static CKernel *s_pThis;
 };
 
 #endif

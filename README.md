@@ -79,6 +79,9 @@ I use vscode and vscode wsl plugin to edit the code.If vscode report it can't fi
 /.../circle-stdlib/libs/circle-newlib/newlib/libc/include
 /.../circle-stdlib/libs/circle/include
 /.../circle-stdlib/libs/circle/addon
+/.../circle/circle-stdlib/libs/circle/addon
+/.../circle/circle-stdlib/install/aarch64-none-circle/include/sys
+/.../circle/circle-stdlib/libs/circle-newlib/newlib/libc/sys
 ```
 
 ## Changes I make to let microlisp run on rpi4b bare metal with circle-stdlib

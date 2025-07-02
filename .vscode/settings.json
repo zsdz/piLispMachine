@@ -1,6 +1,13 @@
 {
     "files.associations": {
         "random": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "kernel.h": "c",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "system_error": "cpp"
     }
 }
