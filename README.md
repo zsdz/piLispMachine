@@ -139,6 +139,18 @@ and the microlisp seems read the expression from stdin every single char,better 
 
 - [ ] There is other rpi4b function,like opengl,may be can try them.
 
+## Errors and unsloved problems:
+1. the code should be separated in some codes:kernel.cpp,lisp.cpp,edit.cpp...but faild now,so the microLisp and editor code is now all in kernel.cpp
+2. some function have parameters:(cd),(mkdir),(unlink),(edit)...the parameters should write in "".even there is now parameters,you have to give a empty "" now
+
+## Acknowledgments
+[Circle](https://github.com/rsta2/circle)
+[circle-stdlib](https://github.com/smuehlst/circle-stdlib)
+[microlisp](https://github.com/lazear/microlisp)
+[lupos](https://github.com/olfp/lupos)
+[kilo](https://viewsourcecode.org/snaptoken/kilo/index.html)
+
+
 
 
 

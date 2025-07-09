@@ -7,7 +7,8 @@ include ../../Config.mk
 CIRCLEHOME = ../../libs/circle
 NEWLIBDIR = ../../install/$(NEWLIB_ARCH)
 
-OBJS	= main.o edit.o lisp.o kernel.o 
+#OBJS	= main.o edit.o lisp.o kernel.o 
+OBJS	= main.o kernel.o 
 
 include $(CIRCLEHOME)/Rules.mk
 

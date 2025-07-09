@@ -14,10 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
+#include <stdio.h>
+
 #ifndef _kernel_h
 #define _kernel_h
 
 #include <circle_stdlib_app.h>
+#include <stdlib.h>
 
 class CKernel : public CStdlibAppStdio
 {
@@ -29,18 +32,24 @@ public:
 	//CConsole have option CONSOLE_OPTION_ICANON and CONSOLE_OPTION_ECHO
 	
 	void setRaw(){
+		//mConsole and mScreen is a nonstatic protected member in class CStdlibAppStdio,so I can't set this method static.I have to set a static member s_pThis to use these method as lupos does
 		mConsole.SetOptions(CONSOLE_OPTION_ECHO);
-		//mConsole.SetOptions (mConsole.GetOptions () & ~CONSOLE_OPTION_ICANON);
 	}
 
-	int restoreMode()
+	void restoreMode()
 	{
-		mConsole.SetOptions(3);
+		mConsole.SetOptions(CONSOLE_OPTION_ICANON|CONSOLE_OPTION_ECHO);
 	}
 
 	void clear(){
 		char *a="\x1b[H\x1b[J";
 		mScreen.Write(a,strlen(a));
+	}
+
+	void printPosition(int a){
+		char *b;
+		sprintf(b, "%d", a);
+		mScreen.Write(b,strlen(b));
 	}
 
 	TShutdownMode Run (void);

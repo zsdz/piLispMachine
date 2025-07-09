@@ -1,4 +1,26 @@
-kernel.o kernel.d: kernel.cpp kernel.h ../../include/circle_stdlib_app.h \
+kernel.o kernel.d: kernel.cpp kernel.h \
+ ../../install/aarch64-none-circle/include/stdio.h \
+ ../../install/aarch64-none-circle/include/_ansi.h \
+ ../../install/aarch64-none-circle/include/newlib.h \
+ ../../install/aarch64-none-circle/include/_newlib_version.h \
+ ../../install/aarch64-none-circle/include/sys/config.h \
+ ../../install/aarch64-none-circle/include/machine/ieeefp.h \
+ ../../install/aarch64-none-circle/include/sys/features.h \
+ ../../install/aarch64-none-circle/include/sys/cdefs.h \
+ ../../install/aarch64-none-circle/include/machine/_default_types.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stddef.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stdarg.h \
+ ../../install/aarch64-none-circle/include/sys/reent.h \
+ ../../install/aarch64-none-circle/include/_ansi.h \
+ ../../install/aarch64-none-circle/include/sys/_types.h \
+ ../../install/aarch64-none-circle/include/machine/_types.h \
+ ../../install/aarch64-none-circle/include/sys/lock.h \
+ ../../install/aarch64-none-circle/include/sys/types.h \
+ ../../install/aarch64-none-circle/include/sys/_stdint.h \
+ ../../install/aarch64-none-circle/include/sys/_pthreadtypes.h \
+ ../../install/aarch64-none-circle/include/machine/types.h \
+ ../../install/aarch64-none-circle/include/sys/stdio.h \
+ ../../include/circle_stdlib_app.h \
  ../../libs/circle/include/circle/actled.h \
  ../../libs/circle/include/circle/gpiopin.h \
  ../../libs/circle/include/circle/spinlock.h \
@@ -112,30 +134,11 @@ kernel.o kernel.d: kernel.cpp kernel.h ../../include/circle_stdlib_app.h \
  ../../libs/circle/addon/fatfs/ff.h \
  ../../libs/circle/addon/fatfs/ffconf.h \
  ../../install/aarch64-none-circle/include/stdint.h \
- ../../install/aarch64-none-circle/include/machine/_default_types.h \
- ../../install/aarch64-none-circle/include/sys/features.h \
- ../../install/aarch64-none-circle/include/_newlib_version.h \
  ../../install/aarch64-none-circle/include/sys/_intsup.h \
- ../../install/aarch64-none-circle/include/sys/_stdint.h \
  ../../install/aarch64-none-circle/include/string.h \
- ../../install/aarch64-none-circle/include/_ansi.h \
- ../../install/aarch64-none-circle/include/newlib.h \
- ../../install/aarch64-none-circle/include/sys/config.h \
- ../../install/aarch64-none-circle/include/machine/ieeefp.h \
- ../../install/aarch64-none-circle/include/sys/reent.h \
- ../../install/aarch64-none-circle/include/_ansi.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stddef.h \
- ../../install/aarch64-none-circle/include/sys/_types.h \
- ../../install/aarch64-none-circle/include/machine/_types.h \
- ../../install/aarch64-none-circle/include/sys/lock.h \
- ../../install/aarch64-none-circle/include/sys/cdefs.h \
- ../../install/aarch64-none-circle/include/sys/string.h lisp.h \
- ../../install/aarch64-none-circle/include/stdio.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stdarg.h \
- ../../install/aarch64-none-circle/include/sys/types.h \
- ../../install/aarch64-none-circle/include/sys/_pthreadtypes.h \
- ../../install/aarch64-none-circle/include/machine/types.h \
- ../../install/aarch64-none-circle/include/sys/stdio.h \
+ ../../install/aarch64-none-circle/include/sys/string.h \
+ ../../install/aarch64-none-circle/include/stdlib.h \
+ ../../install/aarch64-none-circle/include/machine/stdlib.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/iostream \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/requires_hosted.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/aarch64-none-elf/bits/c++config.h \
@@ -208,8 +211,6 @@ kernel.o kernel.d: kernel.cpp kernel.h ../../include/circle_stdlib_app.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/ext/string_conversions.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/cstdlib \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/stdlib.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/_ansi.h \
- ../../install/aarch64-none-circle/include/machine/stdlib.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/std_abs.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/cstdio \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/cerrno \
@@ -236,5 +237,15 @@ kernel.o kernel.d: kernel.cpp kernel.h ../../include/circle_stdlib_app.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/ostream.tcc \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/istream \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/istream.tcc \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stdbool.h \
+ ../../install/aarch64-none-circle/include/sys/wait.h \
  ../../install/aarch64-none-circle/include/unistd.h \
- ../../install/aarch64-none-circle/include/sys/unistd.h
+ ../../install/aarch64-none-circle/include/sys/unistd.h \
+ ../../install/aarch64-none-circle/include/dirent.h \
+ ../../install/aarch64-none-circle/include/sys/dirent.h \
+ ../../include/wrap_fatfs.h \
+ ../../install/aarch64-none-circle/include/sys/stat.h \
+ ../../install/aarch64-none-circle/include/time.h \
+ ../../install/aarch64-none-circle/include/machine/time.h \
+ ../../install/aarch64-none-circle/include/sys/timespec.h \
+ ../../install/aarch64-none-circle/include/sys/_timespec.h
