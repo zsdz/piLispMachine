@@ -52,6 +52,14 @@ public:
 		mScreen.Write(b,strlen(b));
 	}
 
+	void printString(char *a){
+		mScreen.Write(a,strlen(a));
+	}
+
+	void printChar(char *a){
+		mScreen.Write(a,1);
+	}
+
 	TShutdownMode Run (void);
 
 private:

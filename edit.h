@@ -1,1 +1,0 @@
-struct object *edit(struct object *args);

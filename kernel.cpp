@@ -20,6 +20,10 @@
 // #include "edit.h"
 
 #include <iostream>
+// #include <vector>
+#include <fstream>
+#include <cstdint>
+#include <unordered_map>
 using namespace std;
 
 #include <assert.h>
@@ -36,6 +40,7 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <fcntl.h>
 
 // microLisp code:
 #define null(x) ((x) == NULL || (x) == NIL)
@@ -578,10 +583,18 @@ struct object *prim_print(struct object *args)
     return NIL;
 }
 
-struct object *prim_exit(struct object *args)
+// both prim_exitNull and prim_exitNil will return to repl.microlisp use exit(0) which have no meaning here
+
+struct object *prim_exitNull(struct object *args)
 {
     assert(null(args));
-    exit(0);
+    return NULL;
+}
+
+struct object *prim_exitNil(struct object *args)
+{
+    assert(null(args));
+    return NIL;
 }
 
 struct object *prim_read(struct object *args)
@@ -1102,13 +1115,20 @@ struct object *pwd(struct object *args) {
 
 struct object *cd(struct object *args)
 {
+    char *folderName = (car(args))->string;
+
+    if (folderName == NULL) // can't work，I don't know why
+    {
+        cout << "cd command need a folderName\n";
+        return NIL;
+    }
 
     if (chdir((car(args))->string) != 0)
     {
         printf("cd failed unexpectedly\n");
     }
 
-    return NULL;
+    return NIL;
 }
 
 struct object *ls(struct object *args)
@@ -1118,7 +1138,7 @@ struct object *ls(struct object *args)
     DIR *const dir = opendir(buf);
     ;
 
-    // circle-stdlib's sample03 code
+    // circle-stdlib's sample03 code,show how readdir used
     /*
     while (true)
     {
@@ -1140,6 +1160,7 @@ struct object *ls(struct object *args)
         }
     }
     */
+
     struct dirent *dp;
 
     while ((dp = readdir(dir)) != nullptr)
@@ -1147,7 +1168,7 @@ struct object *ls(struct object *args)
         printf("\t%s\n", dp->d_name);
     }
 
-    return NULL;
+    return NIL; // it seems both return NULL and NIL can work,microlisp use NIL
 }
 
 struct object *mkdirWarper(struct object *args)
@@ -1158,7 +1179,7 @@ struct object *mkdirWarper(struct object *args)
         printf("mkdir failed unexpectedly\n");
     }
 
-    return NULL;
+    return NIL;
 }
 
 struct object *unlinkk(struct object *args)
@@ -1169,7 +1190,7 @@ struct object *unlinkk(struct object *args)
         printf("no such file\n");
     }
 
-    return NULL;
+    return NIL;
 }
 
 /* Loads and evaluates a file containing lisp s-expressions */
@@ -1178,12 +1199,12 @@ struct object *load_file(struct object *args)
 {
     struct object *exp;
     struct object *ret = NULL;
-    char *filename = car(args)->string;
-    printf("Evaluating file %s\n", filename);
-    FILE *fp = fopen(filename, "r");
+    char *filenamee = car(args)->string;
+    printf("Evaluating file %s\n", filenamee);
+    FILE *fp = fopen(filenamee, "r");
     if (fp == NULL)
     {
-        printf("Error opening file %s\n", filename);
+        printf("Error opening file %s\n", filenamee);
         return NIL;
     }
 
@@ -1198,320 +1219,31 @@ struct object *load_file(struct object *args)
     return ret;
 }
 
+struct object *cat(struct object *args)
+{
+    string fileName = (car(args))->string;
+
+    ifstream file(fileName);
+
+    if (!file.is_open())
+    {
+        cerr << "cat: " << fileName << ": can't open file" << endl;
+        return NIL;
+    }
+
+    string line;
+    while (getline(file, line))
+    {
+        cout << line << endl;
+    }
+
+    file.close();
+
+    return NIL;
+}
+
 // editor code:
-#define CTRL_KEY(k) ((k) & 0x1f)
-#define ABUF_INIT {NULL, 0}
 
-struct abuf
-{
-    char *b;
-    int len;
-};
-
-typedef struct erow
-{
-    int size;
-    char *chars;
-} erow;
-
-struct editorConfig
-{
-    int cx, cy;
-    int numrows;
-    erow *row;
-    const int screenrows = 25;
-    const int screencols = 80;
-};
-
-struct editorConfig E;
-
-enum editorKey
-{
-    ARROW_LEFT = 1,
-    ARROW_RIGHT,
-    ARROW_UP,
-    ARROW_DOWN
-};
-
-void abAppend(struct abuf *ab, const char *s, int len)
-{
-    char *neww = (char *)realloc(ab->b, ab->len + len);
-    if (neww == NULL)
-        return;
-    memcpy(&neww[ab->len], s, len);
-    ab->b = neww;
-    ab->len += len;
-}
-
-void abFree(struct abuf *ab)
-{
-    free(ab->b);
-}
-
-void initEditor()
-{
-    CKernel::Get()->setRaw(); // if enable,can't display right
-
-    CKernel::Get()->clear();
-
-    E.cx = 0;
-    E.cy = 0;
-    E.numrows = 0;
-    E.row = NULL;
-}
-
-void editorAppendRow(char *s, size_t len)
-{
-    E.row = (erow *)realloc(E.row, sizeof(erow) * (E.numrows + 1));
-
-    int at = E.numrows;
-    E.row[at].size = len;
-    E.row[at].chars = (char *)malloc(len + 1);
-    memcpy(E.row[at].chars, s, len);
-    E.row[at].chars[len] = '\0';
-    E.numrows++;
-}
-
-void editorDrawRows(struct abuf *ab)
-{
-    // abAppend(ab, E.row.chars,E.row.size);//this line can work on display one line of a file
-    int y;
-    for (y = 0; y < E.screenrows; y++)
-    {
-        if (y >= E.numrows)
-        {
-        }
-        else
-        {
-            int len = E.row[y].size;
-            if (len > E.screencols)
-                len = E.screencols;
-            abAppend(ab, E.row[y].chars, len);
-        }
-
-        if (y < E.screenrows - 1)
-        {
-            abAppend(ab, "\r\n", 2);
-        }
-    }
-}
-
-void editorRefreshScreen()
-{
-    struct abuf ab = ABUF_INIT;
-    editorDrawRows(&ab);
-    write(STDOUT_FILENO, ab.b, ab.len);
-    abFree(&ab);
-}
-
-ssize_t my_getline(char **lineptr, size_t *n, FILE *stream)
-{
-    if (lineptr == NULL || n == NULL || stream == NULL)
-    {
-        return -1;
-    }
-
-    size_t capacity = *n;
-    size_t length = 0;
-    int c;
-
-    if (capacity == 0)
-    {
-        capacity = 128;
-        *lineptr = (char *)malloc(capacity);
-        if (*lineptr == NULL)
-        {
-            return -1;
-        }
-    }
-
-    while ((c = fgetc(stream)) != EOF)
-    {
-        if (c == '\n')
-        {
-            break;
-        }
-
-        if (length + 1 >= capacity)
-        {
-            capacity *= 2;
-            *lineptr = (char *)realloc(*lineptr, capacity);
-            if (*lineptr == NULL)
-            {
-                return -1;
-            }
-        }
-
-        (*lineptr)[length++] = (char)c;
-    }
-
-    if (length == 0 && c == EOF)
-    {
-        return -1;
-    }
-
-    (*lineptr)[length] = '\0';
-
-    *n = capacity;
-    return length;
-}
-
-void editorOpen(char *filename)
-{
-    FILE *fp = fopen(filename, "r");
-    // if (!fp) die("fopen");
-
-    char *line = NULL;
-    size_t linecap = 0;
-    ssize_t linelen;
-    linelen = my_getline(&line, &linecap, fp);
-    while ((linelen = my_getline(&line, &linecap, fp)) != -1)
-    {
-        while (linelen > 0 && (line[linelen - 1] == '\n' ||
-                               line[linelen - 1] == '\r'))
-            linelen--;
-        editorAppendRow(line, linelen);
-    }
-    free(line);
-    fclose(fp);
-}
-
-char editorReadKey()
-{
-    int nread;
-    char c;
-    while ((nread = read(STDIN_FILENO, &c, 1)) != 1)
-    {
-        // if (nread == -1 && errno != EAGAIN) die("read");
-    }
-
-    if (c == '\x1b')
-    {
-        char seq[3];
-
-        if (read(STDIN_FILENO, &seq[0], 1) != 1)
-            return '\x1b';
-        if (read(STDIN_FILENO, &seq[1], 1) != 1)
-            return '\x1b';
-
-        if (seq[0] == '[')
-        {
-            switch (seq[1])
-            {
-            case 'A':
-                return ARROW_UP;
-            case 'B':
-                return ARROW_DOWN;
-            case 'C':
-                return ARROW_RIGHT;
-            case 'D':
-                return ARROW_LEFT;
-            }
-        }
-
-        return '\x1b';
-    }
-    else
-    {
-        return c;
-    }
-}
-
-void editorMoveCursor(char key)
-{
-    switch (key)
-    {
-    case ARROW_LEFT:
-        E.cx--;
-        break;
-    case ARROW_RIGHT:
-        E.cx++;
-        break;
-    case ARROW_UP:
-        E.cy--;
-        break;
-    case ARROW_DOWN:
-        E.cy++;
-        break;
-    }
-}
-
-char editorProcessKeypress()
-{
-    char c = editorReadKey();
-
-    switch (c)
-    {
-
-    case CTRL_KEY('q'):
-        // CKernel::Get()->clear();
-        return 'q';
-
-    case ARROW_UP:
-    case ARROW_DOWN:
-    case ARROW_LEFT:
-    case ARROW_RIGHT:
-        editorMoveCursor(c);
-        CKernel::Get()->printPosition(E.cx);
-        CKernel::Get()->printPosition(E.cy);
-        return 'a';
-        // break;
-    // case 'q':
-    // return 'q';
-    //  break;
-    default:
-        return 'x';
-    }
-}
-
-void editorProcessKeypressVoid()
-{
-    char c = editorReadKey();
-
-    switch (c)
-    {
-
-        /*
-        case CTRL_KEY('q'):
-            CKernel::Get()->clear();
-            return 'q';
-        */
-
-    case ARROW_UP:
-    case ARROW_DOWN:
-    case ARROW_LEFT:
-    case ARROW_RIGHT:
-        editorMoveCursor(c);
-        // return 'a';
-        break;
-    case 'q':
-        // return 'q';
-        break;
-    }
-}
-
-struct object *edit(struct object *args)
-{
-    initEditor();
-    editorOpen((car(args))->string);
-    editorRefreshScreen();
-
-    while (1)
-    {
-        // editorRefreshScreen();
-
-        if (editorProcessKeypress() == 'q')
-        {
-            break;
-        }
-    }
-
-    CKernel::Get()->clear(); // if not clear,the history command's result will not appear too
-
-    CKernel::Get()->restoreMode();
-
-    return NULL;
-}
 
 /* Initialize the global environment, add primitive functions and symbols */
 void init_env()
@@ -1563,7 +1295,8 @@ void init_env()
     add_prim("print", prim_print);
     add_prim("get-global-environment", prim_get_env);
     add_prim("set-global-environment", prim_set_env);
-    // add_prim("exit", prim_exit);
+    add_prim("exitnull", prim_exitNull);
+    add_prim("exitnil", prim_exitNil);
     // add_prim("exec", prim_exec);
     add_prim("read", prim_read);
     add_prim("vector", prim_vec);
@@ -1577,7 +1310,8 @@ void init_env()
     add_prim("mkdir", mkdirWarper);
     add_prim("unlink", unlinkk);
 
-    add_prim("edit", edit);
+    //add_prim("edit", edit);
+    add_prim("cat", cat);
 }
 
 // circle routine code:

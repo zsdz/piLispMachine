@@ -1,17 +1,17 @@
 # piBareMetalLisp
 
-piBareMetalLisp(Raspberry pi Bare metal Lisp) is a toy lisp interpreter based on [Circle](https://github.com/rsta2/circle),[circle-stdlib](https://github.com/smuehlst/circle-stdlib) and [microlisp](https://github.com/lazear/microlisp):now it's only use circle-stdlib's IO function as the lisp REPL.The effect on my "rpi4b-notebook":
+piBareMetalLisp(Raspberry pi Bare metal Lisp) is a toy lisp interpreter based on [Circle](https://github.com/rsta2/circle),[circle-stdlib](https://github.com/smuehlst/circle-stdlib) and [microlisp](https://github.com/lazear/microlisp):now it's only use circle-stdlib's IO function as the lisp REPL.The effect on my `rpi4b-notebook`:
 
 ![1](./pic/rpi4bNotebookInsideBig.jpg#pic_left) ![1](./pic/basicUseSample.jpg#pic_right)
 
 ## Build
-You have to make circle and circle-stdlib well(you can test the samples,especially [circle-stdlib sample2 02-stdio-hello](https://github.com/smuehlst/circle-stdlib/tree/master/samples/02-stdio-hello)).If everything is fine,copy or clone the project under the circle-stdlib's sample folder(to use the makefile and environment) ,first "make clean" to delete useless files(like kernel8-rpi4.map,kernel.d,main.d),then make.The kernel8-rpi4.img is the result(I think you can use the kernel8-rpi4.img of the project already build directly,you may rename it to kernel8.img)
+You have to make circle and circle-stdlib well(you can test the samples,especially [circle-stdlib sample2 02-stdio-hello](https://github.com/smuehlst/circle-stdlib/tree/master/samples/02-stdio-hello)).If everything is fine,copy or clone the project under the circle-stdlib's sample folder(to use the makefile and environment) ,first you may need `make clean` to delete useless files(like `kernel8-rpi4.map`,`kernel.d`,`main.d`),then `make`.The `kernel8-rpi4.img` is the result(I think you can use the `kernel8-rpi4.img` of the project already build directly,you may rename it to `kernel8.img`)
 
-It seems rpi4 need kernel's name is kernel8.img.You may edit circle or circle-stdlib's makefile let the kernel file's name is kernel8.img which I have not do this.So you may need change kernel img's name from kernel8-rpi4.img to kernel8.img.(Maybe you can try set  
+It seems rpi4 need kernel's name is `kernel8.img`.You may edit circle or circle-stdlib's makefile let the kernel file's name is kernel8.img which I have not do this.So you may need change kernel img's name from `kernel8-rpi4.img` to `kernel8.img`.(Maybe you can try set  
 
     kernel=kernel8-rpi4.img
 
-in config.txt,I tryed but there is no effort
+in `config.txt`,I tryed but there is no effort
 )
 
 ## Install
@@ -26,7 +26,7 @@ you should replace the img file of rpi4 of your sd card.I found these ways:
 
 https://github.com/rust-embedded/rust-raspberrypi-OS-tutorials/tree/master/05_drivers_gpio_uart#rpi-4
 
-this method seems need fewer file to start rpi4b with kernel8.img
+this method seems need fewer file to start rpi4b with `kernel8.img`
 
 2. Make an sd card using circle's install guide:
 
@@ -36,15 +36,15 @@ https://github.com/rsta2/circle?tab=readme-ov-file#installation
 
 ### 2 prepare the config.txt and cmdline.txt file
 
-copy(or edit the options) the config.txt and cmdline.txt on the sd card's top floder(you can also use them under this project's configFile folder).
+copy(or edit the options) the `config.txt` and `cmdline.txt` on the sd card's top floder(you can also use them under this project's configFile folder).
 
 Be carefull ! :
 
-the config.txt option are seperated line by line:
+the `config.txt` option are seperated line by line:
 
 https://www.raspberrypi.com/documentation/computers/config_txt.html
 
-but cmdline.txt option are seperated by space:
+but `cmdline.txt` option are seperated by space:
 
 https://raspberrytips.com/raspberry-pi-cmdline-txt/
 
@@ -54,7 +54,7 @@ you maybe want to use the US keymap,then add the option
 
     keymap=US
 
-is in cmdline.txt(the default keymap of circle and circle-stdlib seems is DE).There are six keymap options can set:
+is in `cmdline.txt`(the default keymap of circle and circle-stdlib seems is DE).There are six keymap options can set:
 
 https://github.com/rsta2/circle/blob/master/sample/08-usbkeyboard/README
 
@@ -68,7 +68,7 @@ when rpi4 start,you can see some log on screen first(make it more like an 'OS'),
 
     logdev=ttyS1
 
-there info will not display,you will see the lisp repl first
+these info will not display,you will see the lisp repl first
 
 ## IDE config
 
@@ -88,7 +88,7 @@ I use vscode and vscode wsl plugin to edit the code.If vscode report it can't fi
 
 There is two edition of microlisp:[scheme](https://github.com/lazear/microlisp/tree/master/scheme) and [scheme-gc](https://github.com/lazear/microlisp/tree/master/scheme-gc),I just copy the scheme code(it seems easier) to circle-stdlib kernel.cpp,fix some error that vscode (with WSL's vscode plugin) report:
 
-1. the microlisp defined macro TRUE and FALSE,but circle&circle-stdlib defined them too in types.h,so I rename them to TRUEE and FALSEE
+1. the microlisp defined macro `TRUE` and `FALSE`,but circle&circle-stdlib defined them too in types.h,so I rename them to `TRUEE` and `FALSEE`
 
 2. microlisp use c and circle&circle-stdlib use c++,so I add casting of every malloc
 
@@ -111,11 +111,11 @@ Here is the plan of future:
 - [x] try to create some file-system function,like (ls)
 (try to wrap the circle-stdlib's file opreation function)
 
-I have support (ls),(mkdir "dirName"),(cd "folderName"),(unlink "fileOrFolderName")
+I have support `(ls)`,`(mkdir "dirName")`,`(cd "folderName")`,`(unlink "fileOrFolderName")`
 (the parameter should be string in ""):
 ![1](./pic/fileSystem1.jpg)
 
-- [ ] now the interpreter can only eval the single line expression,it's better there is a smallest editor that can edit the lisp code,so I can write more lines of lisp code,and save/reload it.The editor better look like the classic QBasic's IDE
+- [ ] now the interpreter can eval the single line expression.it can eval multi line function defination too,but it's better store the defination in a file.so there need a smallest editor that can edit the lisp code.A better editor should look like the classic QBasic's IDE
 
 - [ ] fix the microlisp's bug,and make it faster:
 
@@ -140,8 +140,17 @@ and the microlisp seems read the expression from stdin every single char,better 
 - [ ] There is other rpi4b function,like opengl,may be can try them.
 
 ## Errors and unsloved problems:
-1. the code should be separated in some codes:kernel.cpp,lisp.cpp,edit.cpp...but faild now,so the microLisp and editor code is now all in kernel.cpp
-2. some function have parameters:(cd),(mkdir),(unlink),(edit)...the parameters should write in "".even there is now parameters,you have to give a empty "" now
+1. the code should be separated in some files:kernel.cpp,lisp.cpp,edit.cpp...but faild now,so the microLisp and editor code is now all in kernel.cpp
+
+2. some function have parameters:`(cd)`,`(mkdir)`,`(unlink)`,`(edit)`...the parameters should write in "".even there is now parameters,you have to give a empty "" now
+
+3. c and c++'s string are not compatible,merge microlisp's c code and circle/circle-stdlib's c++ code got lots of
+
+```
+ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]
+```
+
+warning.add `-Wno-Wwrite-strings` to ingore it now
 
 ## Acknowledgments
 [Circle](https://github.com/rsta2/circle)

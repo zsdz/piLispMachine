@@ -237,6 +237,21 @@ kernel.o kernel.d: kernel.cpp kernel.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/ostream.tcc \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/istream \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/istream.tcc \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/fstream \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/codecvt.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/aarch64-none-elf/bits/basic_file.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/aarch64-none-elf/bits/c++io.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/fstream.tcc \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/cstdint \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/unordered_map \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/unordered_map.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/hashtable.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/hashtable_policy.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/tuple \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/uses_allocator.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/ext/aligned_buffer.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/enable_special_members.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/erase_if.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stdbool.h \
  ../../install/aarch64-none-circle/include/sys/wait.h \
  ../../install/aarch64-none-circle/include/unistd.h \
@@ -248,4 +263,7 @@ kernel.o kernel.d: kernel.cpp kernel.h \
  ../../install/aarch64-none-circle/include/time.h \
  ../../install/aarch64-none-circle/include/machine/time.h \
  ../../install/aarch64-none-circle/include/sys/timespec.h \
- ../../install/aarch64-none-circle/include/sys/_timespec.h
+ ../../install/aarch64-none-circle/include/sys/_timespec.h \
+ ../../install/aarch64-none-circle/include/fcntl.h \
+ ../../install/aarch64-none-circle/include/sys/fcntl.h \
+ ../../install/aarch64-none-circle/include/sys/_default_fcntl.h
