@@ -10,6 +10,8 @@
         "vector": "cpp",
         "system_error": "cpp",
         "cerrno": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "ostream": "cpp",
+        "filesystem": "cpp"
     }
 }

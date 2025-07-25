@@ -111,11 +111,31 @@ Here is the plan of future:
 - [x] try to create some file-system function,like (ls)
 (try to wrap the circle-stdlib's file opreation function)
 
-I have support `(ls)`,`(mkdir "dirName")`,`(cd "folderName")`,`(unlink "fileOrFolderName")`
-(the parameter should be string in ""):
+I have support `(ls)`,`(mkdir "dirName")`,`(cd "folderName")`,`(unlink "fileOrFolderName")`:
 ![1](./pic/fileSystem1.jpg)
 
-- [ ] now the interpreter can eval the single line expression.it can eval multi line function defination too,but it's better store the defination in a file.so there need a smallest editor that can edit the lisp code.A better editor should look like the classic QBasic's IDE
+- [x] now the interpreter can eval the single line expression.it can eval multi line function defination too,but it's better store the defination in a file.so there need a smallest editor that can edit the lisp code.A better editor should look like the classic QBasic's IDE
+
+Now I have crate a editor,you can use it by (edit "fileName").You have to support fileName.If file not exist,it will been created,or it will be open:
+
+![1](./pic/editor.jpg)
+
+the code is from [kilo](https://viewsourcecode.org/snaptoken/kilo/index.html),and for easy to debug,I only copy&test some of it's code:but enought to edit(create,edit,insert char,inster new line,delete char...) step by step(the code before ch6).
+
+it's hard to merge kilo's code then merge microlisp's code:in rpi bare metel,there's no `termios` lib,I use these func to switch between cook and raw mode:
+
+```
+    void setRaw(){
+		mConsole.SetOptions(0);
+	}
+
+	void restoreMode()
+	{
+		mConsole.SetOptions(CONSOLE_OPTION_ICANON|CONSOLE_OPTION_ECHO);
+	}
+```
+
+and some of detail is different between the kilo's code,like:circle's key `enter`'s code is `/n` in raw mode,where kilo use `/r`,and `ARROW_LEFT = 1000` in kilo can't work,I change it to `ARROW_LEFT = 1`(I don't know why),and some ESCAPE SEQUENCES is same in circle and kilo,some are not (I clear the screen use ESCAPE SEQUENCES in /doc/screen.txt).If set `keymap=US width=640` in `cmdline.txt`,the row is 25 and col is 80 each screen,I write it direct in code
 
 - [ ] fix the microlisp's bug,and make it faster:
 
@@ -140,17 +160,14 @@ and the microlisp seems read the expression from stdin every single char,better 
 - [ ] There is other rpi4b function,like opengl,may be can try them.
 
 ## Errors and unsloved problems:
-1. the code should be separated in some files:kernel.cpp,lisp.cpp,edit.cpp...but faild now,so the microLisp and editor code is now all in kernel.cpp
 
-2. some function have parameters:`(cd)`,`(mkdir)`,`(unlink)`,`(edit)`...the parameters should write in "".even there is now parameters,you have to give a empty "" now
-
-3. c and c++'s string are not compatible,merge microlisp's c code and circle/circle-stdlib's c++ code got lots of
+1. c and c++'s string are not compatible,merge microlisp's c code and circle/circle-stdlib's c++ code got lots of
 
 ```
 ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]
 ```
 
-warning.add `-Wno-Wwrite-strings` to ingore it now
+warning.add `-Wno-write-strings` to ingore it now
 
 ## Acknowledgments
 [Circle](https://github.com/rsta2/circle)
@@ -159,9 +176,9 @@ warning.add `-Wno-Wwrite-strings` to ingore it now
 
 [microlisp](https://github.com/lazear/microlisp)
 
-[lupos](https://github.com/olfp/lupos)
-
 [kilo](https://viewsourcecode.org/snaptoken/kilo/index.html)
+
+[lupos](https://github.com/olfp/lupos)
 
 
 

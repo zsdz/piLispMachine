@@ -16,7 +16,12 @@
 #include <dirent.h>
 
 #include "lisp.h"
-#include "edit.h"
+#include "util.h"
+#include "editor.h"
+
+#include <iostream>
+#include <fstream>
+using namespace std;
 
 // #define null(x) ((x) == NULL || (x) == NIL)
 #define EOL(x) (null((x)) || (x) == EMPTY_LIST)
@@ -76,8 +81,8 @@ struct object
 } __attribute__((packed));
 
 /* We declare a couple of global variables for keywords */
-// static struct object *ENV;
-// static struct object *NIL;
+struct object *ENV;
+struct object *NIL;
 static struct object *EMPTY_LIST;
 
 // the circle already defined the macro TRUE and FALSE in types.h,so I change them (microlisp defined) to TRUEE and FALSEE
@@ -195,24 +200,6 @@ struct object *make_vector(int size)
     memset(ret->vector, 0, size);
 
     return ret;
-}
-
-char *my_strdup(const char *str)
-{
-    if (str == NULL)
-        return NULL;
-
-    char *strat = (char *)str;
-    int len = 0;
-    while (*str++ != '\0')
-        len++;
-    char *ret = (char *)malloc(len + 1);
-
-    while ((*ret++ = *strat++) != '\0')
-    {
-    }
-
-    return ret - (len + 1);
 }
 
 struct object *make_symbol(char *s)
@@ -1149,6 +1136,100 @@ struct object *unlinkk(struct object *args)
     return NULL;
 }
 
+/* Loads and evaluates a file containing lisp s-expressions */
+
+struct object *load_file(struct object *args)
+{
+    struct object *exp;
+    struct object *ret = NULL;
+    char *filename = car(args)->string;
+    printf("Evaluating file %s\n", filename);
+    FILE *fp = fopen(filename, "r");
+    if (fp == NULL)
+    {
+        printf("Error opening file %s\n", filename);
+        return NIL;
+    }
+
+    for (;;)
+    {
+        exp = read_exp(fp);
+        if (null(exp))
+            break;
+        ret = eval(exp, ENV);
+    }
+    fclose(fp);
+    return ret;
+}
+
+struct object *cat(struct object *args)
+{
+
+    if (args == NULL)
+    {
+        cerr << "No fileName" << endl;
+        return NIL;
+    }
+
+    string fileName = (car(args))->string;
+
+    ifstream file(fileName);
+
+    if (!file.is_open())
+    {
+        cerr << "cat: " << fileName << ": can't open file" << endl;
+        return NIL;
+    }
+
+    string line;
+    while (getline(file, line))
+    {
+        cout << line << endl;
+    }
+
+    file.close();
+
+    return NIL;
+}
+
+struct object *edit(struct object *args)
+{
+    if (args == NULL)
+    {
+        cerr << "No fileName" << endl;
+        return NIL;
+    }
+
+    initEditor();
+    char *fileName = (car(args))->string; // write lines to buffer
+
+    if (file_exists(fileName))
+    {
+        editorOpen(fileName);
+    }
+
+    while (1)
+    {
+        editorRefreshScreen();
+
+        char a = editorProcessKeypress();
+        if (a == 's')
+        {
+            editorSave(fileName);
+        }
+        else if (a == 'q')
+        {
+            break;
+        }
+    }
+
+    CKernel::Get()->clear(); // if not clear,the history command's result will not appear too
+
+    CKernel::Get()->restoreMode();
+
+    return NIL;
+}
+
 /* Initialize the global environment, add primitive functions and symbols */
 void init_env()
 {
@@ -1195,7 +1276,7 @@ void init_env()
     add_prim(">", prim_gt);
 
     add_prim("type", prim_type);
-    // add_prim("load", load_file);
+    add_prim("load", load_file);
     add_prim("print", prim_print);
     add_prim("get-global-environment", prim_get_env);
     add_prim("set-global-environment", prim_set_env);
@@ -1212,32 +1293,7 @@ void init_env()
     add_prim("cd", cd);
     add_prim("mkdir", mkdirWarper);
     add_prim("unlink", unlinkk);
-
+    add_prim("cat", cat);
     add_prim("edit", edit);
 }
 
-/* Loads and evaluates a file containing lisp s-expressions */
-
-struct object *load_file(struct object *args)
-{
-    struct object *exp;
-    struct object *ret = NULL;
-    char *filename = car(args)->string;
-    printf("Evaluating file %s\n", filename);
-    FILE *fp = fopen(filename, "r");
-    if (fp == NULL)
-    {
-        printf("Error opening file %s\n", filename);
-        return NIL;
-    }
-
-    for (;;)
-    {
-        exp = read_exp(fp);
-        if (null(exp))
-            break;
-        ret = eval(exp, ENV);
-    }
-    fclose(fp);
-    return ret;
-}

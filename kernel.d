@@ -1,5 +1,6 @@
-kernel.o kernel.d: kernel.cpp kernel.h \
- ../../install/aarch64-none-circle/include/stdio.h \
+kernel.o kernel.d: kernel.cpp \
+ ../../install/aarch64-none-circle/include/unistd.h \
+ ../../install/aarch64-none-circle/include/sys/unistd.h \
  ../../install/aarch64-none-circle/include/_ansi.h \
  ../../install/aarch64-none-circle/include/newlib.h \
  ../../install/aarch64-none-circle/include/_newlib_version.h \
@@ -9,16 +10,17 @@ kernel.o kernel.d: kernel.cpp kernel.h \
  ../../install/aarch64-none-circle/include/sys/cdefs.h \
  ../../install/aarch64-none-circle/include/machine/_default_types.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stddef.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stdarg.h \
- ../../install/aarch64-none-circle/include/sys/reent.h \
- ../../install/aarch64-none-circle/include/_ansi.h \
- ../../install/aarch64-none-circle/include/sys/_types.h \
- ../../install/aarch64-none-circle/include/machine/_types.h \
- ../../install/aarch64-none-circle/include/sys/lock.h \
  ../../install/aarch64-none-circle/include/sys/types.h \
+ ../../install/aarch64-none-circle/include/machine/_types.h \
+ ../../install/aarch64-none-circle/include/sys/_types.h \
  ../../install/aarch64-none-circle/include/sys/_stdint.h \
  ../../install/aarch64-none-circle/include/sys/_pthreadtypes.h \
- ../../install/aarch64-none-circle/include/machine/types.h \
+ ../../install/aarch64-none-circle/include/machine/types.h kernel.h \
+ ../../install/aarch64-none-circle/include/stdio.h \
+ ../../install/aarch64-none-circle/include/_ansi.h \
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stdarg.h \
+ ../../install/aarch64-none-circle/include/sys/reent.h \
+ ../../install/aarch64-none-circle/include/sys/lock.h \
  ../../install/aarch64-none-circle/include/sys/stdio.h \
  ../../include/circle_stdlib_app.h \
  ../../libs/circle/include/circle/actled.h \
@@ -138,7 +140,7 @@ kernel.o kernel.d: kernel.cpp kernel.h \
  ../../install/aarch64-none-circle/include/string.h \
  ../../install/aarch64-none-circle/include/sys/string.h \
  ../../install/aarch64-none-circle/include/stdlib.h \
- ../../install/aarch64-none-circle/include/machine/stdlib.h \
+ ../../install/aarch64-none-circle/include/machine/stdlib.h lisp.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/iostream \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/requires_hosted.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/aarch64-none-elf/bits/c++config.h \
@@ -236,34 +238,4 @@ kernel.o kernel.d: kernel.cpp kernel.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/basic_ios.tcc \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/ostream.tcc \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/istream \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/istream.tcc \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/fstream \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/codecvt.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/aarch64-none-elf/bits/basic_file.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/aarch64-none-elf/bits/c++io.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/fstream.tcc \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/cstdint \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/unordered_map \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/unordered_map.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/hashtable.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/hashtable_policy.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/tuple \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/uses_allocator.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/ext/aligned_buffer.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/enable_special_members.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/erase_if.h \
- /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/lib/gcc/aarch64-none-elf/13.2.1/include/stdbool.h \
- ../../install/aarch64-none-circle/include/sys/wait.h \
- ../../install/aarch64-none-circle/include/unistd.h \
- ../../install/aarch64-none-circle/include/sys/unistd.h \
- ../../install/aarch64-none-circle/include/dirent.h \
- ../../install/aarch64-none-circle/include/sys/dirent.h \
- ../../include/wrap_fatfs.h \
- ../../install/aarch64-none-circle/include/sys/stat.h \
- ../../install/aarch64-none-circle/include/time.h \
- ../../install/aarch64-none-circle/include/machine/time.h \
- ../../install/aarch64-none-circle/include/sys/timespec.h \
- ../../install/aarch64-none-circle/include/sys/_timespec.h \
- ../../install/aarch64-none-circle/include/fcntl.h \
- ../../install/aarch64-none-circle/include/sys/fcntl.h \
- ../../install/aarch64-none-circle/include/sys/_default_fcntl.h
+ /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/istream.tcc

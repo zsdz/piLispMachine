@@ -33,7 +33,7 @@ public:
 	
 	void setRaw(){
 		//mConsole and mScreen is a nonstatic protected member in class CStdlibAppStdio,so I can't set this method static.I have to set a static member s_pThis to use these method as lupos does
-		mConsole.SetOptions(CONSOLE_OPTION_ECHO);
+		mConsole.SetOptions(0);
 	}
 
 	void restoreMode()
@@ -44,12 +44,6 @@ public:
 	void clear(){
 		char *a="\x1b[H\x1b[J";
 		mScreen.Write(a,strlen(a));
-	}
-
-	void printPosition(int a){
-		char *b;
-		sprintf(b, "%d", a);
-		mScreen.Write(b,strlen(b));
 	}
 
 	void printString(char *a){
