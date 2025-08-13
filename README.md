@@ -144,7 +144,7 @@ I have support `(ls)`,`(mkdir "dirName")`,`(cd "folderName")`,`(unlink "fileOrFo
 
 - [x] now the interpreter can eval the single line expression.it can eval multi line function defination too,but it's better store the defination in a file.so there need a smallest editor that can edit the lisp code.A better editor should look like the classic QBasic's IDE
 
-Now I have crate a editor,you can use it by (edit "fileName").You have to give a fileName.If file not exist,it will been created,or it will be open:
+Now I have port some kilo's code,you can use it by (edit "fileName").You have to give a fileName.If file not exist,it will been created,or it will be open:
 
 ![1](./pic/editor.jpg)
 
