@@ -1,0 +1,725 @@
+@menu
+* Worms::                             Worms
+* Amalgamation::                      How two Worms are amalgamed
+* Connection::                        Connections
+* Half Eyes::                         Half Eyes and False Eyes
+* Distance and Strategic Distance::   Distance and Strategic Distance
+* Dragons::                           Union of WORMS.
+* Dragons in Color::                  Colored display of DRAGONS.
+@end menu
+
+Before considering its move, GNU Go collects some data in several
+arrays. Two of these arrays, called @code{worm} and @code{dragon}, are
+discussed in this document. Others are discussed in @xref{Eyes}.
+
+This information is intended to help evaluate the connectedness, eye
+shape, escape potential and life status of each group.
+
+Later routines called by @code{genmove()} will then have access to this
+information. This document attempts to explain the philosophy and
+algorithms of this preliminary analysis, which is carried out by the
+two routines @code{make_worm()} and @code{make_dragon()} in 
+@file{dragon.c}.
+
+In this document wherever we define a concept we use CAPITAL LETTERS
+for the term being defined.
+
+A WORM is a maximal set of vertices on the board which are connected
+along the horizontal and vertical lines, and are of the same color,
+which can be BLACK, WHITE or EMPTY. The term EMPTY applied to a worm
+means that the worm consists of empty (unoccupied) vertices. It does
+NOT mean that that the worm is the empty set. A STRING is a nonempty
+worm. An empty worm is called a CAVITY.  If a subset of vertices is
+contained in a worm, there is a unique worm containing it; this is its
+WORM CLOSURE.
+
+A DRAGON is a union of strings of the same color which will be treated
+as a unit. The dragons are generated anew at each move. If two strings
+are in the dragon, it is the computer's working hypothesis that they
+will live or die together and are effectively connected.
+
+The purpose of the dragon code is to allow the computer to formulate
+meaningful statements about life and death.  To give one example,
+consider the following situation:
+@example
+
+      OOOOO
+     OOXXXOO
+     OX...XO
+     OXXXXXO
+      OOOOO
+
+@end example
+
+The X's here should be considered a single group with one three-space
+eye, but they consist of two separate strings.  Thus we must
+amalgamate these two strings into a single dragon. Then the assertion
+makes sense, that playing at the center will kill or save the dragon,
+and is a vital point for both players. It would be difficult to
+formulate this statement if the X's are not perceived as a unit.
+
+The present implementation of the dragon code involve simplifying
+assumptions which can be refined in later implementations.
+
+@node Worms, Amalgamation, Dragon, Dragon
+@comment  node-name,  next,  previous,  up
+@section Worms
+
+The array @code{struct worm_data worm[19][19]} collects information about the
+worms. We will give definitions of the various fields. Each field has
+constant value at each vertex of the worm. We will define each field.
+
+@example
+
+struct worm_data @{
+@{
+  int color;       
+  int size;        
+  float effective_size;
+  int origini;     
+  int originj;     
+  int liberties;   
+  int liberties2;  
+  int liberties3;  
+  int liberties4;  
+  int attacki;     
+  int attackj;     
+  int attack_code;
+  int lunchi;
+  int lunchj;
+  int defendi;
+  int defendj;
+  int defend_code;
+  int cutstone;
+  int cutstone2;
+  int genus;
+  int value;
+  int ko;     
+  int inessential; 
+@};
+@end example
+
+COLOR: If the worm is @code{BLACK} or @code{WHITE}, that is its color.
+Cavities (empty worms) have an additional attribute which we call
+BORDERCOLOR. This will be one of @code{BLACK_BORDER,} @code{WHITE_BORDER} or
+@code{GRAY_BORDER}. Specifically, if all the worms adjacent to a given empty
+worm have the same color (black or white) then we define that to be the
+bordercolor. Otherwise the bordercolor is gray.
+
+Rather than define a new field, we keep this data in the
+field color. Thus for every worm, the color field will
+have one of the following values: @code{BLACK}, @code{WHITE},
+@code{GRAY_BORDER}, @code{BLACK_BORDER} or @code{WHITE_BORDER}. 
+The last three categories are empty worms classified by bordercolor.
+
+
+SIZE: This field contains the cardinality of the worm.
+
+
+ORIGIN: Each worm has a distinguished member, called
+its ORIGIN. Its coordinates are @code{(origini, originj)}. The
+purpose of this field is to make it easy to determine
+when two vertices lie in the same worm: we compare 
+their origin. Also if we wish to perform some test
+once for each worm, we simply perform it at the origin
+and ignore the other vertices. The origin is characterized
+by the test:
+
+@example
+(worm[m][n].origini == m) && (worm[m][n].originj == n).
+@end example
+
+LIBERTIES:      For a nonempty worm the field liberties is the
+number of liberties of the string. This is supplemented
+by LIBERTIES2, LIBERTIES3 and LIBERTIES4, which are the
+number of second order, third order and fourth order 
+liberties, respectively.
+
+The definition of liberties of order >1 is adapted to the
+problem of detecting the shape of the surrounding
+cavity. In particular we want to be able to see if a group
+is loosely surrounded. A LIBERTY OF ORDER n is an empty
+vertex which may be connected to the string by placing n
+stones of the same color on the board, but no fewer. The
+path of connection may pass through an intervening group
+of the same color. The stones placed at distance >1 may
+not touch a group of the opposite color. Connections through
+ko are not permitted. Thus in the following configuration:
+
+
+@example
+          .XX...    We label the     .XX.4.
+          XO....    liberties of     XO1234
+          XO....    order < 5 of     XO1234
+          ......    the O group:     ..2.4.
+          .X.X..                     .X.X..
+
+@end example
+
+The convention that liberties of order >1 may not touch a
+group of the opposite color means that knight's moves and
+one space jumps are perceived as impenetrable barriers.
+This is useful in determining when the string is becoming
+surrounded.
+
+We say that n is the DISTANCE of the liberty of order
+n from the dragon.
+
+ATTACK: If it is determined that the string may be
+easily captured, @code{(attacki, attackj)} points to an 
+attacking move. In the present implementation, this
+is only used for strings with <4 liberties. The
+algorithm in @file{reading.c} is fairly reliable at finding
+ladders but poor at finding nets (geta). This module
+therefore needs rewriting. If no attacking move is
+found, then @code{attacki == -1}.
+
+ATTACK_CODE: 1 if the worm can be captured unconditionally,
+2 or 3 if it can be captured with ko.
+If can be captured provided the attacker is willing
+to ignore any ko threat, then the @code{attack_code == 2}.
+If it can be captured provided the attacker can
+come up with a sufficiently large ko threat, then
+the @code{attack_code == 3}.
+
+LUNCH:  If @code{lunchi != -1} then @code{(lunchi, lunchj)} points
+to a boundary worm which can be easily captured.
+(It does not matter whether or not the string
+can be defended.)
+
+DEFEND: If there is an attack on the string (stored in the ATTACK
+field defined above), and there is a move which defends the
+string, this move is stored in @code{(defendi, defendj)}.  Otherwise
+@code{defendi == -1}.
+
+DEFEND_CODE: 1 if the worm can be defended unconditionally,
+2 or 3 if it can be defended with ko.
+If can be defended provided the defender is willing
+to ignore any ko threat, then the @code{defend_code == 2}.
+If it can be captured provided the defender can
+come up with a sufficiently large ko threat, then
+the @code{defend_code == 3}.
+
+CUTSTONE: This field is equal to 2 for cutting stones, 1 for
+potential cutting stones. Otherwise it is zero.
+Definitions for this field: 
+
+A CUTTING STONE is one adjacent to two enemy strings, which do
+not have a liberty in common. The most common type of cutting
+string is in this situation.
+
+@example
+
+          XO
+          OX
+
+@end example
+
+A POTENTIAL CUTTING STONE is adjacent to two enemy strings
+which do share a liberty. For example, X in:
+
+@example
+
+          XO
+          O.
+
+@end example
+
+For cutting strings we set @code{worm[m][n].cutstone=2}. For
+potential cutting strings we set @code{worm[m][n].cutstone=1}.
+
+
+GENUS: There are two separate notions of genus for worms and
+dragons. The dragon notion is more important, so
+@code{dragon[m][n].genus} is a far more useful field than
+@code{worm[m][n].genus}. Both fields are intended as approximations
+to the number of eyes. The GENUS of a string is the number
+of connected components of its complement, minus one. It is
+an approximation to the number of eyes of the string.
+
+
+VALUE: A measure of the value of the worm.
+
+
+KO: For every ko, the flag @code{ko} is set to 1 at the ko stone
+which is in atari, and also at the ko cavity adjacent
+to it. Thus in this situation:
+
+@example
+
+             XO
+            X.XO
+             XO
+
+@end example
+
+the flag @code{ko} is set to 1 at the rightmost X stone, and also
+at the cavity to its left.
+
+
+INESSENTIAL: An INESSENTIAL string is one which meets a
+criterion designed to guarantee that it has no life
+potential unless a particular surrounding string of the
+opposite color can be killed. More precisely an INESSENTIAL
+STRING is a string S of genus zero, not adjacent to any
+opponent string which can be easily captured, and which has
+no edge liberties or second order liberties, and which
+satisfies the following further property: If the string is
+removed from the board, then the empty worm E which is the
+worm closure of the set of vertices which it occupied has
+bordercolor the opposite of the removed string. The empty
+worm E (empty, that is, as a worm of the board modified by
+removal of S) consists of the union of support of S
+together with certain other empty worms which we call the
+BOUNDARY COMPONENTS of S.
+
+The inessential strings are used in the amalgamation of
+cavities in make_dragon.
+
+
+The function @code{makeworms()} will generate data for all worms. For
+empty worms, the following fields are significant: @code{color},
+@code{size}, @code{origini} and @code{originj}. The @code{liberty},
+@code{attack}, @code{defend}, @code{cutstone}, @code{genus} and
+@code{inessential} fields have significance only for nonempty worms.
+
+@node  Amalgamation, Connection, Worms, Dragon
+@comment  node-name,  next,  previous,  up
+@section Amalgamation
+
+A DRAGON, we have said, is a group of stones which are treated as a
+unit. It is a working hypothesis that these stones will live or die
+together. Thus the program will not expect to disconnect an opponent's
+strings if they have been amalgamated into a single dragon.
+
+The function @code{makedragons()} will amalgamate worms into dragons by
+maintaining separate arrays @code{worms[]} and @code{dragons[]} containing
+similar data. Each dragon is a union of worms. Just as the data maintained in
+@code{worm[19][19]} is constant on each worm, the data in
+@code{dragon[19][19]} is constant on each dragon.
+
+AMALGAMATION of two worms means means in practice replacing the origin
+of one worm by the origin of the other.  Amalgamation takes place in
+two stages: first, the amalgamation of empty worms (cavities) into
+empty dragons (caves); then, the amalgamation of colored worm into
+dragons.
+
+
+@section Amalgamation of cavities
+
+As we have already defined it, a CAVITY is an empty
+worm. A CAVE is an empty dragon.
+
+Under certain circumstances we want to amalgamate two or
+more cavities into a single cave. This is done before we
+amalgamate strings. An example where we wish to amalgamate
+two empty strings is the following:
+
+@example
+
+      OOOOO
+     OOXXXOO
+     OXaObXO
+     OOXXXOO
+      OOOOO
+
+@end example
+
+The two empty worms at a and b are to be amalgamated.
+
+We have already defined a string to be INESSENTIAL if it meets a
+criterion designed to guarantee that it has no life potential unless a
+particular surrounding string of the opposite color can be killed. An
+INESSENTIAL STRING is a string S of genus zero which is not a cutting
+string or potential cutting string, and which has no edge liberties or
+second order liberties (the last condition should be relaxed), and
+which satisfies the following further property: If the string is
+removed from the board, then the empty worm E which is the worm
+closure of the set of vertices which it occupied has bordercolor the
+opposite of the removed string.
+
+Thus in the previous example, after removing the inessential string at
+the center the worm closure of the center vertex consists of an empty
+worm of size 3 including a and b. The latter are the boundary
+components.
+
+The last condition in the definition of inessential worms excludes
+examples such as this:
+
+@example
+
+        OOOO
+       OXXOO
+      OXX.XO 
+      OX.XXO
+      OOXXO
+       OOO
+
+@end example
+
+Neither of the two X strings should be considered inessential
+(together they form a live group!) and indeed after removing one of
+them the resulting space has gray bordercolor, so by this definition
+these worms are not inessential.
+
+Some strings which should by rights be considered inessential will be
+missed by this criterion.
+
+The algorithm for amalgamation of empty worms consists of amalgamating
+the boundary components of any inessential worm. The resulting dragon
+has bordercolor the opposite of the removed string.
+
+Any dragon consisting of a single cavity has bordercolor equal to that
+of the cavity.
+
+
+
+@section Amalgamation of strings
+
+Amalgamation of nonempty worms in GNU Go 2.6 proceeds as follows.
+First we amalgamate all boundary components of an eyeshape. Thus in
+the following example:
+
+@example
+
+.OOOO.       The four X strings are amalgamated into a 
+OOXXO.       single dragon because they are the boundary
+OX..XO       components of a blackbordered cave. The
+OX..XO       cave could contain an inessential string
+OOXXO.       with no effect on this amalgamation.
+XXX...       
+
+@end example
+
+The code for this type of amalgamation is in the routine
+@code{dragon_eye()}, discussed further in EYES.
+
+Next, we amalgamate strings which seem uncuttable. We amalgamate dragons
+which either share two or more common liberties, or share one liberty
+into the which the opponent cannot play without being
+captured. (ignores ko rule).
+
+@example
+
+   X.    X.X     XXXX.XXX         X.O
+   .X    X.X     X......X         X.X
+                 XXXXXX.X         OXX
+
+@end example
+
+A database of connection patterns may be found in @file{patterns/conn.db}.
+
+@node  Connection, Half Eyes, Amalgamation, Dragon
+@comment  node-name,  next,  previous,  up
+@section Connection
+
+The fields @code{black_eye.cut} and @code{white_eye.cut} are set where the
+opponent can cut, and this is done by the B (break) class patterns in
+@code{conn.db}.  There are two important uses for this field, which can be
+accessed by the autohelper functions @code{xcut()} and @code{ocut()}. The
+first use is to stop amalgamation in positions like
+
+@example
+
+..X..
+OO*OO
+X.O.X
+..O..
+
+@end example
+
+where X can play at * to cut off either branch. What happens
+here is that first connection pattern 6 finds the double cut
+and marks * as a cutting point. Later the C (connection) class
+patterns in conn.db are searched to find secure connections
+over which to amalgamate dragons.  Normally a diagonal
+connection would be deemed secure and amalgamated by connection
+pattern 3, but there is a constraint requiring that neither of
+the empty intersections is a cutting point.
+
+This is far from perfect. It would be better to amalgamate in either
+direction, preferably leaving the smallest part as a tail to save or
+sacrifice.
+
+The other use is to simplify making alternative connection patterns to
+the solid connection. Positions where the diag_miai helper thinks a
+connection is necessary are marked as cutting points by connection
+pattern 12. Thus we can write a connection pattern like @code{CC23c}:
+
+@example
+
+?xx?
+XO*?               straight extension to connect
+O..?
+
+:8,90,0,C,5,5,0,2,2,NULL
+
+?xx?
+XOb?
+Oa.?
+
+;xcut(a) && odefend_against(b,a)
+
+@end example
+
+where we verify that a move at @code{*} would stop the enemy from safely
+playing at the cutting point, thus defending against the cut.
+
+
+@node  Half Eyes, Distance and Strategic Distance , Connection, Dragon
+@comment  node-name,  next,  previous,  up
+@section Half Eyes and False Eyes
+
+A HALF EYE is a place where, if the defender plays first, and eye
+will materialize, but where if the attacker plays first, no eye will
+materialize. A FALSE EYE is a vertex which is surrounded by a
+dragon yet is not an eye. Here is a half eye:
+
+@example
+@group
+
+XXXXX
+OO..X
+O.O.X
+OOXXX
+
+@end group
+@end example
+
+Here is a false eye:
+
+@example
+@group
+
+XXXXX
+XOO.X
+O.O.X
+OOXXX
+
+@end group
+@end example
+
+The "topological" algorithm for determining half and false eyes
+is described elsewhere (@pxref{Eye Topology}).
+
+The half eye data is collected in the dragon array. Before this is
+done, however, an auxiliary array called half_eye_data is filled with
+information. The type is 0, or else HALF_EYE or FALSE_EYE depending on
+which type is found; and @code{(ki, kj)} points to a move to kill the half
+eye.
+
+@example
+@group
+
+struct half_eye_data half_eye[19][19];
+
+struct half_eye_data @{
+  int type;         /* HALF_EYE or FALSE_EYE; */
+  int ki;           /* (ki,kj) is the move to kill or live */
+  int kj;
+@};
+
+@end group
+@end example
+
+
+The arrays @code{half_eye[19][19]}, @code{half_eyei[19][19]} and
+@code{half_eyej[19][19]} are filled. First, @code{half_eye[m][n]} is zero
+unless a half eye or false eye is found at the empty vertex @code{(m,n)}; in
+this case, it is assigned the value @code{FALSE_EYE} or @code{HALF_EYE}, and
+(@code{half_eyei[m][n]}, @code{half_eyej[m][n]}) points to the dragon having
+the false or half eye.
+
+
+@node  Distance and Strategic Distance, Dragons, Half Eyes, Dragon
+@comment  node-name,  next,  previous,  up
+@section Distance and Strategic Distance 
+
+
+The DISTANCE from an empty vertex to black is the length of the
+shortest path from the vertex to any black stone, not passing through
+a white stone. The STRATEGIC DISTANCE is defined similarly except
+that the path may not pass through any liberty of any white stone,
+except possibly at the beginning. The distance or strategic
+distance is -1 (representating infinity) if no such path may be found.
+Distance and strategic distance to white are defined similarly.
+
+For example in the following diagram on the edge, the distance from the
+vertex at @code{a} to the color @code{X} is six:
+
+@example
+
+...........
+..X.XXOOO...
+...XOO.a.OO
+...........
+-----------
+
+@end example
+
+because we can find the following path of length 6 from @code{a} to @code{X}:
+
+@example
+
+...........
+..X.XXOOO...
+...6OO1a.OO
+...5432....
+-----------
+
+@end example
+
+The strategic distance is infinite, however. The above path is
+not admissible for strategic distance, because at 3 and 4 it
+passes through @code{O}'s liberties. The path at 1 also is an @code{O} 
+liberty but this is admissible since it is at the very beginning
+of the path.
+
+We maintain these data in the arrays @code{distance_to_black[19][19]}
+and @code{distance_to_white[19][19]}, and similarly for the
+strategic_distance. They may also be accessed by the functions
+@code{distance_to()} and @code{strategic_distance_to()} in @file{utils.c}.
+
+@node  Dragons, Dragons in Color, Distance and Strategic Distance, Dragon
+@comment  node-name,  next,  previous,  up
+@section Dragons
+
+The array @code{struct dragon_data dragon[19][19]} collects information
+about the dragons. We will give definitions of the various
+fields. Each field has constant value at each vertex of the
+dragon. We will define each field.
+
+@example
+
+struct dragon_data @{
+  int color;   
+  int origini; 
+  int originj; 
+  int borderi; 
+  int borderj; 
+  int size;
+  float effective_size;
+  int heyes;
+  int heyei;
+  int heyej;
+  int genus;
+  int escape_route;
+  int escape2;
+  int lunchi;       
+  int lunchj;
+  int status;
+  int safety;    
+  int vitality;
+  int semeai;
+@};
+
+@end example
+
+COLOR: For strings, this is @code{BLACK} or @code{WHITE}. 
+For caves, it is @code{BLACK_BORDER}, @code{WHITE_BORDER} or 
+@code{GRAY_BORDER}. The meaning of these concepts is the same as for worms.
+
+
+ORIGIN: The origin of the dragon is a unique particular vertex
+of the dragon, useful for determining when two vertices belong
+to the same dragon. Before amalgamation the worm origins are
+copied to the dragon origins. Amalgamation of two dragons
+amounts to changing the origin of one.
+        
+
+BORDER: This field is relevant for caves. If the color of the
+cave is @code{BLACK_BORDER} or @code{WHITE_BORDER} then the surrounding worms
+all have the same color @code{BLACK} or @code{WHITE} and these have been
+amalgamated into a dragon with origin @code{(borderi, borderj)}.
+
+
+SIZE: This is the cardinality of the dragon.
+
+
+HEYES: This is the number of half eyes the dragon has. A
+HALF EYE is a pattern where an eye may or may not materialize,
+depending on who moves first. If any half eyes are found,
+@code{(heyi,heyj)} points to a move which will create an eye.
+
+
+GENUS: The GENUS of a nonempty dragon consists of the number
+of distinct adjacent caves whose bordercolor is the color of
+the dragon, minus the number of false eyes found. The genus
+is a computable approximation to the number of eyes a dragon
+has.
+
+
+VALUE: A measure of the value of the dragon.
+
+
+ESCAPE ROUTE: The field @code{dragon[m][n].escape_route} is the maximum 
+value of @code{worm[i][j].liberties4} over the worms of the dragon.  This is a
+measure of the escape potential of the string.
+
+
+
+LUNCH: If @code{lunchi != -1}, then @code{(lunchi, lunchj)} points to a
+boundary worm which can be captured easily. In contrast with the worm version
+of this parameter, we exclude strings which cannot be saved.
+
+
+STATUS: An attempt is made to classify the dragons as @code{ALIVE}, @code{DEAD},
+@code{CRITICAL} or @code{UNKNOWN}. The @code{CRITICAL} classification means
+that the fate of the dragon depends on who moves first in the area. The exact
+definition is in the function @code{dragon_status()}. If the dragon is found
+to be surrounded, the status is @code{DEAD} if it has less than 1.5 eyes or if the
+reading code determines that it can be killed, @code{ALIVE} if it has 2 or more eyes,
+and @code{CRITICAL} if it has 1.5 eyes. A lunch generally counts as a half eye
+in these calculations. If it has less than 2 eyes but seems possibly
+able to escape, the status may be @code{UNKNOWN}.
+
+It is of the utmost importance accomplish this classification as
+accurately as possible. Unfortunately this is not easy.  A problem is
+that the algorithm described is that it occasionally classifies dragons
+as DEAD which can actually form two eyes.
+
+
+SAFETY: This is a field similar to @code{status} but more useful for some
+purposes. In @file{moyo.c} there is a heuristic test for weakness
+based on the influence of surrounding dragons. The safety field
+is the same as the status unless the status is @code{UNKNOWN}. If the status
+is @code{UNKNOWN} then @code{dragon.safety} is set to @code{CRITICAL} if it is
+found to be weak by the algorithm in @code{moyo.c}.
+
+
+VITALITY: A measure of the life potential of the dragon, used in @code{semeai()}.
+
+
+SEMEAI: true if the dragon is involved in a semeai (capturing race).
+
+@node Dragons in Color,  , Dragons, Dragon
+@comment  node-name,  next,  previous,  up
+@section Colored display
+
+You can get a colored ASCII display of the board in which each dragon
+is assigned a different letter; and the different @code{safety} values
+(@code{ALIVE}, @code{DEAD}, @code{UNKNOWN}, @code{CRITICAL}) have different
+colors. This is very handy for debugging.
+
+Save a game in sgf format using CGoban, or using the @option{-o} option with
+GNU Go itself.
+
+Open an @command{rxvt} window. (Xterm will not work. You may also use the
+Linux console.) 
+
+Execute:
+
+@command{gnugo -l [filename] -L [movenum] -T} to get the colored display.
+
+The color scheme: Green = @code{ALIVE}; Yellow = @code{UNKNOWN}; 
+White = @code{DEAD} and Red = @code{CRITICAL}. Worms which have been
+amalgamated into the same dragon are labelled with the same letter.
+
+Other useful colored displays may be obtained by using instead:
+
+@itemize @bullet
+@item the option -E to display eye spaces (@pxref{Eyes}).
+@item the option -m 1 to display territory (@pxref{Moyo}).
+@end itemize
+
+The colored displays are documented elsewhere (@pxref{Colored Display}).

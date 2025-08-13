@@ -1,0 +1,17 @@
+#
+# These are additions to the SGF spec- old commands and some others
+#
+
+#
+# outdated FF3 paramaters
+#
+BS
+WS
+ID
+RG
+SC
+
+#
+# and some random ones used by CGoban
+#
+SY

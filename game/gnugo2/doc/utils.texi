@@ -1,0 +1,160 @@
+Here are some common utility functions from @file{engine/utils.c}.
+
+@itemize @bullet
+@item @code{int pushgo()}
+@findex pushgo()
+@quotation
+Pushes the position onto the stack.
+@end quotation
+@item @code{int popgo()}
+@findex int popgo()
+@quotation
+Pops the movestack.
+@end quotation
+@item @code{int trymove(int i, int j, int color, const char *message, int k, int l)}
+@findex int trymove(int i, int j, int color, const char *message, int k, int l)
+@quotation
+Returns true if @code{(i,j)} is a legal move for color. In that case, it
+pushes the move on the stack and makes the move, incrementing
+@code{stackp}. If the reading code is recording reading variations (as
+with @option{--decide_string} or with @option{-o}), the string
+@code{*message} will be inserted in the SGF file as a comment. The
+comment will also refer to the string at @code{(k,l)} if these are not
+@code{(-1,-1)}.
+Use like this:
+@example
+@group
+
+   if (trymove(i, j, color, [message], k, l)) @{
+        ...
+        popgo();
+   @}   
+
+@end group
+@end example
+@end quotation
+@item @code{int TRY_MOVE()}
+@findex int TRY_MOVE()
+@quotation
+Wrapper around trymove which suppresses @code{*message} and @code{(k,l)}.
+Used in @file{helpers.c}
+@end quotation
+@item @code{tryko(int i, int j, int color, const char *message)}
+@findex tryko(int i, int j, int color, const char *message)
+@quotation
+Pushes the position onto the stack, and makes a move at @code{(i,j)} of
+@code{color}. The move is allowed even if it is an illegal ko capture.
+It is to be imagined that @code{color} has made an intervening ko threat
+which was answered and now the continuation is to be explored.
+@end quotation
+@item @code{dump_stack(void)}
+@findex dump_stack(void)
+@quotation
+Handy for debugging the reading code under GDB. Prints the move stack.
+@end quotation
+@item @code{vgprintf(FILE* outputfile, const char *fmt, va_list ap)}
+@findex vgprintf(FILE* outputfile, const char *fmt, va_list ap)
+@quotation
+This function underpins all the @code{TRACE} and @code{DEBUG} stuff.
+Accepts @code{%c}, @code{%d} and @code{%s} as usual. But it also accepts
+@code{%m}, which takes TWO integers and writes a move @strong{NASTY
+BODGE}: @code{%o} at start means outdent (ie cancel indent).
+@end quotation
+@item @code{void TRACE(const char *fmt, ...)}
+@findex void TRACE(const char *fmt, ...)
+@quotation
+Basic tracing function. Variants @code{RTRACE}, etc. are documented in the source.
+@end quotation
+@item @code{int legal(int i, int j, int color)}
+@findex int legal(int i, int j, int color)
+@quotation
+Returns true if @code{(i,j)} is legal for @code{color}.
+@end quotation
+@item @code{int count(int i, int j, int color, char mx[MAX_BOARD][MAX_BOARD], int maxlib, char mark)}
+@findex int count(int i, int j, int color, char mx[MAX_BOARD][MAX_BOARD], int maxlib, char mark)
+@quotation
+Count liberties of color piece at location @code{(i, j)} and return
+value in global variable @code{lib} (which is also the return value of
+the function). Return size of connected component in @code{size}. If
+@code{k<lib}, then @code{(libi[k],libj[k])} points to one of the
+liberties of the string. @strong{FIXME}: We should get rid of these
+global variables. This function is usually called with a stone of
+@code{color} at @code{(i,j)}. It may also be called with @code{(i,j)}
+@code{EMPTY}. If this is the case, the function (essentially) places a
+stone of (color) on the board and does the calculation.
+@end quotation
+@item @code{void change_dragon_status(int x, int y, int status)}
+@findex void change_dragon_status(int x, int y, int status)
+@quotation
+Change the status of the dragon at @code{(x,y)}.
+@end quotation
+@item @code{void change_defense(int ai, int aj, int ti, int tj)}
+@findex void change_defense(int ai, int aj, int ti, int tj)
+@quotation
+Moves the point of defense of @code{(ai, aj)} to @code{(ti, tj)}.
+@strong{FIXME}: At present can only set defend_code equal to 1 or 0.
+@end quotation
+@item @code{void change_attack(int ai, int aj, int ti, int tj)}
+@findex void change_attack(int ai, int aj, int ti, int tj)
+@quotation
+Moves the point of attack of the worm at @code{(ai, aj)} to @code{(ti, tj)}.
+@strong{FIXME}: At present can only set attack_code equal to 1 or 0.
+@end quotation
+@item @code{int connection_value(int ai, int aj, int bi, int bj, int ti, int tj)}
+@findex int connection_value(int ai, int aj, int bi, int bj, int ti, int tj)
+@quotation
+This important function assigns a value to the connection of two dragons. 
+The move at @code{(ti,tj)} is the connecting move. It is checked whether
+this move will result in a dragon having two eyes.
+@end quotation
+@item @code{int cut_possible(int i, int j, int color)}
+@findex int cut_possible(int i, int j, int color)
+@quotation
+Returns true if color can cut at @code{(i,j)}. This information is
+collected by @code{find_cuts()}, using the @code{B} patterns in the
+connections database.
+@end quotation
+@item @code{int does_attack(int ti, int tj, int ai, int aj)}
+@findex int does_attack(int ti, int tj, int ai, int aj)
+@quotation
+Returns true if the move at @code{(ti, tj)} attacks @code{(ai, aj)}. This
+means that it captures the string, and that @code{(ai, aj)} is not already
+dead. As currently written, this function assumes @code{stackp==0}, though
+this could be easily changed.
+@end quotation
+@item @code{int does_defend(int ti, int tj, int ai, int aj)}
+@findex int does_defend(int ti, int tj, int ai, int aj)
+@quotation
+Returns true if the move at @code{(ti, tj)}
+defends @code{(ai, aj)}. This means that it defends the string, and that
+@code{(ai, aj)} can be captured if no defense is made. As currently
+written, this function assumes @code{stackp==0}, though this could be
+easily changed.
+@end quotation
+@item @code{int find_lunch(int m, int n, int *wi, int *wj, int *ai, int *aj)}
+@findex int find_lunch(int m, int n, int *wi, int *wj, int *ai, int *aj)
+@quotation
+Looks for a worm adjoining the string at @code{(m,n)} which can be easily
+captured. Whether or not it can be defended doesn't matter
+(@pxref{Dragon}). Returns the location of the string in @code{(*wi, *wj)}, and the
+location of the attacking move in @code{(*ai, *aj)}.
+@end quotation
+@item @code{int is_ko(int i, int j, int color)}
+@findex int is_ko(int i, int j, int color)
+@quotation
+Return true if the move @code{(i,j)} by @code{color} is a ko capture
+(whether capture is a legal ko capture on this move or not).
+@end quotation
+@item @code{int singleton(int i, int j)}
+@findex int singleton(int i, int j)
+@quotation
+Return true if @code{(i,j)} is an isolated stone.
+@end quotation
+@item @code{int confirm_safety(int i, int j, int color, int value)}
+@findex int confirm_safety(int i, int j, int color, int value)
+@quotation
+This important function will detect some blunders.  Returns 1 if a move by
+@code{color} at @code{(i,j)} does not diminish the safety of any worm, nor
+tend to rescue inadvertantly an opponent stone.
+@end quotation
+@end itemize

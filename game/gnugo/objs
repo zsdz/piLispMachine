@@ -1,0 +1,4 @@
+count countlib endgame eval exambord findcolr findnext +
+findopen findpatn findsavr findwinr fioe genmove +
+getij getmove initmark main matchpat opening openregn +
+sethand showbord showinst suicide

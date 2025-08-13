@@ -14,6 +14,34 @@ It seems rpi4 need kernel's name is `kernel8.img`.You may edit circle or circle-
 in `config.txt`,I tryed but there is no effort
 )
 
+Makefile include the Rules.mk:
+
+```
+include $(CIRCLEHOME)/Rules.mk
+```
+
+I have edit it,change
+```
+else ifeq ($(strip $(RASPPI)),4)
+ARCHCPU	?= -mcpu=cortex-a72 -mlittle-endian
+ARCH	+= -DAARCH=64 $(ARCHCPU)
+TARGET	?= kernel8-rpi4
+```
+
+to
+```
+TARGET	?= kernel8
+```
+
+but it's not necessary to do this
+
+I can't put erverythin under project's root folder.To compiler the files under folder game,I add this to `Rules.mk`
+
+```
+%.d: game/TicTacToe/%.cpp
+	@$(CPP) $(CPPFLAGS) -M -MG -MT $*.o -MT $@ -MF $@ $<
+```
+
 ## Install
 
 I have only run the img under rpi4b.I don't know if it can run on other rpi model(if it can,the img file name should be change)
@@ -156,6 +184,11 @@ and the microlisp seems read the expression from stdin every single char,better 
 - [ ] The lisp interpreter itself can manage the memery,need to learn the detail,and let the lisp's memery manage way to be the OS's memery manage way
 
 - [ ] It's better be a chess and a go game,start it using (chess) and (go)
+
+I have port gnugo1.2,you can use (go) to play.But it played too low.so it's only "seems can play"(details can find in game/README.md):
+![1](./pic/gnugo1.2.jpg)
+
+You can use (ttt) to play TicTacToe
 
 - [ ] There is other rpi4b function,like opengl,may be can try them.
 

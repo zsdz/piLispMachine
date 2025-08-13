@@ -28,6 +28,7 @@ int main (void)
 		return EXIT_HALT;
 	}
 	
+	
 	CStdlibApp::TShutdownMode ShutdownMode = Kernel.Run ();
 
 	Kernel.Cleanup ();

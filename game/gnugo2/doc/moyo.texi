@@ -1,0 +1,762 @@
+
+@menu
+* Bouzy::                       Bouzy's 5/21 algorithm. 
+* Implementation::              Implementation.
+* 5/21 Territory::              Estimation of territory.
+* 5/10 Moyo::                   Estimation of moyos.
+* 4/0 Area::                    Influence.
+* Weak groups::                 Weak groups.
+* Big move::                    Estimation of big global moves.
+* Caching::                     Caching of delta_*_color() functions.
+@end menu
+
+The file @file{moyo.c} contains algorithms for the computation of
+a number of useful things. Most can be displayed visually using
+the @option{-m} option (@pxref{Colored Display}).
+
+@node Bouzy, Implementation, Moyo, Moyo
+@comment  node-name,  next,  previous,  up
+@section Bouzy's 5/21 algorithm
+
+Bouzy's dissertation is available at:
+
+@url{ftp://www.joy.ne.jp/welcome/igs/Go/computer/bbthese.ps.Z}
+
+It contains an algorithm inspired by prior work of Zobrist and ideas from
+computer vision for determining territory. This algorithm is based on two
+simple operations, DILATION and EROSION. Applying dilation 5 times and erosion
+21 times determines the territory.
+
+To get a feeling for the algorithm, take a position in the early
+middle game and try the colored display using the @option{-m 1} option
+in an RXVT window. The regions considered territory by this algorithm
+tend to coincide with the judgement of a strong human player.
+
+Before running the algorithm, dead stones (@code{dragon.status==0}) 
+must be "removed."
+
+Referring to page 86 of Bouzy's thesis, we start with a function
+taking a high value (ex : +128 for black, -128 for white) on stones on
+the goban, 0 to empty intersections. We may iterate the following
+operations:
+
+@strong{dilation} : for each intersection of the goban, if the intersection
+is >= 0, and not adjacent to a <0 one, then add to the intersection
+the number of adjacent >0 intersections. The same for other color : if
+the intersection is <=0, and not adjacent to a >0 one, then sub to
+it the number of <0 intersections.
+
+@strong{erosion} : for each intersection >0 (or <0), substract (or add) the
+number of adjacent <=0 (or >=0) intersection. Stop at zero.
+
+It's unbelievable, but it works.
+
+the algorithm is just : 5 dilations, then 21 erosion. The number of
+erosions should be 1+n(n-1) where n=number of dilation, since this
+permit to have an isolated stone to give no territory. Thus the
+couple 4/13 also works, but it is often not good, for example when
+there is territory on the 6th line.
+
+For example, let us start with a tobi. 
+
+@example
+
+           128    0    128   
+
+@end example
+
+1 dilation :
+
+@example
+@group
+
+            1          1 
+
+       1   128    2   128   1
+
+            1          1
+
+@end group
+@end example
+            
+2 dilations :
+
+@example
+@group
+
+            1          1
+
+       2    2     3    2    2
+
+   1   2   132    4   132   2   1
+
+       2    2     3    2    2
+              
+            1          1
+
+@end group
+@end example
+
+3 dilations :
+
+@example
+@group
+
+            1          1
+
+       2    2     3    2    2
+     
+   2   4    6     6    6    4   2
+
+1  2   6   136    8   136   6   2   1
+
+   2   4    6     6    6    4   2
+
+       2    2     3    2    2
+
+            1          1
+
+@end group
+@end example
+
+and so on...
+
+Next, with the same example 
+
+3 dilations and 1 erosion :
+
+
+@example
+@group
+
+             2     2     2
+
+    0   4    6     6     6    4
+
+0   2   6   136    8    136   6    2
+
+    0   4    6     6     6    4
+
+             2     2     2
+
+@end group
+@end example
+
+
+3 dilations and 2 erosions :
+
+@example
+@group
+
+                 1
+
+      2    6     6     6    2
+
+      6   136    8    136   6
+
+      2    6     6     6    2
+      
+                 1
+
+@end group
+@end example
+
+3 dil. / 3 erosions :
+
+
+@example
+@group
+
+           5     6     5
+
+      5   136    8    136   5
+      
+           5     6     5
+           
+@end group
+@end example
+           
+3/4 :
+
+
+@example
+@group
+
+          3     5     3 
+          
+      2  136    8    136   2          
+           
+          3     5     3
+          
+@end group
+@end example
+          
+3/5 :
+
+@example
+@group
+
+          1     4     1
+
+         136    8    136
+          
+          1     4     1
+          
+@end group
+@end example
+
+3/6 :
+
+@example
+@group
+
+                3
+         
+         135    8    135
+         
+                3
+
+@end group
+@end example
+
+3/7 :
+
+@example
+@group
+
+         132    8    132
+         
+@end group
+@end example
+
+I interpret this as a 1 point territory.
+
+@node  Implementation, 5/21 Territory, Bouzy, Moyo
+@comment  node-name,  next,  previous,  up
+@section Implementation
+
+The file moyo.c currently uses this algorithm by three ways : 5/21 for
+territory evaluation, 5/10 for moyo evaluation, and 4/0 for "area
+ownership", aka "big moyo" and meta cut/connect. Beware, these
+evaluations don't care of the life and death status of groups. It's
+only a "graphical" analysis of areas of influence.
+
+After dragon evaluation, the function @code{make_moyo()} is called
+once to make the static evaluation of the goban : @code{make_moyo()}
+returns the difference in estimated territory (@code{terri_eval[0]})
+and computes @code{terri_eval[3]} and @code{moyo_eval[3]}. It also
+computes the @code{area_grid} for area ownership & (future) weak group
+analysis. All functions assume that stones evaluated @code{DEAD} in
+the Dragon structure are really dead, and act as they were removed
+from the board.  Technically, the dilations are made with binary
+operators (one row of the goban is stored in two integer, one black
+and one white), then the result is stored in a classical array
+@code{[19][19]} for the erosion computation.
+
+These functions can be used with a color argument whose value is for
+current player or for opponent color: @code{delta_terri},
+@code{diff_terri}, @code{delta_terri_color}, @code{delta_moyo},
+@code{diff_moyo}, @code{delta_moyo_color}, @code{meta_connect}
+and @code{delta_area_color}.
+
+The 5,21,10 ... values are stored in the constants:
+
+@example
+#define MAX_DILAT 5
+#define MAX_ERODE 21
+/* 4 or 5 */
+#define MOY_DILAT 5    /* for delta_moyo */
+/* must MOY_ERODE <= MAX_ERODE if MOY_DILAT != MAX_DILAT*/
+#define MOY_ERODE 10
+
+/* number of dilation for area ownership, must be <= MAX_DILAT */
+#define OWNER_DILAT 4
+@end example
+
+@node  5/21 Territory, 5/10 Moyo, Implementation, Moyo
+@comment  node-name,  next,  previous,  up
+@section 5/21 : territory
+
+As we have seen, 5 dilations/21 erosions produces GNU Go's
+image of territory. These values are determined by the following 
+considerations:
+
+@itemize @bullet
+@item 5 dilations permit one to be sure of influence on very large scale
+@item 21 erosions induce that "isolated" stones don't make territory, they only
+opponent territory
+@item at the end of the game, the evaluated territory matches the actual score.
+@end itemize
+
+the public functions are :
+
+@itemize @bullet
+@item @code{int delta_terri(int ti, int tj, int color)}
+@quotation
+@itemize @minus
+@item test the ti tj move as regards territorial evaluation. This evaluation
+take care of captures, but no komi is added. The returned value is
+the difference in territorial evaluation between terri_test and first
+call to @code{make_moyo()} the evaluation is for "color - OTHER_COLOR".
+@item Tested values are cached, if different patterns test the same ti tj,
+no extra computation is needed.
+@strong{Note}: this function is not really used in GNU Go : future usage could be
+for a end game module, or for displaying who has the lead in the game.
+@end itemize
+@end quotation
+@item @code{int diff_terri(int ti, int tj, int color)}
+@quotation
+wrapper for : delta_terri(..,color)+delta_terri(..,other_color)
+@end quotation
+@item @code{int terri_color(int m,int n)}
+@quotation
+returns the color (WHITE,BLACK,EMPTY) of the m,n intersection, as seen
+by the 5/21 algorithm. This is a public access to already computed 
+values during make_moyo().
+@end quotation     
+@item @code{int delta_terri_color(int ti,int tj, int color, int m, int n)}
+@quotation
+returns the color @code{(WHITE,BLACK,EMPTY)} of the @code{m,n}
+intersection, as seen by the 5/21 algorithm, after a test move in
+@code{ti,tj}. The values of this function are computed and cached
+during the @code{delta_terri()} evaluation.  Calling this function
+also computes and cache @code{delta_terri()}.  (See Note about caching
+@code{delta_*_color()} functions.)
+@end quotation          
+@end itemize
+
+@format
+extern variables :
+
+
+@code{int terri_eval[3]} computed once by @code{make_moyo()}
+   @code{terri_eval[WHITE]} : white territory
+   @code{terri_eval[BLACK]} : black territory
+   @code{terri_eval[0]} : difference in territory (color - other_color)
+   
+@code{int terri_test[3]} computed by @code{delta_terri()}
+   @code{terri_test[WHITE]} : territory evaluation from @code{delta_terri()} for BLACK
+   @code{terri_test[BLACK]} : territory evaluation from @code{delta_terri()} for WHITE
+   @code{terri_test[0]} : return of @code{delta_terri()}, difference in territorial
+   evaluation between @code{terri_test()} and first call to @code{make_moyo()}.
+@end format
+
+   
+Sample: @samp{b} marks black's estimated territory (@samp{X}), @samp{w}
+or White (@samp{O}).
+
+White to play : a move to J11 will bring +7 territorial balance.
+
+@example
+@group
+
+   A B C D E F G H J K L M N
+13 b b b b . . . . . . . . . 13
+12 b b b X b . . . . . . . . 12
+11 b b b b b . . . . . O . . 11
+10 b b b X b . . . . . . . . 10
+ 9 b b b b . . . . . . X . . 9
+ 8 b b X b . . . . . . . . . 8     White territory 22
+ 7 b b b . . . . . . . . . . 7
+ 6 . b b . . . . . . . . . . 6     Black territory 30
+ 5 . . b . . . . . . . O . . 5
+ 4 . . . X . . . . w w w w w 4   
+ 3 . . . . . . O w w O w w w 3
+ 2 . . . . . . . w w w w w w 2
+ 1 . . . . . . . w w w w w w 1
+   A B C D E F G H J K L M N
+
+@end group
+@end example
+   
+delta_terri :
+
+@example
+@group
+
+ 20 21 20 19 11 10 10  8  7  6  3  4  3
+ 23 23 21  X 12 11 13 10  8  6  3  3  4
+ 25 26 25 22 10 11  8  8  7  6  O  5  5
+ 24 26 27  X  9  8  8  5  5  2  3  7  7
+ 25 27 26 13 10  7  7  7  5  4  X 11  8
+ 23 25  X 12 10  9  6  8  5  6  5 10  5
+ 21 19 18 13 11 11 11 10  6  5  5  4  5
+ 14 14 14 13 11 12 13  7  5  2  2  2  2
+ 14 12 11 11 12 11  7  5  2  0  O  1  1
+ 11 10  9  X  9  5  4  2  0 -1 -1 -1  1
+  9  8 14  7  4  3  O -1 -1  O -1 -1 -1
+  8  7  6  7  6  2  1 -1 -1 -1 -1 -1 -1
+  5  4  5  4  3  2  1  0 -1 -1 -1 -1 -1
+
+@end group
+@end example
+
+@node  5/10 Moyo, 4/0 Area, 5/21 Territory, Moyo
+@comment  node-name,  next,  previous,  up
+@section 5/10 : moyo
+
+5 dilations and 10 erode give a value we call MOYO. Moyo has an
+advantage over territory (5/21) since it permits immediate 
+computation of the value of a move. It is intended to be used in
+conjunction with some patterns as an helper. The value 5 and 10 are
+empiric, other could have a similar effect : 4/8, 5/9 , etc...  Using
+5 dilation permit to use some common results with territorial
+evaluation 5/21. The moyo evaluation does not count prisonners nor
+komi, but takes in account dragon @code{DEAD} stones.
+
+the public functions are :
+
+@itemize @bullet
+@item @code{int delta_moyo(int ti, int tj, int color)}
+@quotation
+@itemize @minus
+@item test the ti tj move as regards moyo evaluation.  The returned value 
+is the difference in territorial evaluation between moyo_test and first
+call to make_moyo() the evaluation is for "color - OTHER_COLOR".
+@item Tested values are cached, if different patterns test the same ti tj,
+no extra computation is needed.
+@end itemize
+@end quotation
+@item @code{int diff_moyo(int ti, int tj, int color)}
+@quotation
+wrapper for : @code{delta_moyo(..,color) + delta_moyo(..,other_color)}
+@end quotation
+@item @code{int moyo_color(int m,int n)}
+@quotation
+returns the color (WHITE,BLACK,EMPTY) of the m,n intersection, as seen
+by the 5/10 algorithm. This is a public access to already computed 
+values during make_moyo().
+@end quotation     
+@item @code{int delta_moyo_color(int ti,int tj, int color, int m, int n)}
+@quotation
+returns the color (WHITE,BLACK,EMPTY) of the m,n intersection, as seen
+by the 5/10 algorithm, after a test move in ti,tj. The values of this
+function are NOT cached during the delta_moyo() evaluation. But calling
+this function caches his result for future call, and also computes and 
+cache @code{delta_moyo(ti,tj,color)}.
+(See note about caching @code{delta_*_color()} functions.)
+@end quotation
+@end itemize
+
+@format
+extern variables :
+
+@code{int moyo_eval[3]} is computed once by @code{make_moyo()}
+   @code{moyo_eval[WHITE]} : white moyo evaluation 
+   @code{moyo_eval[BLACK]} : black moyo evaluation
+   @code{moyo_eval[0]} : difference in moyo (color - other_color)
+   
+@code{int moyo_test[3]} is computed by delta_moyo for testing one move   
+   @code{moyo_test[WHITE]} : white moyo evaluation from @code{delta_moyo()}
+   @code{moyo_test[BLACK]} : ...
+   @code{moyo_test[0]} : return of @code{delta_moyo()}, difference in
+     moyo between test moyo and first moyo evaluation (color - other_color)
+@end format
+
+Example: white to play. A move at F4 would increase moyo balance by 20
+points for white.
+
+@example
+@group
+
+   A B C D E F G H J K L M N
+13 b b b b b b b b b b . . . 13
+12 b b b b b b b b b b . . . 12
+11 b b b b X b b b b b . . . 11
+10 b b X b b b b b b X . . . 10
+ 9 b b b b b b . . . . . . . 9
+ 8 b b b b b . . . . . O w . 8     White territory 18
+ 7 . . b X b . . . . . w w w 7
+ 6 . . . . . . . . . w w w w 6     Black territory 32
+ 5 . . . . . . . . . w w w w 5
+ 4 . . w O w . . . w w w w w 4   W/B moyo 36/50 : -14
+ 3 . . w w w w . . w w O w w 3
+ 2 . . . w . . . . . w w w w 2
+ 1 . . . . . . . . . w w w w 1
+   A B C D E F G H J K L M N
+
+@end group
+@end example
+   
+@code{delta_moyo} :
+
+@example
+@group
+
+ 15 17 19 23 24 26 21 21 18 19 15 11  9
+ 18 20 20 24 29 29 24 23 20 21 20 14  8
+ 17 23 19 16  X 26 33 31 21 19 25 14  8
+ 16 20  X 15 16 35 34 32 29  X 13 10  5
+ 16 16 18 15 16 17 23 39 19  7  4  4  2
+ 15 16 13 29 17 25 24 20 12  6  O  0  0
+ 14 16 17  X 23 23 21 18 14  6  1  0  0
+ 20 13 13 13 16 19 31 14 11  7  3  0  0
+ 17 16  6  8  9 25 25 23  8  5  2 -1  0
+ 13 14 12  O 17 20 21 19 17  3  2 -1 -1
+ 11 11  9 22 13 17 17 17 16 14  O -1 -1
+ 11  9 21 20 21 13 16 15 14 12 12 -1 -1
+  9 21 20 20 20 21 13 14 12 12 12 12 -1
+
+@end group
+@end example
+
+
+@node 4/0 Area, Weak groups, 5/10 Moyo, Moyo
+@comment  node-name,  next,  previous,  up
+@section 4/0 : area ownership
+
+This algorithm finds areas of influence, something bigger than classical moyo,
+with light connection between stones. This tool is intended to find weak 
+and strong groups very early in the game. Currently it is used as an helper
+to find moves who cut ot connect these areas at a large scale. This module
+of GNU Go will probably evolve.
+
+The first use will be to test if a tested move will :
+
+@itemize @bullet
+@item cut one opponent group in two (without creating an isolated stone)
+@item meta-connect two groups
+@end itemize
+
+The public functions are :
+
+@itemize @bullet
+@item @code{int area_stone(int m,int n)}
+@item @code{int area_space(int m,int n)}
+@item @code{int area_color(int m,int n)}
+@quotation
+these functions return the number of stones, empty spaces and the color
+of the area around the m n intersection. They are just wrapper function
+to get data already stored in tables computed by @code{make_moyo()}.
+@end quotation
+@item @code{int area_tag(int m,int n)}
+@item @code{void set_area_tag(int m,int n,int tag)}
+@quotation
+these funtions (currently unused) are wrappers to access to a tag value
+associated with an area (for example his weakness).
+@end quotation
+@item @code{int meta_connect(int ti, int tj,int color)}
+@quotation
+Test one move @code{(ti, tj)} for its effect upon area---if the number of
+distinct areas of each color changes, we can detect some of these events:
+@itemize @minus
+@item cut one opponent group in two (without creating an isolated stone)
+@item meta-connect two groups of player color
+@end itemize
+meta_connect returns 15 point for each connection and 10 point for each
+cut. The objective is to give GNU Go the ability to lauch early attacks
+on weak groups, and connect his own groups. @strong{Note}: the area
+ownership algorithm is a little more complex than 5/21 or 5/10, for
+two reasons: we need to correctly analyse the connection of two areas
+by a secure kosumi stone, and the sum of areas is computed by recursive functions.
+@end quotation
+@item @code{int delta_area_color(int ti,int tj, int color, int m, int n)}
+@quotation
+returns the color (@code{WHITE}, @code{BLACK}, @code{EMPTY}) of the @code{(m, n)} 
+intersection, as seen by the 4/0 algorithm, after a test move in
+@code{(ti,tj)}. The values of this function are NOT cached during the
+meta_connect() evaluation. But calling this function caches his result
+for future call, and also computes and cache @code{meta_connect(ti,tj,color)}. 
+(See note about caching @code{delta_*_color()} functions.)  
+@end quotation
+@end itemize
+               
+The values for cutting/connecting can be changed (all this need tuning):
+
+@example
+
+/* number of bonus points for each group connected and opponent 
+   group cut 
+*/
+#define GR_BONUS_CONNECT 15
+#define GR_BONUS_CUT 10
+
+@end example
+
+Sample: 
+
+The 'b' black area are changed to '-' for readibility. A white move at
+K5 got 25 points : this means that meta_connect thinks it would separate
+the J3 stone from K10, and connect the white stones together:
+
+@example
+@group
+
+   A B C D E F G H J K L M N
+13 . . - - . w w . - - - . . 13
+12 . - - - . w w . - - - - . 12
+11 - - - - . w w . - - - - - 11
+10 - - - X . O w . - X - - - 10
+ 9 - - - - . w w . - - - - - 9
+ 8 - - X - - w w . - - - - . 8     White territory 2
+ 7 - - - - - w w . - - w w . 7
+ 6 - - - . . w . - - w w w w 6     Black territory 4
+ 5 . . . w w w - - - w w w w 5
+ 4 w w w w w w - - - w O w w 4   W/B moyo 19/24 : -5
+ 3 w w w O w w - - X - w w w 3
+ 2 w w w w w w - - - - w w w 2
+ 1 . w w w w w - - - - w w . 1
+   A B C D E F G H J K L M N
+
+@end group
+@end example
+   
+area 2  A11: color B,  2 stone  28 spaces
+area 4  A4: color W,  2 stone  39 spaces
+area 9  G5: color B,  2 stone  46 spaces
+area 11  K6: color W,  1 stone  21 spaces
+
+@code{meta_connect} :
+
+@example
+@group
+
+  .  .  .  .  .  .  .  .  .  .  .  .  .
+  .  .  .  .  .  .  .  .  .  .  .  .  .
+  .  .  .  .  .  .  .  .  .  .  .  .  .
+  .  .  .  X  .  O  . 10 10  X  .  .  .
+  .  .  .  .  .  . 10 10 25 25 10  .  .
+  .  .  X  .  . 10 10 25 25 25 25 10  .
+  .  .  .  . 10 10 10 25 25 25 25 25  .
+  .  .  .  .  . 10 25 25 25 25 25 10  .
+  .  .  .  .  .  . 25 25 25 25 10  .  .
+  .  .  .  .  .  .  . 25 25 10  O  .  .
+  .  .  .  O  .  .  .  .  X  .  .  .  .
+  .  .  .  .  .  .  .  . 15  .  .  .  .
+  .  .  .  .  .  .  . 15 15 15  .  .  .
+
+@end group
+@end example
+
+
+After white K5, black played G3, now playing in the center could connect
+all white forces.
+
+@example
+@group
+
+   A B C D E F G H J K L M N
+13 . . - - . w w . - - - . . 13
+12 . - - - . w w . - - - - . 12
+11 - - - - . w w . - - - - - 11
+10 - - - X . O w . - X - - - 10
+ 9 - - - - . w w . - - - - - 9
+ 8 - - X - - w w . - - - - . 8     White territory 1
+ 7 - - - - - w . w w w w w . 7
+ 6 - - - . . . - w w w w w w 6     Black territory 4
+ 5 . . . w w - - w w O w w w 5
+ 4 w w w w w - - - - w O w w 4   W/B moyo 17/26 : -9
+ 3 w w w O w - X - X - w w w 3
+ 2 w w w w w - - - - - w w w 2
+ 1 . w w w w - - - - - w w . 1
+   A B C D E F G H J K L M N
+
+@end group
+@end example
+   
+area 2  A11: color B,  2 stone  28 spaces
+area 4  A4: color W,  1 stone  20 spaces
+area 8  F13: color W,  1 stone  12 spaces
+area 9  F5: color B,  2 stone  20 spaces
+area 12  H7: color W,  2 stone  27 spaces
+area 13  J13: color B,  1 stone  25 spaces
+
+meta_connect :
+
+@example
+@group
+
+  .  .  .  .  .  .  .  .  .  .  .  .  .
+  .  .  .  .  .  .  .  .  .  .  .  .  .
+  .  .  .  .  .  .  . 15  .  .  .  .  .
+  .  .  .  X  .  O 15 15 15  X  .  .  .
+  .  .  .  . 15 30 15 15 15 15 15  .  .
+  .  .  X 15 30 30 30 15 15 15 15  .  .
+  .  . 15 30 30 30 30 30 15 15 15  .  .
+  .  . 15 30 30 30 30 30 15 15  .  .  .
+  .  .  . 15 30 30 30 30 15  O  .  .  .
+  .  .  .  . 15 30 30 15  .  .  O  .  .
+  .  .  .  O  . 15  X 10  X  .  .  .  .
+  .  .  .  .  .  .  .  .  .  .  .  .  .
+  .  .  .  .  .  .  . 15  .  .  .  .  .
+
+@end group
+@end example
+
+
+@node Weak groups, Big move, 4/0 Area, Moyo
+@comment  node-name,  next,  previous,  up
+@section Weak groups
+
+Dragon SAFETY is a modification of the dragon STATUS that
+takes into account the weakness of groups, as found by
+this algoritm.
+
+Weak dragons with @code{dragon[m][n].status == UNKNOWN}
+
+are tagged by 
+
+@code{dragon[m][n].safety = CRITICAL}
+
+These are defined as having 2 or more stones with between 0 and 20
+points of area, computed using the 4/0 algorithm.
+
+Function:
+
+@code{int number_weak(int color)}: returns the number of weak groups
+found for one color.
+
+
+@node Big move, Caching, Weak groups, Moyo
+@comment  node-name,  next,  previous,  up
+@section Big move priority
+
+(experimental) the use of search_big_move function aim to evaluate the 
+value of moves by an empiric rule. Then, if the move proposed by genmove()
+got a lower priority, the big_move is played. Use option -p fearless to 
+select it.
+
+@itemize @bullet
+@item @code{int very_big_move[3]}
+@quotation
+public variable, contains the best territorial move found, value and position.
+@end quotation
+@item @code{void search_big_move(int ti, int tj, int color, int val)}
+@quotation
+evaluate a proposed move, and keep it if it's the bigger found
+current evaluation rule : @code{dt * 0.9 + 15 + val * 0.7}, 
+where @code{val} is the value of the move as proposed by @code{shapes()}
+and other modules, and @code{dt} is @code{diff_terri(ti,tj,color)}.
+@end quotation   
+@end itemize
+
+
+
+@node Caching,  , Big move, Moyo
+@comment  node-name,  next,  previous,  up
+@section Caching of delta_*_color() functions
+
+This 3 functions use the same goban stack for storing their results. The
+stack size is :
+
+@example
+
+#define COLOR_STACK_SIZE 70
+static goban_t boardstack[COLOR_STACK_SIZE];
+
+@end example
+
+This is intentionally left low to minimise memory usage. When the stack 
+is full, the older values are suppressed when a new need of storage come.
+(the stored values are available during one "movenum" turn)
+
+@itemize @bullet
+@item Every call to @code{delta_terri(ti,tj,color)} uses a stack level, available for
+  further @code{delta_terri_color(ti,tj,color,?,?)} call.
+@item Since @code{delta_moyo()} (and @code{meta_connect}) are often called, they do not store 
+their result in this stack every time---only when the @code{delta_*_color()} is 
+called.
+@end itemize
+  
+@strong{Beware}: all dead groups are considered as removed for these functions !
+

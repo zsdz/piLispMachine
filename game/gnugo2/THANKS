@@ -1,0 +1,12 @@
+                      Acknowledgements
+
+We would like to thank Jean-Louis Martineau, Piotr Lakomy and Paul
+Leonard for helpful correspondence. Thanks to everyone who stepped on a
+bug (and sent us a report)!
+
+Thanks to Peter Gucwa, Heikki Levanto, Michael Margolis and Gary Boos
+for help with Visual C++.
+
+We would like to thank Stuart Cracraft, Richard Stallman and Man Li for
+their interest in making this program a part of GNU, William
+Shubert for writing CGoban and gmp.c and Rene Grothmann for Jago.

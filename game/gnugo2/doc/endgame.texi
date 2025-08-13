@@ -1,0 +1,109 @@
+
+Endgame moves are generated just like any other move by GNU
+Go. In fact, the concept of endgame does not exist
+explicitly, but we can consider the endgame to be reached
+when the move values generally have decreased to about 20
+and the endgame patterns come into play. This is typically
+fairly late, when most of the remaining plays are worth a
+few points in gote.
+
+It should be noted that GNU Go currently makes no attempt
+whatsoever to play a theoretically perfect endgame. Instead
+the goal is just to play a decent, although maybe somewhat
+passive, endgame. What this means is primarily to play the
+small endgame moves in roughly the right order.
+
+The endgame is implemented by a number of patterns in
+@file{patterns.db}, classified as EE, edge endgame, or CE, center
+endgame. In order to play the endgame moves in the right
+order, the patterns should be valued according to a
+pessimistic estimation of the size of the move. If the move
+is gote or reverse sente, it should have a value given by
+the table below.
+
+@format
+
+Value   Size
+1       Fill dame, i.e. 0 points gote.
+2       Fill or take an unimportant ko, 1/2 point gote.
+3       1 point gote.
+4       1 1/2 point gote, typically two stage unimportant ko
+        or 1 point gote with a followup of one more point
+        gote. 
+5       2 points gote or 1 point reverse sente.
+7       3 points gote.
+10      4 points gote or 2 points reverse sente.
+15      About 6 points gote or 3 points reverse sente.
+20      At least 8 points gote or at least 4 points reverse
+        sente. 
+
+@end format
+
+Small sente moves should be valued at least 5, with the exact
+value depending on the size of the followup move. Most sente
+moves are not considered as endgame moves by GNU Go, neither
+are larger gote or reverse sente moves. A minimal double
+sente move should at least have value 10, but in most cases
+they should be played before the endgame.
+
+
+@section Example
+
+@example
+@group
+Pattern CE6
+
+X?        push in
+*O
+
+:8,1,0,0,0,0,OX,0,NULL
+@end group
+@end example
+
+A move generated from this pattern may be worth one or more
+points, e.g. in the position
+
+@example
+@group
+XXXO
+..*O
+XXXO
+@end group
+@end example
+
+where it is required that all stones are alive and it is
+assumed that the empty points would be territory for X with
+a stone at *. It could, however, also be applied in a
+position like
+
+@example
+@group
+XXXO
+.X*O
+XXXO
+@end group
+@end example
+
+where it only fills a dame. Hence the value of the pattern
+is no more than 1. To get a larger value for a move in the
+position above, we need to have a more specific pattern that
+is guaranteed to be worth at least one point gote, e.g.
+
+@example
+@group
+Pattern CE6b
+
+X?        push in
+*O        1 points gote
+
+:8,3,0,OX,0,0,0,0,0,NULL
+
+X?
+aO
+
+;marginal_eye(a)
+@end group
+@end example
+
+By taking help of the eye space evaluation we can know for certain
+that this move is worth at least one point.

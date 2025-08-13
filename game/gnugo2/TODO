@@ -1,0 +1,91 @@
+                     GNU Go Task List
+
+
+You can help make GNU GO the best Go program.
+
+This is a task-list for anyone who is interested in helping with GNU
+Go. If you want to work on such a project you should correspond with
+us until we reach a common vision of how the feature will work!
+
+A note about copyright. Before any code can be accepted as a part of
+the official release of GNU Go, the Free Software Foundation will want
+you to sign a copyright disclaimer. Please contact the GNU Go
+maintainer, Daniel Bump (email: bump@math.stanford.edu), to get more
+information and the papers to sign.
+
+Below is a list of things YOU could work on. We are already working on
+some of these tasks, but don't let that stop you. Please contact us or
+the person assigned to task for further discussion.
+
+1. If you can, send us bug FIXES as well as bug reports. If you see
+some bad behavior, figure out what causes it, and what to do about
+fixing it. And send us a patch! If you find an interesting bug and
+cannot tell us how to fix it, we would be happy to have you tell us
+about it anyway. Send us the sgf file (if possible) and attach other
+relevant information, such as the GNU Go version number. In cases of
+assertion failures and segmentation faults we probably want to know
+what operating system and compiler you were using, in order to
+determine if the problem is platform dependent.
+
+2. Tuning the pattern database. This is a sort of art. It is not
+necessary to do any programming to do this since many of the patterns
+do not require helpers. We would like it if a few more Dan level
+players would learn this skill.
+
+3. The reading code assumes that a string with five liberties is safe.
+Sometimes this leads to expanding a dead group into enemy territory, a
+simple waste. An improvement in strength would result from giving
+heuristics for the strategical viability of a group, based on
+moyo/escape route considerations. This is also useful for deciding
+whether a cut is reasonable or needs defending against.
+
+4. The escape potential of a group is today estimated by counting
+fourth order liberties. While this isn't completely unreasonable, it's
+also not accurate enough anymore. An improved implementation might use
+pattern matching (with autohelpers to assist with reading) to identify
+running moves and ways to break through enclosure.
+
+5. Semeai module is vastly in need of improvement. In fact, semeai can
+probably be only analyzed by reading to discover what backfilling is
+needed before we can make atari. Also, semeai module should be able to
+change the status of dragons.
+
+6. The eye space evaluation doesn't work very well for semi-open
+spaces along the edges. An improvement here might require extending
+the basic ``local game'' model for life and death analysis, as
+described in @xref{Eyes}.
+
+7. The eye space evaluation knows about ``chimeras'', positions where
+one player can make two eyes in one move but the opponent also can
+destroy both in one move. This information is, however, currently not
+used in the higher levels of life and death reasoning. There are also
+other interesting positions, such as moves making an eye in sente
+(i.e. by threatening to make another eye), that would need some
+consideration. For inspiration you may wish to read the paper
+``Eyespace Values in Go'' by Howard Landman. The paper is linked from
+the GNU Go development web page.
+
+8. The eye space evaluation would also need to learn about local games
+ending in various kinds of kos.
+
+9. Life and death reading. The eyespace evaluation is currently
+completely static. This has the advantage of being very fast, but
+needing a fairly large pattern database. To incorporate various life
+and death subtleties in this scheme may require enlarging the pattern
+database more than we want and/or being very tricky to get right. An
+alternative is to use reading to deal with some of the complications
+and then perform static evaluation on the nodes.
+
+10. More life and death reading. One could also consider using reading
+to fully play out the local games (@pxref{Eyes}). While this
+probably would be too slow to employ in actual play, it would still be
+useful for verifying and/or automatically generating the eye space
+database. (Inge Wallin has started working on this.)
+
+11. Very much time in the reading is spent counting liberties. It's
+possible that the reading could be made faster by keeping track of the
+liberty counts while doing and undoing moves. There is, however, a
+certain amount of overhead involved here, so a proof of concept would
+definitely be necessary.
+
+

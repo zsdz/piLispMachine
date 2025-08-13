@@ -1,0 +1,1770 @@
+-------------------------------------------------------------------------
+-- ChangeLog
+-------------------------------------------------------------------------
+
+2.6 released February 13, 2000
+
+- sgf/Makefile.in: sgfgen.dsw by sgfgen.dsp in EXTRA_DIST
+- revision of WINDOWS
+
+2.5.74 released February 12, 2000
+
+- corrections to documentation
+- revised VC Project files 
+
+2.5.73 released February 8, 2000
+
+- dependencies added to Makefile.in's
+- white_to_move_hash and black_to_move_hash removed from hash.c
+- vsprintf used in place of sprintf in ttsgf.c
+
+2.5.72 released February 8, 2000
+
+- bugfix in dragon_eye: = where == was intended
+- various functions in moyo.c, reading.c, worm.c made static
+- DRAW_COLOR_CHAR macro modified in moyo.c and showbord.c
+- unnecessary forward declaration of hashtable removed from liberty.h
+- fixed pointer confused with its value in vgprintf
+- unneeded varables removed from ascii_goto, cut_connect_callback and
+  various helpers
+- no longer #undef HAVE_GETTIMEOFDAY in config.vc*
+- @Version@ quoted in config.vcin
+- NO_SYS_TIME_H replaced by HAVE_SYS_TIME_H in play_solo.c
+- win/config.h removed from distribution
+- gnugo.dsw revised
+- utils/utils.dsw replaced by utils/utils.dsp
+- added copy ..\config.vc config.h to win/makeit.bat
+- modified instructions in WINDOWS
+
+2.5.71 released February 8, 2000
+
+- adds a file config.vcin
+- configure creates config.vc from config.vcin
+- config.vcin brought in sync with config.h.in
+- EXTRA_DIST in Makefile.am includes win/ and not individual files
+- add Visual C specific includes in gmp.c
+
+2.5.70 released February 7, 2000
+
+- new small board handicap patterns
+- reading.c: char mark in chain
+- config.h included in moyo.c, gmp.c and ttsgf.c
+- explicit cast in main.c
+- new files win/
+- revision of WINDOWS
+
+2.5.69 released February 7, 2000
+
+- bring config.vc in sync with config.h.
+- Add a #define HAVE_VISUAL_C in config.vc
+- add tests for unistd.h and sys/time.h in configure.in
+- remove the test for getopt.h, which was not used.
+- remove the #include <unistd.h> from files where unistd.h
+- Conditionally include <unistd.h> where needed.
+- include <config.h> in gmp.c (already in 2.7.x line)
+- Change tests #ifndef NO_UNISTD_H to #ifdef HAVE_UNISTD_H
+- remove win/Makefile.am and win/Makefile.in
+- instead add the win directory to the toplevel Makefile.am.
+- remove closeout.c closeout.h long-options.c long-options.h error.h utils/
+- win/Makefile.in: replace  /D HAVE_* and /D NO_* defines by /DHAVE_CONFIG_H
+- adjust UTIL_OBJS for the files removed from the utils subdir
+
+2.5.68 released February 7, 2000
+
+- explicit casts in fuseki.c, moyo.c, play_ascii.c, ttsgf.c
+- fiddling with include files for VC compatibility
+- new file win/makefile.win
+- config.vc moved to top directory
+- undef HAVE_GETTIMEOFDAY in config.vc
+- revision of .dsp and .dsw file
+- revision of WINDOWS
+- Makefile.bump removed from distribution
+- doc/readme.vc removed from distribution
+- minor revision of doc/analyze.texi
+
+2.5.67 released February 6, 2000
+
+- document revision
+- copyright notices mention 2000
+- copyright notices in joseki sgf files
+- max and min are undefined in liberty.h
+- help string reference of -M, --memory is moved
+- modifications to play_ascii.c for Emacs mode
+- emacs.el revised
+
+2.5.66 released February 4, 2000
+
+- Emacs mode added
+
+2.5.65 released February 3, 2000
+
+- new connection pattern
+- tuning
+- bugfix in shapes.c: handling of BC patterns
+- bugfix in make_trouble_helper (could cause crash)
+- we no longer add half eyes when eye.dragoni == -1
+- cutstone2_helper and conn pattern removed
+- mokuhadzushi pattern increased
+- revisions to documentation
+
+2.5.64 released January 31, 2000
+
+- minor tuning
+
+2.5.63 released January 30, 2000
+
+- bug fixed in eye_finder which could cause crashes
+- revisions to documentation
+- new file doc/utils.texi
+- bugfix: L class patterns are correctly invoked without -a
+- new function retrofit_genus
+- new eye pattern !.@...
+- 3 new helpers
+- tuning
+
+2.5.62 released January 27, 2000
+
+- minor tuning
+- documentation revisions
+
+2.5.61 released January 26, 2000
+
+- new helpers
+- new function retrofit1_half_eye()
+- connection_value() esteems critical dragons more
+- bugfix in fuseki.c (test legality)
+- substantial tuning
+- --memory option implemented
+- Texinfo documentation made more 2.6 specific
+
+2.5.60 released January 24, 2000
+
+- tuning
+- revisions to Texinfo docs
+- revised WINDOWS
+
+2.5.59 released January 20, 2000
+
+- bugfix in confirm_safety()
+- tuning
+- revisions to documentation
+- directory docs/ renamed doc/
+- add -lwsock32 to $LIBS for the mingw32 environment for select call in gmp.c
+- interface/gmp.c: include windows.h and windows32/sockets.h
+- several times abort; replaced by abort()
+- remove strsep test and always use strtok in play_ascii.c
+- remove the getdate comments configure.in
+- add a test for availability of gettimeofday
+- prevent division by 0 in play_solo.c 
+- acconfig.h: move HAVE___FUNCTION__ to the right place
+
+2.5.58 released January 18, 2000
+
+- confirm_safety slightly modified
+- attacker calls confirm_safety
+- change_attack also adds a defense if appropriate
+- minor tuning
+- getdate.c removed from distribution
+- update the files getopt.c getopt1.c and getopt.h to glibc-2.1.2
+- added file utils/README 
+- Makefile.am: make utils the first subdirectory to compile
+- patterns/Makefile.am: link in utils/libutils.a when linking mkpat.c
+- documentation converted to Texinfo
+- gnugo.6 moved to docs/
+- docs/WINDOWS moved to top directory
+- docs/AUTOTOOL.README removed from distribution
+
+2.5.57 released January 13, 2000
+
+- substantial tuning
+- some legality testing in eye_finder
+- further testing that semeai is real before modifying worm values
+- filllib brought up to 2.7 fixing some crashes
+- unused 2.7 definitions removed from genmove.c and liberty.h
+- victims must have attack code 2 or 3 to be considered lunch
+- unsigned char changed to signed char in sgfana.c, ttsgf.c, ttsgf_write.c
+
+2.5.56 released January 11, 2000
+
+- tuning and cleanup of patterns.db
+- src/ renamed engine/
+- main.c moved to interface/
+- cleanup of moyo.c removing extra level of indirection
+- double declaration of stack2goban removed
+- dragon.weak renamed dragon.safety
+- revision of docs/DRAGON and docs/MOYO regarding safety
+
+2.5.55 released January 9, 2000
+
+- tuning, new helpers
+- new class L of patterns
+- dragon_status() revised to consider a missing case
+- slight revision of worm values
+- revised heuristics for non-matched eye shapes
+- bugfix in add_half_eye()
+- attack() is more cautious about snapbacks
+- bugfix in confirm_safety()
+- changed declaration of gg_snprintf in ttsgf.c
+- comment out several tests for header files.
+- comment out several tests for functions.
+- add tests for functions random and alarm.
+- mkeyes.c: remove an embedded newline in a string
+- optics.c: added an extra pair of brackets for 
+- removed unused test for VPRINTF
+- commented out test for AC_HEADER_STDC
+- Grouped all tests that were commented out
+- Compiled all AC_CHECK_FUNC{S} calls into AC_CHECK_FUNCS macro
+- removed AM_C_PROTOTYPES macro
+- removed some of the dnl lines which were commented out
+- revised documentation
+
+2.5.54 released January 4, 2000
+
+- worm values reduced
+- bugfix in trymove ko test
+- new function retrofit_half_eye simplifies LD patterns
+- new LD patterns and helpers
+- tuning
+- hash memory can be set at the command line
+- sgf/ files unified with 2.7 distribution
+- eyes.db, mkeyes and optics.c unified with 2.7 distribution
+- adaptations for compiling with Visual C++
+- builds with sprintf when snprintf and g_snprintf unavailable
+- Acknowlegements of Peter Gucwa and Rene Grothmann added to THANKS
+
+2.5.53 released December 29, 1999
+
+- shapes.c: fewer calls to confirm_safety
+- worm.cutstone definition revised
+- mkpat: new autohelper field cutstone
+- new LD (life and death) patterns in patterns.db with helpers
+- moyo.c from 2.7.9
+- more portable rules in Makefile.in's
+- AUTHORS revised
+
+2.5.52 released December 26, 1999
+
+- new helper make_eye_helper
+- eyefinder attacks some groups where an eye can be killed with sente
+- tuning
+- dragon_status is now public
+- improved trace messages for read results, contingent on TRACE_READ_RESULTS
+- caching of read results indexed also on stackp
+- default fourlib_depth is now 5
+- bugfix in add_half_eye: remember to adjust marginal_neighbors
+- bugfix in defend1: consider case of 4 liberties after extend
+- bugfix in confirm_safety
+- in make_worms, check opponent can really cut for cutstone != 0
+- one new eye pattern
+- add a vpathcheck rule
+- Make sgf_properties.h depend on ($srcdir)/{*.def} for a VPATH build.
+- remove the LIBS macros in 2 directories
+- Let CFLAGS contain GNU_SOME_WARNINGS as default
+- Remove @GNUGO_{SOME,ALL}_WARNING@ macros from the Makefile.am's
+
+2.5.51 released December 23, 1999
+
+- much tuning
+- 3 new helpers
+- new eye patterns
+- weights of some hoshi patterns increased
+- penalty for expanding dead worms increased
+- new function confirm safety
+- moves rejected which diminish the safety of other strings
+- don't attack or defend inessential worms
+- new movegen code removed
+- backfill_depth default decreased to 9
+- redefinition of READ_RETURN0
+- inequalities in reading.c made consistent
+- no caching in find_defense if liberties>5
+- try to treat the two liberties in attack2 symmetrically
+- additional moves considered in break_chain2
+- break_chain2: tryharder scheme
+- trace corrected in change_defense
+- remember to set codes in change_defense and change_attack
+- bugfix in does_attack
+- bugfix in singleton
+- remember to increment ko_depth and fourlib_depth in make_worms
+
+2.5.50 released December 16, 1999
+
+- rewriting of revise_worm_values and make_dragons
+- bugfix in revise_worm_values
+- computation of dragon values is done once for all at the end
+- "propagate" spelling corrected
+- eye_finder grudges eyes to unknown shapes (nonlinear, not db)
+- one new connection pattern
+- one new eye pattern
+- new connect_to_live_helper adjusts dragon genus to force connection
+- fourlib_depth increased to 4
+- code conditioned on #if 0 removed from reading.c
+- bugfix in attack2
+- reordering of the nodes in break_chain2 for minor speedup
+- decidestring summarizes even if verbose=0
+- no hashing of positions if stackp<depth
+- connection values increased slightly
+- return value 0 does not cause match_failed for B and C patterns
+- tuning
+
+2.5.49 released December 15, 1999
+
+- in break_chain and defend2, removed stackp<depth contingencies
+- bug fix in break_chain2
+- two calls to naive_ladder removed
+- fixed two uses of DEPTH where depth was intended in reading.c
+- FIXME's in reading.c addressed
+- minor tuning
+- worms are not devalued because they have one liberty
+- worm value bonus for semeai is cut in half
+- no worm value bonus for semeai in case of ko
+- friendly dragons identified in B patterns now
+- testmode output modified
+- cleanup of ttsgf.c, ttsgf_read.c, and ttsgf_write.c
+- improved configure detection of snprintf
+- cleanup in Makefile.am and patterns/Makefile.am
+- configure tests for gcc specific macro __FUNCTION__
+- bugfix in sgf/Makefile.am
+
+2.5.48 released December 11, 1999
+
+- new fields dragon.friend and dragon.bridge set by C patterns
+- eye_finder prefers to connect to a friendly dragon to make life
+- tuning
+- Makefile and configure enhancements from 2.7.1
+- Added remarks about Jago to README
+- play_ascii.c, play_solo.c, play_test.c, sgfana.c from 2.7.1
+
+2.5.47 released December 10, 1999
+
+- based on 2.5.19
+- revisions to reading.c from 2.5.xx line prior to 2.5.46:
+  ko handling, and attacking stones with 4 liberties.
+- other code from 2.5.xx line in sgf.c, semeai.c, utils.c, worm.c, attdef.c
+- dragon.c: if a worm is involved in a small semeai its value is augmented
+- play_gmp.c: sgf_close_file() at end of game
+- revision of docs/DRAGON documenting all dragon_data fields
+
+2.5.19 released October 9, 1999
+
+- new cutstone concept in the experimental move generation
+- minor tuning
+- bugfixes in fill_liberty()
+- bugfix in the handling of lunches
+- bugfix in the improvement of attack and defense points
+- stray patterns in eyes.db relocated
+- autoconf test for glib hopefully working properly
+- some remaining references to hey.db removed
+
+2.5.18 released October 7, 1999
+
+- reduced V_OBA in fuseki.c
+- minor tuning
+- more experimental move generation code
+- new patterns in eyes.db
+- bugfix in fill_liberty()
+- test legality and safety of move much earlier in shapes_callback()
+- autoconf test for glib so snprintf() can be replaced by g_snprintf
+  if unavailable
+- minor change in endgame() output to work around bug in NNGS connecting
+  program
+
+2.5.17 released October 5, 1999
+
+- cleanup of hash.h
+- new function in utils.c: find_origin()
+- attack() and find_defense() represent strings with their origins,
+  improving the efficiency of the caching strategy.
+- backfill depth decreased from 14 to 10
+- optimization and a little cleanup in make_worms()
+- bugfix in value_move_reasons()
+- three initializing functions tidied away from global view
+
+2.5.16 released October 4, 1999
+
+- one new eye pattern
+- more experimental move generation code
+- cleanup of main.h, worm.c, and matchpat.c
+- improved diagnostic error messages in moyo.c
+- bugfix in moyo.c
+- new numbering scheme for eyes.db
+- bugfix in small_semeai()
+- '*' can now be used as label in autohelper functions
+- minor tuning
+- backfill depth increased from 8 to 14.
+
+2.5.15 released October 3, 1999
+
+- new small_semeai() resolves semeais involving worms with 3 or 4 liberties
+- bugfix in only_atari_helper
+- no message in change_attack helper if both ti and worm[ai][aj].attacki==-1
+- minor changes in patterns.db (mostly comments)
+
+2.5.14 released October 1, 1999
+
+- small changes and cleaning in ttsgf_read.c
+- new experimental attacker/defender code
+- minor revisions of hoshi.sgf and patterns.db
+- removed unused function mark_defenses()
+
+2.5.13 released September 29, 1999
+
+- reading code tries to attack strings with 4 liberties
+- new function savestone4
+- help string: options --depth etc. are not debug options as they
+  affect playing strength so these are in main help string now
+- bugfix in dragon_status: dragons rescued by ko are not DEAD
+- continued cleaning of moyo.c
+- one new pattern in eyes.db
+	
+2.5.12 released September 28, 1999
+
+- tuning
+- bugfix in two_bird_helper
+- the last few helpers updated to use change_attack() and change_defense()
+- copyright messages in joseki sgf files replaced by a patterns/README
+	
+2.5.11 released September 26, 1999
+
+- tuning
+- revised "You stepped on a bug" message
+- new pattern in eyes.db
+- revised joseki in hoshi.db
+- komi initialized in main.c
+
+2.5.10 released September 22, 1999
+
+- important bugfix in moyo.c, fixing an indexing out of bounds error.
+- tuning
+
+2.5.9 released September 21, 1999
+
+- cleanup of showbord.c
+- hashitem renamed hashdata
+- tuning
+- more debug info in moyo.c
+
+2.5.8 released September 20, 1999
+
+- bugfix in fuseki.c to avoid passing if opponent plays on first line
+- tuning
+- error messages in moyo.c redirected to stderr
+
+2.5.7 released September 16, 1999
+
+- added src/utils to patterns/ Makefile includes
+- tuning
+- remember to add center stone in sgf file in sethand()
+
+2.5.6 released September 15, 1999
+
+- minor changes for Windows support
+
+2.5.5 released September 13, 1999
+
+- more informative renaming of variables in moyo.c
+- added #include "getopt.h" to mkpat.c
+- check setlinebuf(), if not available use setbuf() in play_ascii.c
+- check snprintf(), if not available redefine to g_snprintf() (glib)
+- new file docs/WINDOWS
+
+2.5.4 released September 12, 1999
+
+- bugfix with --analyze --score: analyze the correct move
+- make install now copies gnugo.6 to /usr/local/man/man6
+- we do not install mkpat, joseki, mkeyes or sgfgen
+- gnugo.6 moved to top directory
+- revisions to documentation
+- docs/structure.doc is eliminated
+- docs/BOUZY renamed MOYO
+- patterns/fuseki2.sgf is back in patterns/
+- suppression of many messages when running --quiet
+- bugfix in fuseki.c which could cause illegal moves
+- bugfix in fuseki.c: do not set i,j then return 0
+
+2.5.3 released September 10, 1999
+
+- bugfix in make_worms: typo in adjacent worm code
+- bugfix in trymove() and legal(): check ko color
+- tuning and cleanup of patterns.db
+- bugfix in filllib preventing rare illegal moves
+- bugfix in hashing code
+- MAX_HANDICAP set to 9
+
+2.5.2 released September 7, 1999
+
+- revision of --help
+- revision of documentation
+- separation of globals. New file src/globals.c
+- further revision of moyo.c: dilation revised
+- bugfix in filllib preventing rare illegal moves
+- tuning
+
+2.5.1 released September 3, 1999
+
+- delta_moyo_simple() checks for isolated groups like delta_moyo()
+- new function average_moyo_simple()
+- docs/BOUZY updated
+- reimplementation of erosion
+- patch to sgfana.c using multiple character names
+
+2.3.94 released September 3, 1999
+
+- Tuning
+- Renumbering and cleanup of patterns.db
+- Bug fix in linear_eye_space().
+- load_sgf_file() gets the right color to move at end of file
+- Various small corrections.
+- backfill_depth is now 8
+
+2.3.93 released September 2, 1999
+
+- bugfix in recognize_eye
+- bugfix in readlad1: use null pointers in readlad2 call
+- fill_liberty() rewritten recursively with backfilling
+- atari_save_helper replaced by constraint.
+- tuning
+- Previous change to moyo_assistance reimplemented correctly
+- sethand() places fixed handicap stones as traditional
+
+2.3.92 released September 1, 1999
+
+- Two new eye patterns
+- Bug fix in filllib.c, avoiding a possible assertion failure
+- Use delta_moyo_simple() in moyo assistance function
+- Tuning
+- gnugo complains about wrong boardsizes
+- avoids some warnings in sgfana.c
+- now -o in ascii mode works with handicap stones
+- bugfix in readlad2
+- bugfix in basicnet3
+- docs/OVERVIEW updated
+
+2.3.91 released August 27, 1999
+
+- warnings when compiling with ncurses are hopefully fixed
+- The connections code no longer amalgamates attackable worms
+- Bug fix in the topological halfeye code. 
+- uncovered a problem with halfeyes in the eyes code, documented in a FIXME
+- Minor tuning.
+- Bug fix in the linear eyes code.
+- Random bonus taken into account in the TRACE prints in shapes.
+- fill_liberty() completely rewritten
+- destroyer taken down
+
+2.3.90 released August 26, 1999
+
+- hey.db removed from distribution
+- we no longer give a point for a pass and compel white to pass last
+- play_solo.c and genmove.c: calls to snprintf changed to sprintf
+- revisions to documentation, and to NEWS, AUTHORS, README, INSTALL
+- partial cleanup of main.c
+- one new eye pattern
+- worm.cut field moved to eye_data structure and initialized properly.
+- Added endgame patterns to fix one non-finish bug
+- Replaced movenum by move_number() in play_solo.c.
+- Removed dead code from dragon.c and liberty.h
+- Minor cleanup in worm.c
+- One new cut pattern in conn.db
+- sente_hane1_helper replaced by constraint
+- Bugfix in computation of max weight in mkpat.c
+- Tuning
+
+2.3.89 released August 25, 1999
+
+- bugfix in eye_finder
+- one new eye pattern
+- gaminfo.seed is set
+- handicap stones added when not present. 
+  (Doesn't work with "-l filename --mode ascii")
+- revision to documentation
+- message about unimplemented commands removed from ascii help
+- One new connection pattern in conn.db.
+- Revised connect_under_helper and 
+- replaced safe_hane_helper by a constraint
+- Revised some joseki values in hoshi.sgf
+- Tuning of patterns.db.
+
+2.3.88 released August 23, 1999
+
+- board size bug fix in moyo.c
+- fuseki.c: 3-3 invasion deprecated in 9 stone fuseki
+- New joseki in hoshi.sgf (tsukenobi variation and one 3-3 invasion)
+- tuning
+
+2.3.87 released August 22, 1999
+
+- eye.esize-eye.msize>7 is alive in recognize_eye
+- several eye patterns added
+- dragon_status: escape_route bound for CRITICAL upped to 6
+- -o and --analyzerfile add handicap stones by AB,AW
+- in nonfile modes the handicap stones are added in sethand() 
+- sethand() checks for max handicap values and returns actually set stones 
+- reduced MAX_HANDICAP to 19
+- main.c checks for MAX_HANDICAP
+- sgf_close_file is called only once, when ending ascii mode with "quit"
+- GM property added in --analyzerfile
+- HA property added in --analyzerfile (in sethand())
+- defined MIN_BOARD 3 in liberty.h
+- help output shows MIN_BOARD, MAX_BOARD and MAX_HANDICAP
+- cleanup of shapes.c, optics.c and moyo.c
+
+2.3.86 released August 21, 1999
+
+- resolved: hashed functions shall be readlad2 and basicnet3
+- connection code patch to reconcile amalgamation and cutstone
+  classification (needs rewriting)
+- tuning
+- amalgamate over _dead_ ko positions
+- bugfix in not_lunch_helper
+- Changed semantics of play_attack_defend_n()
+- unused color parameter removed from get_read_result
+- no compiler warnings under GNU/Linux
+- man page docs/gnugo.6 added
+- convenient tcsh completion described in docs/MISC
+
+2.3.85 released August 20, 1999
+
+- configure option --disable-hashing now functional
+- values are not hashed when stackp>depth
+- cleanup of mkpat.c
+- cleanup of eyes.h
+- tuning
+- now prints number of eyes in analyzerfile with --analyze eyeinfo
+
+2.3.84 released August 18, 1999
+
+- tuning
+- cleanup of dragon.c
+- halfeyes.c removed from the distribution
+- configure option --disable-hashing sets HASHING to 0
+- sgf.c: avoid trying to close output file twice
+- eyes.db: code # has been changed to @ to avoid conflict with comments
+- Revised compute_eyes() and split off linear eyes to an own function.
+- Made return value from recognize_eye() more consistent.
+- New autohelper functions to identify eye space points: eye(),
+  proper_eye(), and marginal_eye()
+- Major revisions of endgame patterns, taking eye space into account
+- obsolete functions play_attack_defend2() to play_attack_defend8() removed
+
+2.3.83 released August 15, 1999
+
+- joseki.c upgraded to generate constraints in .db
+- 3 new autohelpers in mkpat.c: diff_moyo, area_space, area_stone
+- interface/play_test.c: bugfix when --testmode and --analyze are combined
+- CHECK_HASHING turned off
+
+2.3.82 released August 14, 1999
+
+- hash codes are now computed incrementally
+- bugfix in hash.c
+- reading.c: sacrifice only if stackp<backfill_depth to avoid slow reads
+- sgf.c and main.c: --decidestring works with small boards
+- cleanup of src/attdef.c
+- update: doc/MISC
+- play_ascii: new commands HELPDEBUG, GOTO, DEFEND, SHOWMOYO, SHOWTERRI, 
+  SHOWAREA, SHOWDRAGONS, SAVE, and LISTDRAGONS
+- play_ascii: command COMMENT now only writes to analyzerfile
+- analyze: new commands AREACOLOR, DEFENSE, MOYOVALUE, TERRICOLOR, TERRITORY, TERRIVALUE
+- abortgo saves abortgo.sgf independent of any -o or --analyzerfile
+
+2.3.81 released August 11, 1999
+
+- new function number_weak returns the number of weak groups
+- little tuning in hoshi.sgf
+- major update of all fuseki.c
+- change in --playstyle options, new fuseki become the default
+- added stone color NONE in liberty.h for use with set_computer_player()
+- new function capture in ascii mode 
+- new function last in ascii mode
+- bugfix: sethand does not set handicap stones to sgf tree any more
+- bugfix: testmode game with --analyze skips variations 
+- new sgfana.c with analyze functions and gnugo specific parts of ttsgf.c
+- new function sgfTriangle()
+- new function sgfMarkWorm()
+- bugfix: analyze function recommended switched off as default
+- new analyze function capture
+
+2.3.80 released August 10, 1999
+
+- Implement hashing for attack() and find_defense()
+- option -H = --hash allows user to specify which functions use hashing
+- cleanup of sethand.c
+- cleanup of semeai.c
+- option --playstyle <style>, replace old --fuseki and --fearless
+
+2.3.79 released August 10, 1999
+
+- hash.h: bugfix which caused reading errors in rr_set_result_ri_rj
+- reading.c: savestone2 looks for double ataris to chain when stackp>depth
+- updated docs/MISC: analyze functions
+- option --analyze works again (was temporarily off by accident)
+- option --analyze works in --testmode game, no variations tested
+- new analyze functions: moyocolor, recommended, eyeinfo, worminfo
+- bug fix in analyze function eyes
+- option --score last --analzyerfile saves the potential territory with TW,TB
+- option --statistics writes also to analyzerfile
+- abortgo() saves analyzerfile 
+- ttsgf.c: ttsgf_move_made() removed
+- play_solo.c: timing added to benchmark mode
+
+2.3.78 released August 7, 1999
+
+- hashing in basicnet3 and savestone3
+- bugfix in play_gmp.c: undo now seems to work!
+- sgf/sgf_utils.c: bugfixes in get_moveX and get_moveY
+- interface/play_solo.c: bugfix in get_moveXY
+
+2.3.77 released August 5, 1999
+
+- showbord.c: revised behavior of -E option
+- minor change in moyo.c to have it reinitialized when a game is reloaded
+- change in scoring system for compliancy with chinese & japanese style rules
+- ascii mode: save territory points to analyzerfile 
+- gmp mode: log game in sgf tree
+- gmp mode: undo implemented by replaying sgf tree
+- gmp mode: save result and territory points to analyzerfile
+- ttsgf.c: new function sgfOverwritePropertyInt()
+- ttsgf.c: new function sgfAddStone()
+- sethand.c: sets handicap stones to sgf tree
+- hash.diff removed from distribution
+
+2.3.76 released August 4, 1999
+
+- interface/html directory contains cgi interface
+- bugfix in optics.c: initialization of domains
+- bugfix in reading.c: some variations were being overlooked
+- hashing implemented in savestone2
+
+2.3.75 released August 2, 1999
+
+- mark illegal moves in --printsgf with IL property
+- Some new macros in hash.h
+- Use hashing in readlad2 
+- Some cleanup of worm.c
+- option -f rewritten : opening tuning, including oba moves
+- non fuseki part of old -f option became --fearless option
+
+2.3.74 released August 1, 1999
+
+- bugfixes in helpers.c. One of these could cause a crash
+- two connection patterns increased substantially
+- moved get_komi() and inc_movenumber() to liberty.h
+- play_ascii(): new commands to navigate the game tree in ascii mode
+- back command (undo) implemented in ascii mode! Newly placed
+  stones appear as variations in the sgf
+- play_ascii(): changed the compare length of some commands. Now q works
+  for quit, b for back and f for forward.
+- removed bug in play_ascii(): user pass after computer pass did not
+  display result.
+- fixed bug in helpanalyzer output
+- utils.c: added function intialize board() and removed remove_stone()
+- fixed the komi bug reported by Douglas in --analzyerfile
+
+2.3.73 This version may be released later
+
+2.3.72 released July 30, 1999
+
+- bugfix in updateboard ko handling
+- Moved obsolete documentation about reading.c to doc about utils.c
+- Expanded documentation about reading with hashing
+- minor tuning
+
+2.3.71 released July 29, 1999
+
+- bugfix in make_worms: moving point of defense
+- fixes to handling of ko after a pass
+- updatepassmove() removed
+- updateboard now handles pass moves.
+- KO handling by trymove is currently broke
+- play_ascii.c, play_gmp.c, play_solo.c updated accordingly.
+- revisions to ascii interface.
+- legal() now reports a pass move to be legal.
+- revision of one eye pattern
+- tuning to increase attention to connections
+- 2 new helpers
+- mkpat: weak autohelper option needed ==CRITICAL
+- modified worm values
+
+2.3.70 released July 28, 1999
+
+- Zobrist hashing implemented
+- new files src/hash.h and src/hash.c
+- readlad1 uses hashing
+- readlad2 does consider 2 stone sacrifices if stackp<backfill_depth
+- revised method of ko detection using
+- New file docs/HALFEYES describing the topology of false eyes and half eyes.
+- Halfeye detection rewritten from scratch according to docs/HALFEYES.
+- Revisions to connection code.
+- A small amount of tuning.
+- Dragon values changed when worm values are.
+- Designation of marginal eye spaces revised to consider if enemy has a safe move
+- Bugfix in worm.c
+
+2.3.69 released July 27, 1999
+
+- bug fix in connections.c
+- two false eye patterns added
+- one pattern added
+- readlad2 sorts liberties before plunging in to the read
+- readlad2 rejects sacrifices of more than one stone
+- bugfix in shapes.c
+- in worm.c we sometimes try point of attack for defense
+- removed the -b bug 
+- removed some warnings
+- ascii mode: new command comment writes one line comments to file
+- ascii mode: new command score displays terri_eval
+- ascii mode: new command dead  shows dead stones as lower letters
+- ascii mode: at end shows dead dragons, lets user toggle their state
+- ascii mode: REsult propterty is written to analyzerfile
+- new command line option helpanalyze
+- option --score end outputs territory points (TW,TB) to analyzerfile
+- utils.c: new function remove_stone
+- utils.c: new function change_dragon_status
+- main.c:  added shortcut for --help to the help message
+- ttsgf.c: reduced the memory consumption of the sgf structure
+- liberty.h: made the dragon structure public
+
+2.3.68 released July 26, 1999
+
+- Tuning, seki patterns.
+- New connection patterns.
+- Revision of connections code.
+- New helpers.
+- eye_finder() now considers shape's move as defender() and attacker() do
+- Cleaning up and bug fixes in attdef.c.
+- More debug messages for the eyes code.
+- Bug fixes in compute_eyes() and play_attack_defend_n().
+- Bug fix in shapes.c: TRACE was missing an argument
+- fixed testwind compiler warning
+
+2.3.67 released July 25, 1999
+
+- bugfix in attacker: depth was changing each move
+- A class patterns, analogous to the D class, implemented but not tested
+- B and C classes can now be used in the same pattern.
+- The meta_connect bonus now specified with a new field
+- doc/PATTERNS revised
+- the oplay_attack() and similar autohelper functions documented
+- meta_connect bonus removed from most patterns except block/expand
+- Weakness bonuses are now applied at a later time than they were.
+  Thus B and C patterns are treated the same as patterns using helpers
+- A 5,5 weakness bonus added to all cut/connect patterns 
+- diag_miai2 helper revised.
+- Some tuning.
+- shapes.c cleaned up.
+- revisions in interface/play_ascii.c
+- substantial revision in sgf/ttsgf.c
+- new option --analyzerfile (see docs/MISC)
+- docs/SCORING is renamed docs/MISC
+
+2.3.66 released July 23, 1999
+
+- make_worms: bugfix in resetting of worm.attack and worm.defend 
+- bugfix in does_defend
+- new autohelper macros
+- play_attack_defend_n can take an arbitrary number of parameters
+- function who_win renamed who_wins for grammatical reasons
+- play_gmp.c: if there is a handicap we assume komi=0.5
+- play_solo.c: captures not added a second time
+- new patterns in eyes.db
+- some tuning
+- sgf.c: pass is [tt] unless board_size>19
+- depth and backfill_depth are augmented in attacker() and defender()
+- bugfix in printsgf mode
+- sgf_printboard prints current board position to sgf file
+- LOAD_AND_PRINT mode: read file, output final position
+
+2.3.65 released July 21, 1999
+
+- dragon_eye does not amalgamate across an ikken tobi
+- play_ascii.c: change depth on the fly
+- new option --statistics
+- revision of various helpers and 2 new helpers
+- mkpat rewritten so constraints can now be on several lines.
+- New autohelper functions xplay_attack, oplay_attack, xplay_defend,
+  and oplay_defend, which take variable number of arguments.
+- New functions in utils.c to support the above.
+- tuning
+- bugfix in sethand.c
+- increased DEPTH to 14 and BACKFILL_DEPTH to 7
+- change_attack can sometimes reclassify dragons as DEAD
+- command line resetting of depth
+
+2.3.64 released July 20, 1999
+
+- reformatting of reading.c
+- bugfix in break_chain2
+- revised basicnet3: try harder to rescue boundary chains
+- revised basicnet3: remember moves tried to avoid redundant reading
+- bugfix in find_lunch: pick juciest worm
+- sgf property PL implemented in play_solo
+- revisions in play_solo.c and fuseki.c for small boards
+
+2.3.63 released July 19, 1999
+
+- delta_moyo, delta_terri work with either color
+- 2 new functions diff_terri and diff_moyo, 
+- cleanup of moyo.c
+- -f option revised
+- docs/BOUZY revised
+- new docs/SCORING
+- New autohelper functions.
+- New connection patterns and revisions of the connections matching code.
+- Bugfix to an eye pattern.
+- Much tuning.
+- Revised criterion for when to defend or attack a worm.
+- Extended the scope of destroyer().
+- Experimental worm and cut revaluation in light of dragon formations
+- Changed heuristics for eye values of non-matched eye shapes.
+- reordered arguments to does_attack() and does_defend()
+- bugfix in readlad2: backfill was turned off
+- default backfill_depth is now 5
+- -l and -o options can be - for stdin and stdout
+
+2.3.62 released July 17, 1999
+
+- New autohelper functions, xlib(), olib(), xcut(), and ocut().
+- Revised documentation for autohelper functions.
+- Connections database introduced. New files: connections.c and conn.db.
+- find_dragon_pairs() disabled, replaced by connection patterns.
+- Cutting patterns from the connection database can modify eye spaces.
+- Amalgamation in dragon_eye() no longer done over marginal eyes.
+- mkpat partially rewritten.
+- Minor correction to eyes.db.
+- Nakade helpers cleaned away.
+- Minor tuning,
+- two more nakade like patterns removed, EC63 again C   pattern.
+- Bug fix in attacker(): discount bad captures, not good ones
+- New function destroyer() to capture of strings that can't currently
+  be defended, but which could be after opponent backfilling
+- Some cleaning in genmove.c.
+- Attack points of non-defendable strings not moved in make_worms
+- defense points added for adjacent non-defendable strings so
+  dragon amalgamation won't confuse semeai()
+- new function read_sgf_header used by load_and_analyse_sgf_file
+- new function load_and_score_sgf_file
+- new option --score and new mode LOAD_AND_SCORE
+- new function evaluate_territory
+
+2.3.61 released July 15, 1999
+
+- nakade patterns are gone
+- only linear patterns are currently hand-coded
+- many new eye patterns
+- not_lunch_helper aids in hane/kill combinations
+- undid a change in 2.3.59: amalgamation on first line
+
+2.3.60 released July 15, 1999
+
+- TODO revised
+- copyright revised in interface/ files
+- new pattern in eyes.db
+- halfeyes: require O not dead
+- revision of detect_trap_helper
+- revision of one pattern in hey.db
+- new ko patterns
+- other minor changes
+- new functions does_attack and does_defend in utils.c
+- attacker and defender call these functions
+- copyright notice slightly changed in main.c
+- reformatting of worm.c
+- unwanted handicap printf removed from play_gmp.c
+
+2.3.59 released July 14, 1999
+
+- revision of docs/DRAGON
+- several new eye patterns
+- fair amount of tuning. Particularly, changes to diag_miai patterns
+- dragon.c: we don't amalgamate a dragon if it touches the eyeshape
+  only on the first line
+- COLOR_STACK_SIZE increased to 70
+- DEBUG used in optics.c
+
+2.3.58 released July 13, 1999
+
+- mkpat revised. Autohelper functions now can take multiple parameters.
+  First out is defend_against(a,b) which plays our own stone at a and
+  then checks whether the opponent can safely play at b.
+- some tuning of patterns.
+- new function defend_against() in utils.c
+- bugfix in compute_eyes(): missing returns
+- two new eye patterns
+- bugfix in add_half_eye
+- more refined testing of att_X case in halfeyes.c
+- halfeye: obsolete test that eye and halfeye are in distinct cavities omitted
+- halfeye: we check that * is a safe move for X
+- restored marginal test in throw_in_atari_helper (removed in 2.3.55)
+- superceded docs/GRAPHS removed from distribution
+- filllib.c reformatted
+
+2.3.57 released July 12, 1999
+
+- count and chain rewritten for speed
+- more graceful error message if no in file specified in testmode
+- eye pattern 10 needed a vital point
+- find_lunch and make_worms: a ko is not lunch
+
+2.3.56 released July 11, 1999
+
+- add_half_eye: when a half eye's vital point is in another eyeshape 
+  the eyeshapes are amalgamated. This is correct and stops some crashes
+- computer tries to compute the score at end of game
+- new function who_win in moyo.c
+- one chimera pattern included in eyes.db
+- bugfix in attdef.c: color in territory test
+- bugfix in showbord.c: display of capture count
+
+2.3.55 released July 9, 1999
+
+- integration of half eye and eye code
+- separate eye domains for black and white
+- revision of docs/EYES to document the algorithm
+- a couple of changes that will be undone in a later release:
+  temporary oversimplification of treatment of att_X in hey_callback
+  temporary oversimplification of throw_in_atari_helper
+- removal of one half eye pattern
+- experimental penalty for running inside enemy territory
+- bug fix in semeai.c
+- revision in showboard for -E option
+
+2.3.53 released July 8, 1999
+
+- reading.c: new function special_rescue finds certain saving moves
+- revisions to savestone2 including use of special_rescue
+- speedup in find_lunch
+- minor revisions to hey.db and eyes.db
+- bugfix in mkpat (this could cause compilation failure)
+- bug fix in make_dragons (ignore eyes when not relevant)
+
+2.3.52 released July 7, 1999
+
+- bugfix in setup_double_atari_helper (could cause crash)
+- minor tuning
+- revision make_domains: influence can't creep under third line stone
+- revision to find_lunch: if already eaten it's not lunch
+- revision in halfeyes.c vis a vis Pattern 12
+
+2.3.51 released July 6, 1999
+
+- revision of mkeyes
+- new function recognize_eye() for use by the reading code (unfinished)
+- revision of the -f option (move generator based on territory)
+- cleanup in helpers.c and replacement of helpers by constraints
+
+2.3.50 released July 4, 1999
+
+- gnugo -f implements search for big moves with delta_moyo>=12 
+- and delta_terri >=14. Such a move gets value 80. 
+- tuning
+- some work on false eye code
+- some work on the eye code
+- bugfix in double_atari_helper
+
+2.3.49 released July 2, 1999
+
+- Correction to sgf output from ascii interface.
+- Results of safe_move() are cached if stackp==0.
+- Helpers and some other code rewritten to use safe_move() 
+- Bugfixes in  block_attack_defend_helper and urgent_connect_helper
+- Reading bug fixed in savestone2().
+- tuning
+- autohelper options safe_xmove,safe_omove,xmoyo,omoyo,xarea,oarea,xterri,oterri
+- new function mkeyes to compile the eye database (unfinished)
+- docs/GRAPHS explains the approach to the eye code
+- revisions to eyes.db and eyes.h
+- in halfeyes.c we make an exception to the rule that X can't be captured
+- revisions to hey.db
+- dragons with one eye and lunch are CRITICAL
+- revisions to eye_finder to find such dragons
+- eyespaces are not connected through adjacent marginal eyes
+- various fields initialized in make_domains()
+- bugfixes in make_domains
+- bugfix in compute_eyes: sometimes found the wrong end of a linear space
+
+2.3.48 released June 29, 1999
+
+- experimental changes to fuseki.c
+- revisions to helpers and patterns
+- eye_finder() now calls sgf_move_considered()
+- revisions to compute_eyes: eye shapes of size 4
+- DEPTH is now 13, BACKFILL_DEPTH is 9
+- gnugo --help now prints defaults of depth and backfill_depth
+- bugfix in worm.c: some non-kos were incorrectly identified as ko
+
+2.3.47 released June 29, 1999
+
+- substantial speedup in chainlinks
+- minor tuning
+
+2.3.46 release June 28, 1999
+
+- tuning, new helpers and patterns
+- some half eye code restored to dragon.c
+- some further linear patterns in compute_eyes()
+- bugfix in savestone3
+- speedup in find_lunch: if stackp==0, we used cached info
+- in break_chain2 don't try certain foolish moves
+- speedup in basicnet3 (avoid unnecessary readlad1)
+
+2.3.45 released June 27, 1999
+
+- 3 new functions delta_terri_color, delta_moyo_color, delta_area_color
+- new board stack in moyo.c
+- BOUZY updated
+- bug fixes regarding half eyes in dragon.c and eyes.c
+- new code for some linear patterns
+- bugfix: dragons around a ko were getting amalgamated
+
+2.3.44 released June 25, 1999
+
+- bugfix in atari_save_helper (could cause crash)
+- revision to CD68 (could cause GNU to play out a ladder)
+- bugfix in dragon.c: incrementing msize wrongly
+- minor revisions to make_domains()
+- new functions int moyo_color(int m,int n) and int terri_color(int m,int n)
+  returning the color of the intersection as seen by terri & moyo modules
+- new function delta_moyo_simple() without meta_connect bonus, delta_moyo()
+  is now a wrapper to this one (should be a transparent modification)
+- diag_miai_helper uses the new moyo_color()
+
+2.3.43 released June 24, 1999
+
+- revisions to ascii interface
+- gnugo can resume adjourned games
+- gnugo plays through endgame phase of the ascii interface
+- much tuning
+- revisions to helpers and new helpers
+- in this version a weak group has between 0 and 20 points space
+- two half eye patterns are back. Half eyes still not working right
+- (incomplete) revision of eye code to deal with half eyes
+- bug fix in eyes.c regarding opponent stones within eyespace
+- tinkering with hoshi.sgf
+
+
+2.3.42 released June 23, 1999
+
+- weak groups now have between 4 and 20 liberties
+- diag_miai_helper won't recommend a move in opponent's territory
+- revisions to patterns/hoshi.sgf
+- mkpat.c: fields in NULL pattern at end of patterns.c corrected
+- mkpat.c: weak option added to pattern compiler
+- some tuning
+- dragon.c: error eye.msize was preventing us from finding false eyes
+- some code moved from eye.c to dragon.c to help finding false eyes
+- compute_eyes and propogate_eyes are now public functions
+- bugfix in shapes.c: obonus and xbonus should now work correctly
+- revisions to documentation
+
+2.3.41 released June 22, 1999
+
+- compute_eyes is partially written (without using matchpat)
+- revisions to computation of genus
+- openeyes is expunged
+- half eye database is invoked earlier
+- half eye database used only to find false eyes
+- bonus field split into obonus and xbonus
+- obonus and xbonus are applied to patterns involving weak groups
+- most EB patterns now have bonuses
+- 5 point bonus for patterns involving weak groups (2.3.38) is gone
+- some tuning
+- some bugfixes in eyes.c, dragons.c and semeai.c
+
+2.3.40 released June 21, 1999
+
+- substantial revisions and new code in dragon.c and eye.c
+- dragons around an eye shape are now amalgamated
+- delta_moyo looks in meta_connect for the tested move
+- Bug fixes for two helpers.
+- Minor tuning.
+- GNU now can read sgf files with missing final ")".
+- defender and the attacker try the move suggested by shapes()
+- The semeai player now prefers to play on mutual liberties if this
+  improves the liberty balance.
+
+2.3.39 released June 18, 1999
+
+- some tuning, new helper block_attack_defend_helper
+- eye code now fills out an array eye[][] with data
+- revision to eye algorithm
+- open eye spaces now have origins
+- bugfix with -E option
+- dead groups are now cyan in showboard (were white)
+
+2.3.38 released June 17, 1999
+
+- experimental bonus of 5 points to patterns involving a weak dragon
+- revision of patterns/hoshi.sgf: attachment variations deprecated
+- open eye shapes are now computed. Display these with gnugo -E
+- some tuning
+
+2.3.37 released June 16, 1999
+
+- weak groups no longer classed dragon.status==CRITICAL. Instead ...
+- new field dragon.weak
+- old worm.weak and dragon.weak renamed worm.lunch and dragon.lunch
+- weak groups (found by moyo) classed dragon.weak==CRITICAL
+- dragon.weak field not used by genmove but displayed by showboard
+- new helper wedge2_helper
+- tuning and other revisions to pattern database
+- src/eye.c code is now linked though not used by genmove
+- revisions to showboard to display eye domains if xo=1
+- int make_worms() (was void) returns 1 if board not empty
+- find_weak() renamed find_lunch()
+
+2.3.36 released June 15, 1999
+
+- weak groups are classed CRITICAL so they scrounge eyes
+- new function test_weak to find weak groups (in moyo.c)
+- revision to print_txt_color
+- bugfix in fill_liberties
+- revised docs/BOUZY
+- bugfix: find_defense no longer checks that strings can be attacked
+  which required some modifications, slowing us down a little
+- DEPTH reduced to 12
+
+2.3.35 released June 15, 1999
+
+- reading code is much faster now and hopefully also more accuracy. 
+- new function relative_break_chain() used in revised readlad2()
+- caching of moves eschewed in break_chain(), break_chain2() 
+  if return pointer is NULL
+- DEPTH increased from 10 to 13
+- new docs/READING explains using --decidestring -o with gdb
+- connect_under_helper() rewritten to use connection_value()
+- housecleaning in patterns.db
+
+2.3.34 released June 14, 1999
+
+- test for pass in play_solo.c corrected
+- tuning
+- new pattern classification: Edge Expansion
+- GNU tries in two ways to fill liberties (points in Chinese count)
+- before passing, DEAD opponent stones in semeai are reclassed
+  unknown, then shapes is rerun
+- if that doesn't work, new function fill_liberty() tries again
+- new field dragon.semeai, new function revise_semeai()
+- static_eval() is gone (superceded by moyo())
+- reading.c: new function savestone3()
+- reading.c: savestone2 no longer tries to find the best move since
+  we have ways to improve points of attack and defense
+- some code taken out of find_defense()
+- dump_stack() uses gprintf instead of TRACE and counts variation
+
+2.3.33 released June 12, 1999
+
+- new function meta_connect to test a move against area ownership 
+  (returns true when the move connects/disconnects meta groups)
+- area ownership now sees kosumi connections
+- minor changes in moyo.c data structures
+- in shape.c, added some bonus for meta_connect moves
+- in mkpat.c, some bonus added to maxwt for meta_connect moves
+- minor tuning
+- in readlad2() we consider throwins
+- Copyright updated (no longer says 2.0) in src/ and patterns/
+
+2.3.32 released June 11, 1999
+
+- substantial speedup of reading code
+- in savestone2, we try to find an easy saving move before reading
+- in savestone2, we don't try second move if first works
+- in readlad2, we postpone break_chain2 but not break_chain
+- option --decidestring -o now outputs variation numbers
+- bugfix in extend_to_kill_helper
+- embryonic src/eyes.c included in tar file
+
+2.3.31 released June 10, 1999
+
+- new globals last_move_i and last_move_j give the last move made. 
+  This is used to improve(?) ascii output.
+- fixed bug ascii play where the captured stones where added wrong
+- play_ascii and play_test start with move 0 like play_gmp
+- in ascii play the last move is now marked
+- bug fixed in ascii play when a pass is made
+	
+2.3.30 released June 9, 1999
+
+- reimplementation of of handicap in ascii without writing p[][]
+- new functions for saving/restoring game state without using stack
+- use inc_movenum instead of movenum++ in play_gmp and play_solo
+- revision to ko_important_helper: ko values cut in half
+- move_attack() and move_defense() renamed change_attack() and change_defense()
+- new komoku pattern
+- 2 new patterns
+
+2.3.29 released June 7, 1999
+
+- connection_value moved to src/util.c
+- alive11_helper modified
+- eschewing of kos by attacker() and defender(), dropped in 2.3.28 is back
+- edge_ko_important helper added
+- new sente_extend_helper, straight_connect_helper, block_to_kill_helper
+  extend_to_kill_helper, revise_value_helper
+- new half eye pattern
+- several new patterns and changes to patterns.db
+- moved some CC patterns from wrong section
+- now --color should work with ascii interface
+
+2.3.28 released June 6, 1999
+
+- bugfix (worm.c, shapes.c, helpers.c): propogate_worm not used with stackp>0
+- attacker() and defender() no longer eschew kos
+- unused sgfAddPlay is commented out (fixing a warning)
+- fixes to trace (indent is back, caves which are kos are reported correctly)
+- default backfill_depth is 7 (arrived at by trial and error)
+- option --decidestring no longer requires -o (useful with or without it)
+- in make_worms() code to improve worm.attack, worm.defend we now read
+  one step deeper in the stack to avoid horizon effect
+- initialization in propogate_worm() uses memset
+
+2.3.27 released June 5, 1999
+
+- new option -B [depth] should now work
+- default values of depth and backfill_depth are 10 and 5
+- new function mprintf which is similar to gprintf but writes to stdout
+- changed vgprintf to work with different outputs (i.e. stderr, stdout)
+- the testmode now write its output to stdout only (never stderr)
+- bugfix in backfire_helper
+
+2.3.26 released June 4, 1999
+
+- Backfill depth can now be set with -B [depth]
+- very minor revisions to patterns.db
+- reading.c: bc was not being initialized when stackp>0 (twice)
+
+2.3.25 released June 1, 1999
+
+- bug fix in new make_worm() code
+- connection_value gives a bonus if the connecting move makes 2 eyes
+- mystery pattern CB102 removed
+
+2.3.24 released May 30, 1999
+
+- tuning of joseki and patterns
+- revised definition of inessential worms --- require worm.weak==-1
+- new code in make_worms() to revise points of attack/defense
+- BACKFILL_DEPTH reduced to 4 due to increased slowness
+- basicnet4 included but turned off
+
+2.3.23 released May 29, 1999
+
+- asymmetry bug in moyo.c fixed: when init_moyo() is launched,
+  boardsize is not known
+- area computation and dilat algorithm bug
+- distribution includes reading.c.alt for the experimentally inclined
+- tuning and new helpers
+- dragon.c split into dragon.c and worm.c
+
+2.3.22 released May 27, 1999
+
+- disabled long jumps into enemy area without a secure connection
+- no center pattern can jump down to or along the second line
+- revision to the endgame patterns according to docs/ENDGAME
+- detect_trap_helper looks for moves attacking two groups at once
+- some other tuning
+- evaluate_game removed from the distribution
+- semeai will not recommend a move which leads to an immediate loss
+- bugfix in semeai: bestlib was not getting updated
+
+2.3.21 released May 27, 1999
+
+- Empty corner play moved to src/fuseki.c (new) and reimplemented
+- Embryos for 3-4, 3-3, 5-3, and 5-4 joseki databases in patterns/*.sgf
+- option -m [level] for debugging moyos
+- docs/EYES revised
+- bugfix in urgent_connect_helper
+- pattern revisions
+
+2.3.20 released May 26, 1999
+
+- readlad2 now tries backfilling. readlad2 and attack return 2 if
+  a backfill is found but no direct attacking move
+- new patterns
+- use of macros to simplify helpers
+- trymove: sgf --decidestring now gives more information
+- solves errors when MAX_DILAT != MOY_DILAT
+- now the area ownership uses 4 dilation, which seems better.
+- docs/ENDGAME added from Gunnar's email of May 18, 1999
+
+2.3.19 released May 24, 1999
+
+- edge block/expand patterns reordered
+- tuning
+- a new joseki
+- a new helper
+- Move evaluate_game functionality into play_test.c
+- It is now main.c that loads the sgf file into a tree.
+- If no playmode / testmode is supplied, look for a comment
+  of the form  C[testmode=...] in the root node. If found,
+  this sets the playmode / testmode.
+- Other interface fns take the tree, rather than filename, as param.
+- testmode is now a local variable, passed as param into play_test,
+  rather than setting into global state via set_testmode / get_testmode
+- Move the tests for acceptable sgf file (GM[1]FF[3/4]) into the
+  sgf reader, rather than in the user of the tree.
+- bugfix in hane_backfill_helper
+- semeai now attacks dragons of low vitality
+- semeai tries a little harder to choose a smart liberty
+
+2.3.18 released May 23, 1999
+
+- break_chain() and break_chain2() return 2 if saving move can be taken
+- savestone2() and find_defense() try harder not to make self-atari
+- find_defense() now considers tenuki
+- forgot to initialize adjsize and adjlib in chainlinks()
+
+2.3.17 released May 23, 1999
+
+- Complete reordering and some tuning of the fuseki patterns.
+- A little tuning elsewhere.
+- Documentation of the new features in the patterns.db format.
+- The -m option enhanced with another board with delta_moyo values.
+- chainlinks test now in basicnet3
+- delta_terri(int ti, int tj,int color) : the same as delta_moyo(),
+  but against the 5/21 evaluation
+- area ownership evaluation (using 5/0 algo), with wrapper functions :
+  area_stone(int m,int n), area_space(int m,int n)
+  area_color(int m,int n), area_tag(int m,int n)
+  set_area_tag(int m,int n,int tag)
+- the values are computed during make_moyo evaluation, use
+  "gnugo -m" to see how area are evaluated.
+- bugfix in play_test.c
+
+2.3.16 released May 22, 1999
+
+- Wind assistance complemented by moyo assistance.
+- Move dependent randomness replaced by pattern dependent randomness.
+- Format of patterns.db changed to accomodate new features mentioned above.
+- One new joseki line.
+- Jump out patterns retuned. They may still be somewhat out of tune
+  but in a new and different way. Or maybe they even work quite well.
+- Some tuning of fuseki patterns.
+- Caching of upower and mypower values from testwind.
+- Some functions moved from matchpat.c to shapes.c.
+
+2.3.15 released May 22, 1999
+
+- board-setup nodes were being ignored in test-mode
+- fixes a bug where moves annotated as bad (MA[]) were reported as good.
+- took ascii_showboard out of play_test.c.
+- end_sgfdump() tries to pop the stack before closing the file
+- DEPTH ramped all the way up to 10, the new reading code is so fast
+- evaluation of moves is moved to break_chain and break_chain2
+- simplification of readlad1, readlad2, savestone2, find_defense and basicnet3
+- a few annotated games against David Fotland's XGO added to regression/
+
+2.3.14 released May 21, 1999
+
+- documentational changes to helpers.c
+- minor changes in patterns.db
+- all jump_out_helper patterns changed to weight 60 for moyo heuristics
+- jump_out_helper() modified to use moyo heuristics
+- new function delta_moyo() run quite fastly, using the cache as proposed.
+  the result of this function go in global variables :
+  moyo_test[WHITE],moyo_test[BLACK] and the difference from precedent
+  moyo evaluation is in moyo_test[0]
+  delta_moyo returns what is expected : the difference from point of view
+  of "color" player, aka moyo_test[0]
+  the same for moyo_eval[3] and terri_eval[3]
+  so all the results are availables for later use. 
+  (see sources for details)
+- used #defines for the variables 5/21 and 5/10 (can be 4/10 too), see liberty.h
+
+
+2.3.13 released May 20, 1999
+
+- further revisions to ttsgf_read.c regarding file buffering
+- tuning, new patterns, helpers, half eye patterns
+
+2.3.12 released May 20, 1999
+
+- tuning
+- ttsgf_read.c: changed 
+
+2.3.11 released May 19, 1999
+
+- reading.c from 2.3.8 is restored
+- MAX_FILE_BUFFER increased to 150000 in ttsgf_read.c
+- tuning and a new joseki
+- hide most of liberty.h from non-src/ code.
+- src/ and patterns/ define BUILDING_GNUGO_ENGINE,
+  and are therefore allowed to see all the internal
+  symbols. Otherwise, code just sees a few functions,
+  and sees 'const' versions of the variables.
+- (liberty.h defines a macro PUBLIC_VARIABLE which expands
+  to  extern  for engine source files, and extern const
+  for others)
+- *NOTE* : we get many warnings about const violations,
+  where other modules write to these variables. In particular,
+  ascii_showboard makes temporary changes to p[][].
+  But it still compiles (with gcc at least). These interface 
+  violations were always there. Now they are visible.
+- Moved remove_string() and count_territory() from play_ascii
+  into src/utils : these need to be part of the engine
+  since they have intimate access to the state.
+- Did a bit of gratuitous changes with play_test.c
+  No functionality changes.
+- lost get_*_a and put_*_a interface functions.
+- make_dragons() is no longer predicated on movenum, but 
+  on existence of worms.
+- potential_moves[][] is now taken seriously : genmove()
+  clears it at the start of the move cycle, rather than
+  having sgf_move_made() clear it at some random time
+  after genmove has returned.
+- semeai criterion slightly changed: my dragon.vitality<0
+  and your dragon.status==DEAD.
+
+2.3.10 released May 18, 1999
+
+- hane_backfill_helper deprecated
+- semeai module now consults vitality field to initiate fighting
+- test mode did not pass movenum to engine code: fixed.
+  did away with the game_info entries for boardsize and move_number, 
+  made the interface use the engine's global variables instead.
+  Better solution is needed (see TODO)
+
+2.3.9 released May 17, 1999
+
+- play_solo.c: in load_sgf_file() we now use global movenum instead of mv
+- play_solo.c: white stones were loading as black (fixed)
+- new helpers, tuning, revisions to pattern database
+- mkpat.c: maxwt now takes bonus into account
+- reading.c: break_chain2 simplified
+
+2.3.8 released May 17, 1999
+
+- backfill.sgf added to regression/
+- color added to moyo.c
+- bugfix in moyo.c: captures were counted backwards
+- BOUZY added to docs/
+- bugfix in sente_hane_helper
+- joseki patterns are now type 's'
+- fix the board_size bug in test mode
+- reimplement load_sgf_file() in terms of the sgf parser : gives us
+  ability to read multiple AB[][]... for free
+- move load_sgf_file and load_and_analyse_sgf_file from sgf/ into
+  interface.  (Currently play_solo.c but that's temporary.)
+  Justification is that these fns have more to do with the engine
+  than with sgf files.
+- put in the emacs variable blocks into some of the files
+- remove some extern refs from .c files - according to David 
+  this is a bad practise
+- Remove a few remaining // comments, and disable // comments in 
+   GNUGO_SOME_WARNINGS
+- Reorganise the --help page, and add long options for most of the 
+   short ones. The --help is modelled after gnu tar.
+- Some files had #define _NO_PROTO to hide getopt() prototype, but 
+   these files were not doing option parsing, so  assume this is redundant.
+- interface game_info structure was used only in interface.c, so
+   moved the structure defn out of a public header file
+- The ttsgf_read.c code only offered to parse an sgf file which had 
+   already been read into a buffer. Moved a code fragment which appeared 
+   in two places to load the file then parse it into a readsgffile() 
+   function.
+- Prefixed all the symbols for long option names with OPT_, and mode 
+   names with MODE_to avoid namespace clashes. (DECIDE_STRING was being 
+   used as a mode and an option.)
+
+2.3.7 released May 15, 1999
+
+- Jerome's moyo mode (-m option)
+- new patterns and helpers, including backfill patterns CD47 and CD48
+- reading.c: trysafe in readlad2 has been removed
+- reading.c: in savestone2 if stackp==0 we first try to capture
+-  a surrounding string. This would lead to thrashing if we tried
+-  it at deeper levels
+- reading.c: bug fix in find_defense (Gunnar)
+- reading.c: in break_chain2 we omit harder attacks if string has
+-  3 liberties since this causes too many errors.
+- reading.c: in basicnet3 we test a little more the attack really works
+
+2.3.6 released May 15, 1999
+
+- bug fixes in patterns/
+
+2.3.5 released May 14, 1999
+
+- tuning, new helper
+- initialization in src/evaluate_game.c and interface/play_test.c
+
+2.3.4 released May 13, 1999
+
+- Nils' changes to main.c and src/Makefile.am
+- tuning, joseki revisions, new helper wedge_helper
+
+2.3.3 released May 12, 1999
+
+- find_weak eschewed in find_defense
+- change to allow build in a directory other than source
+- braces to joseki.c to avoid a warning about dangling else
+- added --testmode game to analyze games and see if it considered the moves
+- added docs/structure.doc describing program structure and APIs
+
+2.3.2 released May 12, 1999
+
+- missing library files restored in utils/Makefile.am
+- tuning, invasion under hoshi joseki
+- and a cosmetic bug fix in shapes.c.
+- patterns for endgame ko
+- bugfix in double_attack patterns
+
+2.3.1 released May 11, 1999
+
+- Joseki compiler and beginnings of a Joseki database
+- some tuning
+- Tweak sgf/Makefile.am to write generated sgf_properties to $(srcdir)/
+    note : this generates a warning at automake, but I think it is benign.
+- remove the GCC_OPTS from the Makefile.am's, and replace with either
+    @GNUGO_SOME_WARNINGS@ or @GNUGO_ALL_WARNINGS@.
+    This means we can centralise the choice of which warnings we enable,
+    rather than having to duplicate the list of warnings in each component.
+- Add code to configure.in to generate the above.  ALL_WARNINGS switches off use
+    of // comments  (via  which runs preprocesser in ansi mode).
+    SOME_WARNINGS will do the same once all components have been cleaned up.
+    SOME_WARNINGS is intended for code over which we don't have full control (eg gmp.c)
+    and so we have to be more liberal in the diagnostics.
+- Removed from the build some of the stuff in utils/ which we do not (currently) use.
+- fixed clear_board() bug that caused segfaults
+- fixed game parameter handling in main() to use interface API
+- updated other interfaces to partially use interface API (no more
+   passing from main!)
+- removed // comments where they were not needed
+   They stil are in the tt* code, that needs to be revisited!!
+- patched sgfgen to use stdin and stdout- makes things easier
+
+2.1.25 released May 10, 1999
+
+- added --decidestring option for sgf debugging reading code
+- added regression directory: contains a few example test files
+- added --quiet option
+- added --testmode option: move, annotation, or both
+   This allows some flexibility in handling differently annotated files
+- added --infile and --outfile options
+- wrote play_test to handle regression testing
+- wrote sgfgen, a program to translate SGF definitions into a header file
+- added Tommy Thorn's code for SGF parsing and implemented tree parsing
+- updated ASCII interface to rely on interface routines- it works!
+- updated interfaces to handle new 'pass' based on int returned from genmove
+- made genmove return boardsize, boardsize coordinates for pass 
+- added interface specification and code-- we now have engine independence!
+- moved all SGF code into sgf directory
+
+2.1.23 released May 7, 1999
+
+- sgf debugging of reading code (from gdb only in this release)
+
+2.1.22 released May 6, 1999
+
+- renum target removed from pattern Makefile.am and Makefile.in
+- strategic_distance was being calculated incorrectly
+- revisions to pattern database
+- chainlinks now tabulates the size of adjacent worms in preparation
+     to trying to sorting them when stackp<depth
+- split out play_solo() into play_solo.c
+- moved interface routines (play*, gmp*, sgf*) into interfaces/ directory
+- combined play*.h into interface.h
+- renamed 'lib' directory to 'utils' to be consistent with other dir names
+- moved AUTOMAKE.README into docs
+
+2.1.21 released May 5, 1999
+
+- minor revisions to pattern database
+- adds tests for term.h and curses.h before defing CURSES
+- fixes a typo in helpers.c
+- fixes some hard-wired 18's in make_worms()
+- fixes what I believe to be a bug in scoping in make_worms
+- gratuitously moves some variable declarations around in make_worms
+- moved pattern files to patterns directory
+- pattern files and functions are now linked in as a library: libpatterns
+
+2.1.20 released May 5, 1999
+
+- configure options
+- main.c: LOAD_AND_ANALYZE mode
+
+2.1.19 released May 4, 1999
+
+- removed #include "../lib/getopt.h" from play_ascii.c - not needed
+- added some code to better handle config.h to main.c and play_ascii.c
+- added ascii_showboard() before the counting starts, useful after 'play 999'
+- added --mode option to main.c
+- changed how different play modes are started: now using switch()
+- removed -g option: use --mode instead
+- changed MAX_BOARD to 25 in liberty.h: try some bigger games!
+- changed sgf 'pass' to [tt] if boardsize>19, else [] (by SGF standard)
+- changed 'pass' moves to send board_size, board_size to sgf routines
+
+2.1.18 released May 3, 1999
+
+- play_ascii: playblack and playwhite are recognized as valid commands.
+- play_ascii: Correct use of strtok on Solaris (missing strsep)
+- ascii display and showboard now work as stated in the help command
+- ascii display doesn't draw the board twice if showboard is enabled.
+- ascii force was broken, is no longer.
+- added check for getopt.h to configure.in
+- fixed PLAY in play_ascii: need to check for two passes!
+- prettyfication in main.c: changed strcmp() usage
+- fixed seed printing in sgf.c
+- play_gmp: handicap was not being passed to sgf_write_game_info
+
+2.1.17 released May 2, 1999
+
+- added counting to ascii interface
+- Gunnar's reshuffled patterns
+- LDFLAGS = $(COLORLIB) in src/Makefile.am and src/Makefile.in
+
+2.1.16 released May 1, 1999
+
+- further revisions to ascii interface
+
+2.1.15 released May 1, 1999
+
+- further revisions to play_ascii and sgf.c
+- Gunnar's pattern classification in patterns.db
+- static evaluation of the board position
+
+2.1.13 released April 30, 1999
+
+- moved all sgf routines into sgf.c
+- changed pass value: from 19, 19 --> board_size, board_size
+- added sgf_open_file() sgf_close_file() and sgf_flush_file() to sgf.c
+- also added sgf_write_line() and sgf_write_game_info()
+- rewrote play_solo to use new sgf routines
+- absolutely no more build errors! (at least on Linux...)
+- renamed ascii.* play_ascii.*
+- moved play_gmp into play_gmp.c and added header file
+- added komi option (doesn't do anything yet, just parses it)
+
+2.1.12 released April 29, 1999
+
+- finished adding long options
+- color also works now (--handicap and --boardsize have been working)
+- needs a little cleanup with short options- some should become long
+- finished ASCII interface
+- can display any board size up to 25x25
+- has command line options and help
+- enhanced error messages
+- added 'switch' command to switch colors in the middle of play
+
+2.1.11 realeased April 29, 1999
+
+- Minor changes to the syntax of patterns.db and hey.db as a preparation
+  for restructuring of patterns.db. Documentation in PATTERNS updated.
+- moved ascii play code into ascii.c
+- copied showboard code for ascii play into ascii.c (ascii_showboard)
+- updated Makefile.am's to reflect changes
+- removed posix and error.c files from lib dir- not needed
+- added long option parsing; still need to add this to help menu
+- moved PATTERNS, DRAGON and OVERVIEW to /docs
+
+2.1.10 released April 28, 1999
+
+- incorporated more reorganizational patches
+
+2.1.9 released April 28, 1999
+
+- Automake-ized (NL)
+- Made code which moves dragon[m][n].borders contingent on !worm[m][n].ko
+- Set TRUST_GRID back to 1.
+
+
+

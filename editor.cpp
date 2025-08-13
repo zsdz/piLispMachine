@@ -622,3 +622,32 @@ char editorProcessKeypress()
         return 'x';
     }
 }
+
+void edit1(char* fileName)
+{
+    initEditor();
+
+    if (file_exists(fileName))
+    {
+        editorOpen(fileName);
+    }
+
+    while (1)
+    {
+        editorRefreshScreen();
+
+        char a = editorProcessKeypress();
+        if (a == 's')
+        {
+            editorSave(fileName);
+        }
+        else if (a == 'q')
+        {
+            break;
+        }
+    }
+
+    CKernel::Get()->clear(); // if not clear,the history command's result will not appear too
+
+    CKernel::Get()->restoreMode();
+}

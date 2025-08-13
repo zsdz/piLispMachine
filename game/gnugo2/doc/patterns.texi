@@ -1,0 +1,978 @@
+
+@menu
+* Patterns Overview::           Overview of the pattern database
+* Pattern Attributes::          Pattern Attributes
+* Defensive Patterns::          Defensive Patterns
+* Offensive Patterns::		Offensive Patterns
+* Helper Functions::            Function that assist the matcher
+* Wind Assistance::             Wind Assistance
+* Moyo Assistance::		Moyo Assistance
+* Tuning::			Tuning the Pattern Database
+* Autohelpers::                 Automatic generation of helper functions
+* Autohelper Functions::        Autohelper Functions
+* Pattern Matcher::             Implementation
+* Symmetry::                    Symmetry and Transformations
+* Matcher Details::             Details of implementation
+* Grid Optimization::           The "Grid" Optimisation
+* Joseki Compiler::             The joseki compiler
+* Advanced Features::           Advanced features of the joseki compiler
+* Connection Patterns::		Connection Patterns
+@end menu
+
+
+@node Patterns Overview, Pattern Attributes, Patterns, Patterns
+@comment  node-name,  next,  previous,  up
+@section Patterns Overview
+
+
+A database of patterns is supplied in patterns.db These are ascii
+representations, of the form:
+
+@example
+@group
+Pattern EB115
+
+??o|          sente hane
+?Oo|
+XX*|
+...|
+?.?|
+
+:8,50,0,O,5,5,5,0,0,sente_hane_helper
+@end group
+@end example
+
+where @samp{O} marks a friendly stone, @samp{X} marks enemy stones, 
+@samp{.} marks an empty vertex, @samp{*} marks @samp{O}'s next move,
+@samp{o} marks a square either containing @samp{O} or empty but not 
+@samp{X}. (The symbol @samp{x}, which does not appear in this pattern,
+means @samp{X} or @samp{.})  Finally @samp{?} Indicates a location
+where we don't care what is there, except that it cannot be off the
+edge of the board.
+
+The line of @samp{|}'s along the right in this example is the edge of
+the board itself---this is an edge pattern. Corners can also be
+indicated. So this pattern describes a hane on the first line. The
+@samp{o} makes sure that it would not be in atari immediately, though
+the matcher can check for this automatically (see class).  Elements
+are not generated for @samp{?} markers, but they are not completely
+ignored - see below.
+	
+The line beginning @samp{:} describes various attributes of the
+pattern, such as its symmetry and its importance.  Optionally, a
+function called a ``helper'' can be provided to assist the matcher in
+deciding the worth of the move, and a simple measure of the influence
+of nearby stones can be factored in. In this case, there is a helper,
+the sente_hane_helper, which may be found in helpers.c. Most patterns
+do not require a helper, and this field is filled with NULL.
+
+The matcher searches the board for places where this layout appears on
+the board, and chooses the highest scoring pattern.
+
+@node Pattern Attributes, Defensive Patterns, Patterns Overview, Patterns
+@comment  node-name,  next,  previous,  up
+@section Pattern Attributes
+
+After the pattern, some supplementary information in the format:
+
+@example
+@group
+  :trfno, patwt, assistance, classification, 
+       obonus, xbonus, splitbonus, minrand, maxrand, helper_function
+@end group
+@end example
+
+Here trfno represents the number of transformations of the pattern to
+consider, usually 8 (no symmetry, for historical reasons), or one of 
+@samp{|}, @samp{\}, @samp{/}, @samp{-}, @samp{+}, @samp{X}, where the
+line represents the axis of symmetry.  (E.g. @samp{|} means
+symmetrical about a vertical axis.) @code{patwt} is the numerical pattern
+value - if there is a helper function (see below), it is the maximum
+weight it can return.
+
+The assistance attribute reflects the fact that a pattern may have
+different values depending on external circumstances. For example, a
+pattern to connect is less important where I am powerful, but more
+important where my opponent is powerful. There are two different
+methods of assistance, wind assistance (@pxref{Wind Assistance})
+and moyo assistance (@pxref{Moyo Assistance}).
+
+The classification scheme is as follows : a sequence of
+zero or more of the following characters, each with a
+different meaning.
+
+@itemize 
+@item Classification @samp{s}:
+@quotation
+no checking is done. This is appropriate for sacrifice patterns.
+Otherwise, the matcher requires that the stone played cannot
+be trivially captured.
+@end quotation
+@item Classification @samp{n}:  
+@quotation
+In addition to usual check that the stone played cannot be
+trivially captured, it is also confirmed that an opponent
+move here could not be captured.
+@end quotation
+
+@item Classification @samp{O}:  
+@quotation
+It is checked that every friendly (@samp{O}) stone of the pattern
+belongs to a dragon which is classified as ALIVE or UNKNOWN.
+@end quotation
+
+@item Classification @samp{o}:  
+@quotation
+It is checked that every friendly (@samp{O}) stone of the pattern
+belongs to a dragon which is classified as DEAD or UNKNOWN.
+@end quotation
+@item Classification @samp{X}:  
+@quotation
+It is checked that every opponent (@samp{X}) stone of the pattern
+belongs to a dragon which is classified as ALIVE or UNKNOWN.
+@end quotation
+@item Classification @samp{x}:  
+@quotation
+It is checked that every opponent (@samp{X}) stone of the pattern
+belongs to a dragon which is classified as DEAD or UNKNOWN
+@end quotation
+@item Classification @samp{A}:
+@quotation
+If it is found that an @samp{X} stone at @samp{(m,n)} of the pattern
+can be captured (@code{worm[m][n].attacki != 0}) then the move at
+@samp{*} is tried.  If it is found to attack the stone,
+@code{worm[m][n].attack} is set to equal @samp{*}. This means that the
+attacker will later use this move to attack the stone.
+@end quotation
+@item Classification @samp{D}:  
+@quotation
+If it is found that an @samp{O} stone at @samp{(m,n)} of the pattern
+can be captured (@code{worm[m][n].attacki != 0}) then the move at * is tried.
+If it is found to defend the stone, @code{worm[m][n].defend} is set to equal
+@samp{*}. This means that the defender will later use this move to defend the
+stone.  
+@end quotation
+@item Classification @samp{C}:  
+@quotation
+If two distinct @samp{O} dragons occur in the pattern, the pattern
+is given the minimum of the @code{connection_value} and the return value
+of the pattern.
+@end quotation
+@item Classification @samp{B}:  
+@quotation
+If two distinct @samp{X} dragons occur in the pattern, the pattern
+is given the minimum of the @code{connection_value} and the return value
+of the pattern.
+@end quotation
+@item Classification @samp{L}:  
+@quotation
+Match the pattern and run the helper, even if the weight is less than
+that of the largest pattern found already. This is appropriate for
+patterns whose significance is in the side effects of the helpers.
+@end quotation
+@end itemize
+
+One common classification is @samp{OX} (which rejects pattern if
+either sides stones are dead). The string @samp{-} may be used as a
+placeholder. (In fact any characters other than the above and @samp{,} 
+are ignored.)
+
+@samp{o} and @samp{O} could conceivably appear in a class, meaning it
+applies only to @code{UNKNOWN}. Similarly @samp{X} and @samp{x} could
+be used together.
+
+Some care must be taken with the @samp{A} and @samp{D} classes. If
+more than one worm that can be attacked or defended is present in the
+pattern, only one of them, arbitrarily chosen, will be found.
+
+The classes @samp{B} and @samp{C} can be used together. If both
+connection values are greater than 0, the pattern is given a combined
+value which is the larger of them plus a fraction of the smaller one.
+
+The values obtained for the @samp{B} and @samp{C} classes are further
+limited by the sum of the primary pattern weight (@code{patwt}) and the
+assistance value.  The bonuses described below are applied after this
+limitation.
+
+The field @code{obonus} is a bonus which is added when the pattern contains
+any dragon of color @samp{O} with @code{dragon[m][n].safety != 0}.
+This means that the dragon has size at least 2 and between 0 and 20
+points of area, computed by the Bouzy 4/0 algorithm. Similarly the
+xbonus is added when the pattern contains at least one weak X dragon.
+
+The field splitbonus is a bonus which is added when the move splits
+opponent dragons on a large scale or joins own dragons in the same
+manner (@pxref{Moyo}).
+
+To avoid playing the same moves each game, minrand and maxrand
+specifies a random adjustment of the move value, uniformly distributed
+between minrand and maxrand, inclusively. This feature is primarily
+used for fuseki moves, where the choice of exact moves is a matter of
+inspiration anyway.
+
+helper_fn is the name of a C function which will be invoked
+to assist in the evaluation of the pattern. It will be passed
+the co-ordinates on the board of the pattern element marked @samp{*},
+the rotation of the pattern which has been matched,
+and the color of the piece for whom the move is being considered.
+(@samp{O} in the key above). Facilities are provided for navigating
+around the pattern taking the rotation into account.
+
+@node Defensive Patterns, Offensive Patterns, Pattern Attributes, Patterns
+@comment  node-name,  next,  previous,  up
+@section Defensive Patterns
+
+Usually a pattern will only contribute a move if its value is
+large enough to outweigh all other moves which have been
+found. There is an exception to this, however. If the
+pattern classification string contains a @samp{D}, the pattern
+is a defensive one. If an @samp{O} string is found in the pattern
+which can be captured, and if the move at @samp{*} defends it,
+then the point of defense (worm[m][n].defendi, worm[m][n].defendj)
+is moved to @samp{*}. This means that even if the pattern has small
+value, the defensive move will be remembered later when 
+defender() is run.
+
+@node Offensive Patterns, Helper Functions, Defensive Patterns, Patterns
+@comment  node-name,  next,  previous,  up
+@section Offensive Patterns
+
+Another exception is patterns with a classification string containing
+an @samp{A}. These patterns are offensive ones. If an @samp{X} string is found
+in the pattern which can be captured but also defended, and if the move at 
+@samp{*} also attacks it, then the point of attack (worm[m][n].attacki,
+worm[m][n].attackj) is moved to @samp{*}.  This means that even if the pattern
+has small value, the offensive move will be remembered later when attacker()
+is run. Notice that this means that the suggested move will never find an
+attack that wasn't found otherwise, but it can be used to capture enemy stones
+more efficiently or with better shape than the move attacker() would have
+found unassisted.
+
+@node Helper Functions, Wind Assistance, Offensive Patterns, Patterns
+@comment  node-name,  next,  previous,  up
+@section Helper Functions
+
+Helper functions can be provided to assist the matcher in weighing up
+the importance of a move. The helper is supplied with the compiled
+pattern entry in the table, and the (absolute) position on the board
+of the @samp{*} point.
+
+One difficulty is that the helper must be able to cope with all the
+possible transformations of the pattern.  To help with this, a
+transformation number is supplied.  This number can be passed to a
+utility function @code{offset()} with the relative co-ordinates in the
+original, untransformed pattern. This function will return the actual
+board co-ordinates to use for the indicated stone.
+
+The actual helper functions are in @file{helpers.c}. They are declared
+in @file{patterns.h}.
+
+As an example to show how to write a helper function, we consider
+defend_bamboo_helper. This begins with a comment:
+
+@example
+@group
+/*
+
+?X?        ?X?         
+O.O        ObO 
+O.*        Oat
+
+*/
+@end group
+@end example
+
+The image on the left is the actual pattern. On the right we've
+taken this image and added letters to label (ti, tj), (ai, aj)
+and (bi, bj). Of course t is always at *, the point where GNU
+Go will move if the pattern is adopted.
+
+@example
+@group
+
+int
+defend_bamboo_helper (ARGS)
+@{
+  int ai, aj, bi, bj;
+  int tval=0;
+  int other=OTHER_COLOR(color);
+
+  OFFSET(0, -1, ai, aj);
+  OFFSET(-1, -1, bi, bj);
+
+  if (strategic_distance_to(other, ti, tj)>10)
+    return (0); /* solid connection is better */
+  if (TRYMOVE(bi, bj, other)) @{
+    if (TRYMOVE(ai, aj, color)) @{
+      if (safe_move(ti, tj, other))
+	  tval=COMPUTE_SCORE;
+      popgo();
+    @}
+    popgo();
+  @}
+  return (tval);
+@}
+
+@end group
+@end example
+
+The @code{OFFSET}s tell GNU Go the positions of the two stones at @code{a=(ai,aj)}
+and @code{b=(bi,bj)}. The correctness of the coordinates (relative to
+@code{t=*=(ti,tj)}) can be confirmed by consulting the diagram in the
+prefatory comment. The macro @code{TRYMOVE} invokes the function @code{trymove()},
+@code{ARGS} supplies standard arguments to the helper, and @code{COMPUTE_SCORE}
+assigns the value of the pattern (@pxref{Pattern Attributes}).
+
+The pattern is subjected to two tests. First, the strategic_distance to X
+(@pxref{Dragon}) must not be too great. The rationale behind this test
+is that if the strategic distance is great, then simply making a solid
+connection probably secures one point more territory. On the other hand
+if the strategic distance is small, the region in question may not be
+secure territory, and the bamboo joint is often better.
+
+Hand-coding helpers such as this one is a powerful tool but not always
+needed. The same functionality can often be obtained more easily using an
+autohelper (@pxref{Autohelpers}).
+
+@node Wind Assistance, Moyo Assistance, Helper Functions, Patterns
+@comment  node-name,  next,  previous,  up
+@section Wind Assistance 
+
+Wind assistance, @code{wind(ucutoff, uvalue, mycutoff, myvalue)}, is
+based on the power of the stones in a neighborhood of the considered
+move. My power (@code{mypower}) and your power (@code{upower}) are
+measured by the function @code{testwind()}. The actual value of the
+wind assistance is given by the formula:
+
+To calculate a color's power near the point @code{*}, we sum @code{6-d}) 
+where @code{d} is the distance of a stone to @code{*}, where the sum
+is over all stones of the given color with @code{d<6}.
+
+@code{upower} and @code{ucutoff} must have the same sign, as must
+@code{mypower} and @code{mycutoff}.  In practice we have mostly used
+positive values for these parameters. We have always given uvalue and
+myvalue the value 1 or in rare instances 2.
+
+For example
+
+@example
+@group
+"connect if invaded"
+
+OX..
+.*.O
+.?.?
+
+:8,55,wind(20,1,0,0),-,0,0,0,NULL
+@end group
+@end example
+
+These represent additional biases to the score for the influence of
+nearby stones. The first pair are a multiplier and a cutoff for enemy
+stones, and the second for friendly stones. The actual weight
+(computed in the function @code{compute_score()}) is given by the
+formula:
+
+@example
+  uvalue*min(upower,abs(ucutoff)) + myvalue*min(mypower,abs(mycutoff)).
+@end example
+
+
+Typically uvalue (if nonzero) would have the value 1, meaning that the
+score increases by 1 for each increase in upower, up to a maximum of
+ucutoff, after which it does not increase. Thus in this example, the
+value of the pattern can increase up to 75, becoming more valuable
+when the opponent becomes strong in the area. This is a good feature
+for patterns which help the safety of our group.
+
+@node Moyo Assistance, Tuning, Wind Assistance, Patterns
+@comment  node-name,  next,  previous,  up
+@section Moyo Assistance
+
+Moyo assistance, @code{moyo(moyocutoff, moyovalue)}, is based on an
+estimation of "moyo" (@pxref{Moyo}).
+
+In practice this is a combination of territory and influence for both
+players. The function @code{delta_moyo()} computes the difference in
+moyo between the current position and after the move has been
+made. The actual value of the moyo assistance is given by the formula:
+
+@example
+  moyovalue*min(deltamoyo,moyocutoff)
+@end example
+
+@node Tuning, Autohelpers, Moyo Assistance, Patterns
+@comment  node-name,  next,  previous,  up
+@section Moyo Assistance
+
+Since the pattern database decides GNU Go's personality to a very great
+extent, much time can be devoted to ``tuning'' it.  Here are some
+suggestions.
+
+If you want to experiment with modifying the pattern database, invoke
+with the @option{-a} option.  This will cause every pattern to be
+evaluated, even if its maximum possible contribution is smaller than a
+pattern already found. This makes the program less efficient, but then
+you can see how much you must increase a pattern value in order to
+`promote' a better move over the move actually chosen.
+
+You can obtain a Smart Go Format (SGF) record of your game in at least
+two different ways. One is to use CGoban to record the game. You can
+also have GNU Go record the game in Smart Go Format, using the
+@option{-o} option. It is best to combine this with @option{-a}. Do not
+try to read the sgf file until the game is finished and you have
+closed the sgf window. This does not mean that you have to play the
+game out to its conclusion. You may close the CGoban window on the
+game and GNU Go will close the sgf file so that you can read it.
+
+If you record a game in SGF form using the @code{-o} option, GNU Go
+will add labels to the board to show all the moves it considered, with
+their values. This is an extremely useful feature, since one can see
+at a glance whether the right moves with appropriate weights are being
+proposed by the pattern matcher. If bad moves are being proposed, one
+may modify a pattern to exclude it, or reduce the value of the
+pattern.  If important moves are not proposed at all, you may have
+found a gap in the pattern database, and you can add a pattern. If the
+right move is proposed but with too low a score, this may be a sign
+that you should adjust its weight upwards. It is almost always best to
+make the *minimum* adjustment needed to correct the bad behavior.
+
+If you decide to add a pattern, give some thought to adding the
+pattern in exactly the right generality by putting @samp{?} at
+irrelevant locations, and by using the @samp{o} and @samp{x} options.
+
+First, due to a bug of unknown nature, it occasionally happens
+that GNU Go will not receive the SIGTERM signal from CGoban that it
+needs to know that the game is over. When this happens, the sgf file
+ends without a closing parenthesis, and CGoban will not open the
+file. You can fix the file by typing:
+
+@example
+ echo ")" >>[filename]  
+@end example
+
+at the command line to add this closing parenthesis. Or you could
+add the ")" using an editor.
+
+Pattern weights exceeding 99 can be displayed by CGoban but you may
+have to resize the window in order to see all three digits. Grab the
+lower right margin of the CGoban window and pull it until the window
+is large. All three digits should be visible.
+
+If you are playing a game without the -o option and you wish to
+analyze a move, you may still use CGoban's ``Save Game'' button to get
+an SGF file. It will not have the values of the moves labelled, of
+course.
+
+Once you have a game game saved in SGF format, you can analyze any
+particular move by running:
+
+@example
+  gnugo -l [filename] -L [move number] -t -a -w
+@end example
+
+to see why GNU Go made that move, and if you make changes to the
+pattern database and recompile the program, you may ask GNU Go to
+repeat the move to see how the behavior changes.
+
+Alternatively, you can use the CGoban tools to delete all moves after
+and including the one you want to study, and then load without the
+@option{-L} option.
+
+If a pattern is contributing a bad move, you can adjust its weight
+downward, or you you can adjust the weight of a pattern which is
+contributing a good move up. If no pattern is contributing the move
+that you think should be made, then you may add a pattern.
+
+You can also get a visual display of the dragons using the -T
+option. The default GNU Go configuration tries to build a
+version with color support using either curses or the
+ansi escape sequences. You are more likely to find color
+support in rxvt than xterm, at least on many systems, so
+we recommend running:
+
+@example
+  gnugo -l [filename] -L [move number] -T
+
+@end example
+
+in an rxvt window. If you do not see a color display,
+and if your host is a GNU/Linux machine, try this again
+in the Linux console.
+
+Worms belonging to the same dragon are labelled with the same letters.
+The colors indicate the value of the field @code{dragon.safety}, which
+is set in @file{moyo.c}.
+
+@format
+Green:  GNU Go thinks the dragon is alive
+Yellow: Status unknown
+Blue:   GNU Go thinks the dragon is dead
+Red:    Status critical (1.5 eyes) or weak by the algorithm
+        in @file{moyo.c}
+@end format
+
+If you want to get the same game over and over again, you can
+eliminate the randomness in GNU Go's play by changing the value of
+seed in main.c to a fixed nonzero integer. If @code{seed==0}, then GNU
+Go will play a different game each time.
+
+@node Autohelpers, Autohelper Functions, Tuning, Patterns
+@comment  node-name,  next,  previous,  up
+@section Autohelpers
+
+In addition to the hand-written helper functions in helpers.c there
+can be automatic helper functions. These are briefly described in
+the pattern database and compiled into C source which goes into
+@file{patterns.c}.
+
+The "pattern compiler" is based on the idea of constraint diagrams and
+expressions. To give an example, one pattern consists of a pair of
+diagrams:
+
+@example
+@group
+Pattern ED54
+
+|oOOX           maybe capture corner
+|..XO
+|.*XO
+|..??
++----
+
+:8,85,0,s,10,0,0,0,0,NULL
+
+|obbX
+|..Aa
+|.*Aa
+|..??
++----
+
+;(lib(A)<=4) && (lib(a)>=lib(A)-1) && (lib(b)>=lib(A))
+;&& (!dead(A)||attack(a))
+@end group
+@end example
+
+The first diagram and the colon line has exactly the same interpretation
+as usual. The diagram below and the semicolon line(s) are optional and
+can only be used to reject the pattern given above. Note that some
+strings now have labels which are referred to in the constraint.
+
+Only strings for which we have constraints need be labeled. Labels may
+be any letter except OoXxt. To make the database consistent and easy to
+read it is our convention that @samp{X} strings should be upper-case
+and @samp{O} strings lower-case, but the implementation does not
+enforce this.  Neither does it require that all stones in a string be
+labeled (it goes with the first appearance) but it is good practice to
+do so anyway.
+
+The constraint expression is transformed by mkpat into an
+automatically generated helper function (there is a new field in the
+pattern struct, so it does not conflict with the old helper). @code{lib(x)}
+can be regarded as a macro which is expanded by mkpat into
+@code{worm[xi][xj].liberties}. The resulting expression must be valid C code,
+otherwise the generated @file{patterns.c} won't compile. In principle any
+code can be written on the line but to keep the database maintainable
+we should restrict ourselves to boolean and arithmetic expressions,
+which anyone should be able to understand and write with no more than
+a little trouble. If the expression evaluates to true the pattern is
+accepted by the autohelper, if false it is rejected. If there are
+multiple semicolon lines for the same pattern, these are concatenated
+before generating the code. 
+
+@node Autohelper Functions, Pattern Matcher, Autohelpers, Patterns
+@comment  node-name,  next,  previous,  up
+@section Autohelper Functions
+
+@example
+lib(x)
+lib2(x)
+lib3(x)
+lib4(x)
+@end example
+
+Number of first, second, third, and fourth order liberties of a worm
+respectively (@pxref{Dragon}).
+
+@example
+xlib(x)
+olib(x)
+@end example
+
+The number of liberties that an enemy or own stone, respectively,
+would obtain if played at the empty intersection x.
+
+@example
+ko(x)
+@end example
+
+True if x is either a stone or an empty point involved in a ko
+position.
+
+@example
+status(x)
+alive(x)
+unknown(x)
+critical(x)
+dead(x)
+@end example
+
+Status of a dragon. @code{status(x)} returns an integer that can have
+the values @code{ALIVE}, @code{UNKNOWN}, @code{CRITICAL}, or
+@code{DEAD}. The four other functions returns true if the dragon has
+the corresponding status and false otherwise (@pxref{Dragon}).
+
+@example
+genus(x)
+@end example
+
+The number of eyes of a dragon. It is only meaningful to compare this
+value against 0, 1, or 2.
+
+@example
+xarea(x)
+oarea(x)
+xmoyo(x)
+omoyo(x)
+xterri(x)
+oterri(x)
+@end example
+
+Functions related to various kinds of influence and territory
+estimations (@pxref{Moyo}). @code{xarea(x)} evaluates to true if
+@samp{x} is either a living enemy stone or an empty point within his "area".
+@code{oarea(x)} is analogous but with respect to our stones and area.
+
+@code{cutstone(x)} returns @code{worm[x].cutstone}, which can be 0, 1,
+or 2 (@pxref{Dragon}).
+
+@example
+weak(x)
+@end example
+
+True for a dragon with @code{safety==CRITICAL}.
+
+@example
+attack(x)
+defend(x)
+@end example
+
+These give the results of tactical reading. @code{attack(x)} is true if the
+worm can be captured, @code{defend(x)} is true if there also is a defending
+move. Please notice that @code{defend(x)} will return false if there is no
+attack on the worm.
+
+@example
+safe_xmove(x)
+safe_omove(x)
+@end example
+
+True if an enemy or own stone, respectively, can safely be played at
+@samp{x}. By safe it is understood that the move is legal and that it cannot
+be captured right away.
+
+@example
+odefend_against(x,y)
+xdefend_against(x,y)
+@end example
+
+True if an own stone at @samp{x} would stop the enemy from safely playing at
+@samp{y}, and conversely for the second function.
+
+@example
+does_defend(x,y)
+does_attack(x,y)
+@end example
+
+True if a move at @samp{x} defends/attacks the worm at @samp{y}. For
+defense a move of the same color as @samp{y} is tried and for attack a move
+of the opposite color.
+
+@example
+xplay_defend(a,b,c,...,z)
+oplay_defend(a,b,c,...,z)
+xplay_attack(a,b,c,...,z)
+oplay_attack(a,b,c,...,z)
+@end example
+
+These functions make it possible to do more complex reading
+experiments in the constraints. All of them work so that first the
+sequence of moves @samp{a}, @samp{b}, @samp{c},... is played through
+with alternating colors, starting with @samp{X} or @samp{O} as
+indicated by the name. Then it is tested whether the worm at @samp{z}
+can be attacked or defended, respectively. It doesn't matter who would
+be in turn to move, a worm of either color may be attacked or
+defended. For attacks the opposite color of the string being attacked
+starts moving and for defense the same color starts. The defend
+functions return true if the worm cannot be attacked in the position
+or if it can be attacked but also defended.  The attack functions
+return true if there is a way to capture the worm, whether or not it
+can also be defended.
+
+@example
+eye(x)
+proper_eye(x)
+marginal_eye(x)
+@end example
+
+True if @samp{x} is an eye space for either color, a non-marginal eye
+space for either color, or a marginal eye space for either color,
+respectively.
+
+@node Pattern Matcher, Symmetry, Autohelper Functions, Patterns
+@comment  node-name,  next,  previous,  up
+@section Pattern Matcher
+
+The pattern code in GNU Go 2.6 is fairly straightforward conceptually,
+but because the matcher consumes a significant part of the time in
+choosing a move, the code is optimized for speed. Because of this
+there are implementation details which obscure things slightly.
+
+In GNU Go 2.6, the ascii patterns.db file is precompiled into tables
+(see patterns.h) by a standalone program mkpat.c, and the resulting
+file patterns.c is compiled and linked into the main gnugo executable.
+
+Each pattern is compiled to a header, and a sequence of elements,
+which are (notionally) checked sequentially at every position and
+orientation of the board. These elements are relative to the pattern
+'anchor' (or origin).  One @samp{X} or @samp{O} stone is (arbitrarily)
+chosen to represent the origin of the pattern. (We cannot dictate one
+or the other since some patterns contain only one colour or the
+other.)  All the elements are in co-ordinates relative to this
+position. So a pattern matches "at" board position (m,n,o) if the the
+pattern anchor stone is on (m,n), and the other elements match the
+board when the pattern is transformed by transformation number
+'o'. (See below for the details of the transformations, though these
+should not be necessary)
+
+@node Symmetry, Matcher Details, Pattern Matcher, Patterns
+@comment  node-name,  next,  previous,  up
+@section Symmetry and Transformations
+
+In general, each pattern must be tried in each of 8 different
+permutations, to reflect the symmetry of the board. But some
+patterns have symmetries which mean that it is unnecessary
+(and therefore inefficient) to try all eight. The first
+character after the ':' can be one of '8','|','\','/',
+'X', '-', '+', representing the axes of symmetry.
+
+
+@example
+@group
+transformation   I    -    |     .     \    l    r     /
+                ABC  GHI  CBA   IHG   ADG  CFI  GDA   IFC
+                DEF  DEF  FED   FED   BEH  BEH  HEB   HEB
+                GHI  ABC  IHG   CBA   CFI  ADG  IFC   GDA
+
+                 a    b    c     d     e    f    g     h
+@end group
+@end example
+
+Then if the pattern has the following symmetries, the
+following are true...
+
+@example
+@group
+|  c=a, d=b, f=e, h=g
+-  b=a, c=d, e=f, g=i
+\  e=a, g=c, f=b, h=d
+/  h=a, f=c, g=b, e=d
+X  a=d=e=h, b=c=f=g
++  a=b=c=d, e=f=g=h
+@end group
+@end example
+
+We can choose to use transformations a,d,f,g  as the
+unique transformations for patterns with either @samp{|} or @samp{\}
+symmetry.
+
+Thus we choose to order the transformations a,f,d,g,.... and choose
+first 2 for @samp{X} and @samp{-}, the first 4 for @samp{|}, @samp{-},
+@samp{/}, and @samp{\}, and all 8 for non-symmetrical patterns.
+
+@node Matcher Details, Grid Optimization, Symmetry, Patterns
+@comment  node-name,  next,  previous,  up
+@section Matcher Details
+
+i) An entry in the pattern header states whether the anchor is an X or
+an O. This helps performance, since all transformations can be
+rejected at once if the anchor stone does not match. (Ideally, we
+could just define that the anchor is always O or always X, but some
+patterns contain no O's and some contain no X's.)
+
+ii) The pattern header contains the size of the pattern (ie the
+co-ordinates of the top left and bottom right elements) relative to
+the anchor. This allows the pattern can be rejected quickly if there
+is not room for the pattern to fit around the anchor stone in a given
+orientation (ie it is too near the edge of the board).  The bounding
+box information must first be transformed like the elements before it
+can be tested, and after transforming, we need to work out where the
+top-left and bottom-right corners are.
+
+iii) The edge constraints are implemented by notionally padding the
+pattern with rows or columns of '?' until it is exactly 19 elements
+wide or high. Then the pattern is quickly rejected by (ii) above if it
+is not at the edge. So the example pattern above is compiled as if it
+was written
+
+@example
+@group
+"example"
+.OO????????????????
+*XX????????????????
+o??????????????????
+:8,80
+@end group
+@end example
+
+iv) The elements in a pattern are sorted so that non-space
+elements are checked before space elements. It is hoped that,
+for most of the game, more squares are empty, and so the
+pattern can be more quickly rejected doing it this way.
+
+v) The patterns themselves are sorted by decreasing
+maximum-weight, which is the maximum value the pattern can
+take, taking weight and wind assistance into account.  For
+this to work, the weight stored for patterns with helpers
+must be the maximum which the helper can return. As a hint,
+to simplify maintenance, the helper can access the stored
+weight from the pattern structure passed in.
+
+vi) The actual tests are performed using an 'and-compare'
+sequence. Each board position is a 2-bit quantity.
+%00 for empty, %01 for O, %10 for X.
+We can test for an exact match by and-ing with %11 (no-op),
+then comparing with 0, 1 or 2. The test for 'o' is the
+same as a test for 'not-X', ie not %10. So and with %01
+should give 0 if it matches. Similarly 'x' is a test that
+bit 0 is not set.
+
+@node Grid Optimization, Joseki Compiler, Matcher Details, Patterns
+@comment  node-name,  next,  previous,  up
+@section The "Grid" Optimization
+
+This is a compile time option. By editing the makefile,
+you can use this faster code to match patterns. The only 
+disadvantage to using this code is that it might be harder 
+to understand and debug.
+
+As described in (vi), the comparisons between pattern and
+board are performed as 2-bit bitwise operations. Therefore they
+can be performed in paralled, 16-at-a-time on a 32-bit machine.
+
+Suppose the board is layed out as follows :
+
+@example
+@group
+ .X.O....OO
+ XXXXO.....
+ .X..OOOOOO
+ X.X.......
+ ....X...O.
+@end group
+@end example
+
+which is internally stored internally in a 2d array (binary)
+
+@example
+@group
+ 00 10 00 01 00 00 00 00 01 01
+ 10 10 10 10 01 00 00 00 00 00
+ 00 10 00 00 01 01 01 01 01 01
+ 10 00 10 00 00 00 00 00 00 00
+ 00 00 00 00 10 00 00 00 01 00
+@end group
+@end example
+
+we can compile this to a composite array in which each element
+stores the state of a 4x4 grid of squares :
+
+@example
+@group
+ ????????  ????????  ???????? ...
+ ??001000  00100001  10000100
+ ??101010  10101010  10101001
+ ??001000  00100000  10000001
+@end group
+
+@group
+ ??001000  00100001  ...
+ ??101010  10101010
+ ??001000  00100000
+ ??001000  10001000 
+@end group
+...
+
+@group
+ ??100010  ...
+ ??000000
+ ????????
+ ????????
+@end group
+@end example
+
+
+Where '??' is off the board.
+
+We can store these 32-bit composites in a 2d merged-board array,
+substituting the illegal value %11 for '??'.
+
+Similarly, for each pattern, mkpat produces appropriate 32-bit and-value
+masks for the pattern elements near the anchor. It is a simple matter
+to test the pattern with a similar test to (vi) above, but for 32-bits
+at a time.
+
+@node Joseki Compiler, Advanced Features, Grid Optimization, Patterns
+@comment  node-name,  next,  previous,  up
+@section The Joseki Compiler
+
+GNU Go includes a joseki compiler in patterns/joseki.c. This processes
+an sgf file (with variations) and produces a sequence of patterns
+which can then be fed back into mkpat. The joseki database is in files
+in @file{patterns/} called @file{hoshi.sgf}, @file{komoku.sgf},
+@file{sansan.sgf}, @file{mokuhadzushi.sgf} and @file{takamoku.sgf}.
+
+Not every node in the sgf file contributes a pattern. The nodes
+which contribute patterns have the joseki in the upper right
+corner, with the boundary marked with an @samp{A} and the value
+given by a comment.
+
+@node Advanced Features, Connection Patterns, Joseki Compiler, Patterns
+@comment  node-name,  next,  previous,  up
+@section Advanced Features
+
+The joseki compiler is able to generate a constraint line in the
+@file{.db}.  The square symbol is a shortcut for @code{oarea()}, the
+triangle is @code{xarea()} and the circle is
+@code{(!oarea()&&!xarea())} = an empty area.
+
+The delimiter between value and classification in the SGF 
+comment must be @samp{;}, for example:
+
+@example
+81;
+D
+@end example
+
+Spaces and @code{\n} may be omitted.
+
+These features are experimental and are currently not used in the 
+joseki files. 
+
+@node Connection Patterns, , Advanced Features, Patterns
+@comment  node-name,  next,  previous,  up
+@section Connection Patterns
+
+The patterns in @file{patterns/conn.db} are compiled separately
+from the other patterns. When a @samp{B} pattern is found, a cutting
+point is set in the worm data structure and make eye space marginal for the
+connection inhibiting entries of the pattern. If it is a C pattern,
+amalgamate the dragons in the pattern.
+
+
+
+
+
+
+
+

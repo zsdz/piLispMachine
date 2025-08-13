@@ -1,0 +1,150 @@
+         COMPILING GNU GO ON MICROSOFT PLATFORMS
+
+GNU Go is being developed on Unix variants. GNU Go is easy
+to build and install on those platforms.
+
+GNU Go 2.6 is the first version of GNU go that has support
+for building on MS-DOS, Windows 3.x, Windows NT and Windows
+95/98. Windows 2000 has not been tested yet.
+
+There are two approaches to building GNU Go on
+Microsoft platforms.
+
+1) The first approach is to install a Unix-like environment
+   based on ports of GCC to Microsoft platforms. This
+   approach is fully supported by the GNU Go development
+   team and is known to work well. Several high-quality
+   free Unix-environments for Microsoft platforms are
+   available.
+
+2) The second approach is to use compilers such as Visual C
+   developed specially for the Microsoft platform. GNU Go 2.6
+   supports Visual C. Presently there are two ways to use
+   Visual C. One is to use the provided project files, The other
+   is to use the makeit.bat which invokes Nmake with the
+   provided makefile, and thus compiles the project for you.
+
+The sequel of this document gives more details on
+the various ways to compile GNU go for Microsoft platforms.
+
+1) Using free Unix-environments and GCC
+ A) Windows 95/98, MS-DOS and Windows 3.x using DJGPP
+ B) Windows NT, Windows 95/98 using Cygwin
+ C) Windows NT, Windows 95/98 using MINGW32
+
+2) Visual C:
+ D1) Windows NT, Windows 95/98 using Visual C and project files
+ D2) Windows NT, Windows 95/98 using Visual C and makefiles
+
+A) Windows 95/98, MS-DOS and Windows 3.x using DJGPP
+
+  On these platforms DJGPP can be used. GNU Go installation
+  has been tested in a DOS-Box with long filenames on
+  Windows 95/98. GNU Go compiles out-of-the box with the
+  DJGPP port of GCC using the standard Unix build and
+  install procedure. I am not sure whether it will compile
+  on a DOS-Box with 8.3 filenames.
+
+  Some URLs for DJGPP:
+
+  DJGPP home page:
+     http://www.delorie.com/djgpp/
+
+  DJGPP ftp archive on simtel:
+     ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/
+     ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/
+
+  bash2.03 port for DJGPP:
+     http://snowball.frogspace.net/djgpp/
+
+  GNU Go development can also be done with DJGPP. Making
+  and applying patches all works.
+
+  Optionally you can use glib to get a working
+  version of snprintf. Building glib requires
+  minor editing of the glib source for djgpp.
+
+B) Windows NT, Windows 95/98 using Cygwin
+
+  On these platforms the Cygwin environment can be
+  installed. GNU Go compiles out-of-the box using the
+  standard Unix build procedure on the Cygwin environment.
+
+  The generated executable is not a stand-alone
+  executable: it needs cygwin1.dll that comes with the
+  Cygwin environment. cygwin1.dll contains the emulation
+  layer for Unix.
+
+  Cygwin Home page:
+    http://sourceware.cygnus.com/cygwin/
+
+  Optionally you can use glib to get a working
+  version of snprintf. Glib builds out of the
+  box on cygwin.
+
+C) Windows NT, Windows 95/98 using MINGW32
+
+  The Cygwin environment also comes with MINGW32. This
+  generates an executable that relies only on Microsoft
+  DLLs. This executable is thus completely comparable to
+  a Visual C executable and easier to distribute than the
+  Cygwin executable. To configure for MINGW32 the following
+  command must be typed in the Cygwin bash shell after
+  CD-ing to the top level GNU Go directory:
+
+  env CC='gcc -mno-cygwin' ./configure
+
+  After a successful configure make and make install can
+  be run.
+
+  Building glib for MINGW32 has not been tested by us.
+  You *can't* use a glib built for Cygwin with MINGW32.
+
+D1) Windows NT, Windows 95/98 using Visual C and project files
+
+  1) The file config.vc must be renamed config.h.
+
+  2) Open the VC++ workspace file gnugo.dsw
+
+  3) Compile the projects in the following order:
+
+     utils, sgfgen, sgf, mkpat, joseki, mkeyes, patterns, interface, gnugo
+
+D2) Windows NT, Windows 95/98 using Visual C and makefiles
+
+  The makefile is compatible with the Nmake from MS-VC, both versions
+  5 and 6 (DevStudio 97 and 98). To use it do
+
+    CD win
+    makeit
+
+  This invokes the batch file win/makeit.bat, which copies the
+  file config.vc to win/config.h and then runs the makefile.
+
+  MS-VC requires a few environment variables to be set up when used
+  from nmake. Its installation does not set these up, but there is a
+  bat file provided. The makeit.bat contains a call to this bat file,
+  but it is commented out. If needed, uncomment it and edit the path
+  to point to the place where your VC is installed.
+
+        RUNNING GNU GO ON WINDOWS NT AND WINDOWS 95/98
+
+GNU Go does not come with its own graphical user
+interface. The Java client jago can be used.
+
+A) Jago
+
+  To run the Java clients you need JRE, the Java Runtime Environment.  This 
+  can be obtained from http://www.javasoft.com/.  This is the runtime part of 
+  the Java Development Kit (JDK) and consists of the Java virtual machine, 
+  Java platform core classes, and supporting files.
+
+  Jago: http://mathsrv.ku-eichstaett.de/MGF/homes/grothmann/jago/Go.html
+
+  -- need to invoke GNU Go with 'gnugo --quiet --mode gmp'  
+  -- run 'gnugo --help' from a cygwin or DOS window for a list of options
+  -- optionally specify -D # for the search depth to make the game faster
+
+  Jago works well with both the Cygwin and Mingw32 executables. The
+  DJGPP executable also works, but has one annoying problem: You can't
+  close the game after scoring it.

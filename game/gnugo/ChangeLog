@@ -1,0 +1,27 @@
+Fri Oct 20 1995  Frank Pursel
+
+	* Fixed bug in findcolor.c
+
+Tue Oct 17 13:29:17 1995  Man Li
+
+	* Rewrote findcolor.c to check color of four neighbors
+
+Fri Sep 17 1995  Frank Pursel
+
+	* Added new private functions node2ij, node, createlist, enqueue,
+	dequeue, bfslist in file endgame.c
+
+	* Modified function endgame to delete connected dead stones as
+	group and improve the 'fill' algorithm in file endgame.c
+
+Mon Sep 11 15:54:21 1995  Man Li
+
+	* Changed random function to system rand function
+
+	* Changed function declaration and prototype to ISO standard
+
+	* Added new header file gnugo.h
+
+	* Changed patterns.c to patterns.h
+
+        * Removed files random.c, seed.c

@@ -1,0 +1,50 @@
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+configure:577: checking for a BSD compatible install
+configure:630: checking whether build environment is sane
+configure:687: checking whether make sets ${MAKE}
+configure:733: checking for working aclocal
+configure:746: checking for working autoconf
+configure:759: checking for working automake
+configure:772: checking for working autoheader
+configure:785: checking for working makeinfo
+configure:805: checking whether to enable maintainer-specific portions of Makefiles
+configure:865: checking for gcc
+configure:978: checking whether the C compiler (gcc  ) works
+configure:994: gcc -o conftest    conftest.c  1>&5
+configure:991:1: warning: return type defaults to 'int' [-Wimplicit-int]
+  991 | main(){return(0);}
+      | ^~~~
+configure:1020: checking whether the C compiler (gcc  ) is a cross-compiler
+configure:1025: checking whether we are using GNU C
+configure:1053: checking whether gcc accepts -g
+configure:1085: checking for Cygwin environment
+configure:1118: checking for mingw32 environment
+configure:1149: checking for executable suffix
+configure:1185: checking how to run the C preprocessor
+configure:1266: checking whether gcc needs -traditional
+configure:1314: checking for ranlib
+configure:1343: checking whether make sets ${MAKE}
+configure:1371: checking whether sys/types.h defines makedev
+configure:1401: checking for sys/mkdev.h
+configure:1439: checking for sys/sysmacros.h
+configure:1478: checking for working const
+configure:1557: checking for unistd.h
+configure:1557: checking for string.h
+configure:1557: checking for sys/time.h
+configure:1600: checking for setlinebuf
+configure:1600: checking for random
+configure:1600: checking for alarm
+configure:1600: checking for snprintf
+configure:1600: checking for gettimeofday
+configure:1746: checking for __FUNCTION__
+configure:1755: gcc -c -g -O2  conftest.c 1>&5
+configure: In function 'main':
+configure:1751:9: warning: initialization discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+ 1751 | char *s=__FUNCTION__
+      |         ^~~~~~~~~~~~
+configure:1777: checking for color support
+configure:1782: checking for curses.h
+configure:1811: checking for term.h
+configure:1842: checking for tputs in -lncurses

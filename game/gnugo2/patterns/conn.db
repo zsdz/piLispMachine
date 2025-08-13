@@ -1,0 +1,285 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 1999 and 2000 by the Free Software Foundation.      #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# Database of connection patterns.
+#
+#  ? - don't care
+#  . - empty
+#  X - opposite color of O, not easily captured
+#  O - color of dragon having false or half eye
+#  x - X or empty
+#  o - O or empty and an X move here could be captured
+#  * - cutting point in the O formation, an X move here must be
+#      tactically safe
+#  ! - inhibit connection, eye space points for O are turned marginal
+#
+
+Pattern 1
+
+?XO
+O*!
+---
+
+:8,B,NULL
+
+
+Pattern 2
+
+?XO
+O*!
+.!.
+---
+
+:8,B,NULL
+
+
+Pattern 3
+
+.O
+O.
+
+:X,C,NULL
+
+aO
+Ob
+
+;!xcut(a) && !xcut(b)
+
+
+Pattern 4
+
+OO
+..
+OO
+
+:+,C,NULL
+
+
+Pattern 5
+# Ok, this is a bit fishy, but we need it in order find the sente
+# move at *, threatening to cut.
+
+|.O?         force X to connect
+|!*X
+|.O?
+
+:-,B,NULL
+
+
+Pattern 6
+
+?O.          fragile double connection 
+X*O
+?O.
+
+:8,B,double_does_break_helper
+
+
+Pattern 7
+
+?OO
+o..
+?O?
+
+:8,C,NULL
+
+?OO
+cba
+?O?
+
+;odefend_against(a,b) && olib(c)>1
+
+
+Pattern 8
+
+?OO
+X..
+?O?
+
+:8,C,NULL
+
+?OO
+Xba
+?O?
+
+;odefend_against(a,b)
+
+
+Pattern 9
+# second line clamp
+
+x.!?
+XO*!
+x.!?
+----
+
+:8,B,NULL
+
+
+Pattern 10
+
+X.O?
+.*!?
+..!!
+----
+
+:8,B,NULL
+
+
+Pattern 11
+
+O!O
+!*X
+.O?
+
+:8,B,NULL
+
+O!a
+!*X
+.b?
+
+;lib(a)==2 || lib(b) == 2
+
+
+Pattern 12
+
+XO?
+O*!
+?!?
+
+:\,B,basic_cut_helper
+
+
+Pattern 13
+
+O
+.
+O
+
+:+,C,NULL
+
+O
+A
+O
+
+;!safe_xmove(A)
+
+
+Pattern 14
+
+.O
+..
+O.
+oO
+
+:8,C,NULL
+
+dO
+ab
+Oc
+oO
+
+;(xplay_attack(a,b,c,a) || xplay_attack(a,b,c,c)) &&
+;(xplay_attack(b,a,d,b) || xplay_attack(b,a,d,d))
+
+
+Pattern 15
+
+XO
+O.
+
+:\,C,NULL
+
+AO
+OB
+
+;attack(A) || !safe_xmove(B)
+
+
+Pattern 16
+# This pattern is an ugly way to ensure that the X stone is at least
+# regarded as a potential cutting stone. The helper returns 0 so the
+# pattern does not fire as a B pattern. With an improved connectivity
+# analysis, this pattern should no longer be needed.
+
+XO
+O*
+
+:\,B,ugly_cutstone_helper
+
+AO
+OB
+
+;attack(A) && safe_xmove(B)
+
+
+Pattern 17
+
+?O.
+...
+?O.
+
+:+,C,NULL
+
+?Od
+cab
+?Oe
+
+;olib(c)>1 && xplay_attack(a,b,c,d,e,e)
+
+
+Pattern 18
+
+OXO
+!*!
+.!.
+---
+
+:8,B,NULL
+
+
+Pattern 19
+
+O..O
+O...
+....
+----
+
+:8,C,NULL
+
+
+Pattern 20
+
+O.X
+X.O
+
+:8,C,NULL
+
+ObB
+AaO
+
+; (((xplay_attack(a,b,A) && (!xplay_defend(a,b,A) || xplay_attack(a,b,B)))
+; || (xplay_attack(a,b,B) && !xplay_defend(a,b,B)))
+; && (((xplay_attack(b,a,A) && (!xplay_defend(b,a,A) || xplay_attack(b,a,B)))
+; || (xplay_attack(b,a,B) && !xplay_defend(b,a,B)))))
+
+# END OF FILE

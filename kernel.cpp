@@ -61,6 +61,10 @@ CStdlibApp::TShutdownMode CKernel::Run(void)
 
     printf("\n");
 
+    printf("Use (go) to play gnugo1.2.(print exit to exit the program).Use (ttt) to play TicTacToe");
+
+    printf("\n");
+
     string prompt;
     char buf[1024];
 

@@ -1,0 +1,266 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 1999 and 2000 by the Free Software Foundation.      #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+	
+
+(;GM[1]FF[3]
+RU[Japanese]SZ[19]HA[0]KM[5.5]
+GN[early fuseki variations]
+DT[1999-08-14]
+SY[Cgoban 1.9.7]TM[-]
+(;B[qc];W[tt]PL[1]
+(;B[pd]LB[lh:A]C[75
+;;#1
+])
+
+(;B[pd]LB[lh:A]MA[kd][pi]C[77
+;;#2
+])
+
+(;B[od]LB[lh:A]MA[kd]C[76
+;;#3
+])
+
+(;B[od]LB[lh:A]MA[kd]TR[pi]C[78
+;;#4
+])
+
+(;B[nc]LB[lh:A]TR[kd][pi]LB[nc:1][qf:2]
+C[81;
+;
+diff_moyo(1)>=diff_moyo(2)
+# play where it makes more profit
+])
+
+(;B[nc]LB[lh:A]TR[kd]LB[nc:1][qf:2]CR[pi]
+C[80;
+;
+diff_moyo(1)>=diff_moyo(2)
+#6
+])
+
+(;B[qf]TR[kd]CR[pi]LB[lh:A][qf:1][nc:2]
+C[80;
+;
+diff_moyo(1)>=diff_moyo(2)
+#7
+])
+)
+
+(;B[pc]
+(;W[tt]
+(;B[qe]LB[lh:A]MA[kd]TR[pi]C[84
+;;#9
+])
+
+(;B[pe]MA[kd][pi]LB[lh:A]C[85
+;;#8
+])
+
+(;B[pe]CR[pi]MA[kd]LB[lh:A]C[83
+;;#10
+])
+
+(;B[qe]MA[kd]CR[pi]LB[lh:A]
+C[82;
+;
+;
+#should happen less often then high enclosure
+#11
+])
+
+(;B[pe]LB[lh:A]MA[kd][pn]CR[pi]C[84
+])
+
+(;B[qe]TR[kd][pi]LB[lh:A]
+C[87;
+;
+#play urgent low enclosure, since we are surrounded 
+])
+
+(;B[qe]LB[lh:A]TR[kd]MA[pi]C[84
+])
+
+(;B[pe]LB[lh:A]TR[kd]MA[pi]C[84
+])
+
+(;B[pe]TR[kd]CR[pi]LB[lh:A]C[85
+])
+
+(;B[qe]LB[lh:A]TR[kd]CR[pi]C[84
+])
+
+(;B[pe]LB[lh:A]CR[kd]MA[pi]C[85
+])
+
+(;B[qe]LB[lh:A]CR[kd]C[84
+])
+)
+
+(;W[qe]LB[lh:A]MA[kd][pi]C[84
+])
+
+(;W[pe]MA[kd][pi]LB[lh:A]C[83
+])
+
+(;W[pe]MA[kd]LB[lh:A]C[82
+])
+
+(;W[qe]LB[lh:A]C[82
+])
+)
+
+(;B[pd]
+(;W[tt]
+(;B[qf]LB[lh:A]TR[kd][pi]LB[qf:1][nc:2]
+C[80;
+;
+diff_moyo(1)>=diff(moyo(2)
+])
+
+(;B[qc]MA[kd][pi]LB[lh:A]C[79
+])
+)
+
+(;W[qf]MA[pi]CR[kd]LB[lh:A]C[83
+;;
+# approach on my side 
+])
+
+(;W[qf]LB[lh:A]TR[kd]
+C[82
+;;
+!xarea(1)
+# approach on empty side or my side
+]LB[pi:1])
+
+(;W[qf]LB[lh:A]CR[kd][pi]MA[pn]TR[fd]C[81
+])
+
+(;W[qf]LB[lh:A]CR[kd][pi]C[81
+])
+
+(;W[qc]LB[lh:A][pi:1]
+C[80;
+;
+oarea(1)&&oarea(2)&&area_stone(1)>2&&area_stone(2)>2&&!weak(1)&&!weak(2)
+#  launch early 3-3 invasion because we are strong both side
+# ?
+]
+LB[kd:2])
+
+(;W[qf]LB[lh:A][kd:1][pi:2]
+C[79
+;;
+oarea(1)&&oarea(2)&&area_space(2)<=area_space(1)
+# play the side we are less strong 
+])
+
+(;W[qc]LB[lh:A][kd:1][pi:2]
+C[81
+;
+;
+xarea(1)&&xarea(2)&&area_stone(1)>2&&area_stone(2)>2&&!weak(1)&&!weak(2)
+#  3-3 invasion if opponent very strong on both sides
+])
+
+(;W[qf]LB[kd:1][pi:2][lh:A]
+C[80
+;
+;
+xarea(1)&&xarea(2)&&(area_stone(1)>2area_stone(2))
+# play the side where opponent is less strong
+])
+)
+
+(;B[oc]
+(;W[tt]
+(;B[qd]LB[kd:1][pi:2][lh:A]
+C[84;
+;
+oarea(1)||oarea(2)
+#if we got one extension side, play enclosure 
+])
+
+(;B[qd]LB[lh:A][kd:1][pi:2]C[82;
+;
+!oarea(1)&&!oarea(2)
+])
+)
+
+(;W[pe]LB[lh:A]MA[pi][pn]C[82
+])
+
+(;W[qd]C[82
+]LB[lh:A])
+)
+
+(;B[od]
+(;W[tt]
+(;B[qd]LB[lh:A][kd:1][pi:2]C[84;
+;
+oarea(1)||oarea(2)
+])
+
+(;B[qd]LB[lh:A][kd:1][pi:2]C[82
+
+
+])
+)
+
+(;W[qd]LB[lh:A]C[82
+])
+
+(;W[qc]LB[lh:A]C[81
+])
+)
+
+(;B[qc]C[
+]
+(;W[pd]LB[lh:A]MA[kd][pi]LB[ec:1][ce:2][co:3][eq:4][oq:5][qo:6]
+C[84;
+;
+(area_stone(1)>1||area_stone(2)>1)&&(area_stone(3)>1||area_stone(4)>1)
+&&(area_stone(5)>1||area_stone(6)>1)
+# don't cap 3-3 if other corner move is possible 
+])
+
+(;W[pd]LB[lh:A]MA[kd]
+C[82;
+;
+(area_stone(1)>1||area_stone(2)>1)&&(area_stone(3)>1||area_stone(4)>1)
+&&(area_stone(5)>1||area_stone(6)>1)
+# don't cap 3-3 if other corner move is possible 
+]
+LB[ec:1][ce:2][co:3][eq:4][oq:5][qo:6])
+
+(;W[pd]
+C[81;
+;
+(area_stone(1)>1||area_stone(2)>1)&&(area_stone(3)>1||area_stone(4)>1)
+&&(area_stone(5)>1||area_stone(6)>1)
+# don't cap 3-3 if other corner move is possible 
+]
+LB[lh:A][ec:1][ce:2][co:3][eq:4][oq:5][qo:6])
+)
+
+)

@@ -1,0 +1,1482 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 1999 and 2000 by the Free Software Foundation.      #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                                                               #
+#                  Eye Shape Database                           #
+#                                                               #
+#     . - ordinary eye space                                    #
+#     * - ordinary eye space and key point                      #
+#     ! - marginal eye space                                    #
+#     @ - marginal eye space and key point                      #
+#     X - dead opponent stone                                   #
+#     x - . or X                                                #
+#                                                               #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+#
+# FIXME:
+#   Why does it never recognize the eye 'X'?
+#   ...and how can there be one?
+#
+
+#
+# The patterns are sorted as follows within each size, with the primary
+# criterium first: 
+#
+# 1. Number of rows, lowest first.
+# 2. Number of marginal vertices.
+# 3. Number of possible eyes
+#
+# In addition to 1, there is also the requirement that all patterns
+# with the same topology come together. E.g. among the four vertices,
+# two rows patterns, those with topology
+#
+#  .
+# ...
+#
+# come together and those with topology
+#
+# ..
+# ..
+#
+# follows later.
+
+###############################
+#          1 element          #
+###############################
+
+Pattern 101
+
+x
+
+:1,1
+
+Pattern 102
+
+!
+
+:0,0
+
+
+###############################
+#          2 elements         #
+###############################
+
+Pattern 201
+
+xx
+
+:1,1
+
+Pattern 202
+
+@x
+
+:1,0
+
+Pattern 203
+
+!!
+
+:0,0
+
+
+###############################
+#          3 elements         #
+###############################
+
+Pattern 301
+
+x*x
+
+:2,1
+
+Pattern 302
+
+xXx
+
+:1,1
+
+Pattern 303
+
+!.x
+
+:1,1
+
+Pattern 304
+
+@Xx
+
+:1,0
+
+Pattern 306
+# a chimera
+
+x@x
+
+:2,0
+
+Pattern 391
+
+!x!
+
+:0,0
+
+Pattern 392
+# This actually came up once.
+
+!@.
+
+:1,0
+
+
+Pattern 393
+
+!!!
+
+:0,0
+
+
+###############################
+#          4 elements         #
+###############################
+
+#
+# Topology: ....
+#
+ 
+Pattern 401
+
+x..x
+
+:2,2
+
+Pattern 402
+
+x*Xx
+
+:2,1
+
+Pattern 403
+
+xXXx
+
+:1,1
+
+Pattern 405
+
+!.xx
+
+:1,1
+
+Pattern 406
+
+!X.x
+
+:1,1
+
+Pattern 407
+
+@XXx
+
+:1,0
+
+Pattern 408
+
+!.x@
+
+:1,0
+
+Pattern 410
+
+!x@x
+
+:1,0
+ 
+Pattern 411
+
+!XX!
+
+:0,0
+
+#
+# Do we ever get more than 2 marginal eye points with a linear 4 pattern?
+#
+
+#            .
+# Topology: ...
+#
+
+Pattern 421
+
+ x
+x*x
+
+:2,1
+
+Pattern 422
+
+ x
+xXx
+
+:1,1
+
+Pattern 423
+
+ !
+x*x
+
+:2,1
+
+
+Pattern 424
+
+ x
+x@x
+
+:2,0
+
+
+Pattern 425
+
+ !
+!*x
+
+:1,0
+
+
+Pattern 426
+
+ x
+@Xx
+
+:1,0
+
+
+#           ..
+# Topology: ..
+#
+
+Pattern 431
+
+xx
+xx
+
+:1,1
+
+
+Pattern 432
+
+@x
+xx
+
+:1,0
+
+
+Pattern 433
+
+!@
+.x
+
+:1,0
+
+#
+# Completely dead patterns.
+#
+
+Pattern 491
+
+ .
+!X!
+
+:0,0
+
+Pattern 492
+
+!!
+XX
+
+:0,0
+
+Pattern 493
+
+!x
+x!
+
+:0,0
+
+
+Pattern 494
+
+ !
+!x!
+
+:0,0
+
+
+###############################
+#          5 elements         #
+###############################
+
+
+#
+# 5 vertices.  Now it is getting tricky...  
+# At least we will get all the linear patterns correct.
+#
+
+#
+# Topology: .....
+#
+
+#
+# Linear, no marginal vertices.
+#
+
+Pattern 501
+# At least seki, which is equal to 2 eyes.
+
+xxxxx
+
+:2,2
+
+#
+# Linear, one marginal vertex.
+#
+
+
+Pattern 502
+
+@x..x
+
+:2,1
+
+  
+Pattern 503
+
+!.X*x
+
+:2,1
+
+
+Pattern 504
+
+@XXXx
+
+:1,0
+
+
+Pattern 505
+# NOTE: This overlaps pattern 504 which are the cases where we actually
+#       have to defend.
+
+!xxxx
+
+:1,1
+
+
+# FIXME:
+# Continue here.  I believe everything above this line is correct.
+
+
+#
+# Linear, two marginal vertices.
+#
+
+#Pattern 529
+# This actually turned up once, but it was bent...
+#!!...
+#:1,1
+
+
+Pattern 506
+
+!.x.!
+
+:1,1
+
+# FIXME:
+#
+# !..X!
+#
+
+
+Pattern 507
+
+!x!.x
+
+:1,1
+
+
+Pattern 508
+# Must be matched before 509.
+
+!.x@x
+
+:2,0
+
+
+Pattern 509
+
+!x.@x
+
+:1,0
+
+
+Pattern 510
+
+!.@.!
+
+:1,0
+
+
+#            .
+# Topology: ....
+#
+
+Pattern 521
+
+ x
+xX*.
+
+:2,1
+
+
+Pattern 522
+
+ x
+xXXx
+
+:1,1
+
+
+Pattern 523
+# gf Is this correct? Seems to me that X can only take off a few points
+# by moving first, not reduce the number of eyes. (2.5.25)
+# db corrected valuation (2.5.27)
+# gf Changed '*' to '.'. (2.5.27)
+
+ x
+x.!x
+
+:2,2
+
+
+Pattern 524
+
+ x
+!*xx
+
+:2,1
+
+
+Pattern 525
+
+ x
+x*x!
+
+:2,1
+
+
+Pattern 526
+
+ x
+xX.!
+
+:1,1
+
+
+Pattern 527
+
+ ! 
+!..x
+
+:1,1
+
+
+Pattern 528
+
+ !
+!*Xx
+
+:1,0
+
+
+Pattern 529
+
+ !
+x..!
+
+:1,1
+
+
+Pattern 530
+
+ @
+xX.!
+
+:1,0
+
+
+Pattern 531
+
+ @
+x.X!
+
+:1,0
+
+
+# FIXME: Pattern 
+#
+#  X
+# .X.!
+
+
+Pattern 532
+
+ !  
+!xx!
+
+:0,0
+
+
+Pattern 533
+
+ !
+!.@x
+
+:1,0
+
+
+#           ..
+# Topology: ...
+#
+
+Pattern 541
+
+xx
+x*x
+
+:2,1
+
+
+Pattern 542
+
+xx
+xXx
+
+:1,1
+
+
+Pattern 543
+
+x.
+@.x
+
+:2,1
+
+
+Pattern 544
+
+xx
+@Xx
+
+:1,0
+
+
+Pattern 545
+
+xX
+!.x
+
+:1,1
+
+
+Pattern 546
+
+xx 
+x.!
+ 
+:1,1
+
+
+# FIXME: Pattern 
+#
+# !X
+# !XX
+
+
+Pattern 547
+
+!!
+.*x
+
+:1,0
+
+
+Pattern 548
+
+!.
+!..
+
+:1,1
+
+
+Pattern 549
+
+..
+!@.
+
+:1,0
+
+
+Pattern 550
+
+xx
+@.!
+
+:1,0
+
+
+Pattern 551
+
+xx
+@X!
+
+:0,0
+
+
+#            .
+# Topology: ...
+#            .
+
+Pattern 561
+# This pattern must be matched before 562. The vital point would be
+# suicide for X.
+
+ X
+X.X
+ X
+
+:2,2
+
+
+Pattern 562
+# gf Were this pattern actually missing? (2.5.25)
+
+ x
+x*x
+ x
+
+:2,1
+
+
+Pattern 563
+# gf Were this pattern actually missing? (2.5.25)
+
+ x
+xXx
+ x
+
+:1,1
+
+
+#
+# Completely dead patterns
+#
+# gf What is special about these patterns? (2.5.25)
+
+Pattern 591
+
+!.
+..!
+
+:0,0
+
+
+Pattern 592
+
+!!
+xx!
+
+:0,0
+
+
+Pattern 593
+
+x!
+!x!
+
+:0,0
+
+
+Pattern 594
+
+ ! 
+!x!
+ ! 
+
+:0,0
+
+
+Pattern 595
+# gf Added. (2.5.32)
+
+ x 
+xX!
+ ! 
+
+:0,0
+
+
+###############################
+#          6 elements         #
+###############################
+
+#
+# Topology: ......
+#
+
+Pattern 601
+
+xxxxxx
+
+:2,2
+
+
+Pattern 602
+
+!....x
+
+:2,2
+
+
+Pattern 603
+
+@..xXx
+
+:2,1
+
+
+Pattern 604
+
+@.xX..
+
+:2,1
+
+
+Pattern 605
+
+!..X.X
+
+:2,2
+
+
+Pattern 606
+
+!.X...
+
+:2,2
+
+
+Pattern 607
+
+!.XxxX
+
+:2,2
+
+
+Pattern 608
+
+@.XxX.
+
+:2,1
+
+
+Pattern 609
+
+@X.xxx
+
+:2,1
+
+
+Pattern 610
+
+@Xx.xx
+
+:2,1
+
+
+Pattern 611
+
+@Xxx.x
+
+:2,1
+
+
+
+Pattern 612
+
+@XXXXx
+
+:2,0
+
+
+Pattern 613
+
+!.xx.!
+
+:1,1
+
+
+Pattern 614
+
+!.@x.x
+
+:2,1
+
+
+# FIXME: Do all size 6 linear patterns with 2 or more marginal eye points.
+
+
+Pattern 615
+
+@XX.X!
+
+:1,0
+
+
+Pattern 616
+
+@XXX.!
+
+:1,0
+
+
+Pattern 617
+
+.@.!.!
+
+:1,0
+
+
+#            .
+# Topology: .....
+#
+
+Pattern 621
+
+ x
+x*xx!
+
+:2,1
+
+
+Pattern 622
+
+ !
+x*x.!
+
+:2,1
+
+
+#             .
+# Topology: .....
+#
+
+Pattern 631
+
+  x
+x*X.!
+
+:2,1
+
+
+Pattern 632
+
+  x
+xX*.!
+
+:2,1
+
+
+Pattern 633
+
+  x
+.XX.!
+
+:1,1
+
+
+Pattern 634
+
+  x
+!x*x!
+
+:2,1
+
+
+#            ..
+# Topology: ....
+#
+
+Pattern 641
+
+ xx
+!.*x
+
+:2,1
+
+
+Pattern 642
+
+ !!
+!.*.
+
+:1,0
+
+
+Pattern 643
+
+ .@
+!..!
+
+:1,0
+
+
+Pattern 644
+
+ !! 
+!xx!
+
+:0,0
+
+#           ..
+# Topology: ....
+#
+
+Pattern 651
+# gf Split and revised. (2.5.27)
+# Certain instances of this pattern are 1,1 on the edge.
+
+.x
+x*x!
+
+:2,1
+
+
+Pattern 652
+# gf New pattern. (2.5.28)
+# This pattern must be matched before 653.
+
+XX
+X*x!
+
+:2,1
+
+
+Pattern 653
+# gf Split and revised. (2.5.27)
+
+Xx
+x.x!
+
+:1,1
+
+
+Pattern 654
+# gf New pattern. (2.5.27)
+
+xx
+xX.!
+
+:1,1
+
+
+#           ...
+# Topology: ...
+#
+
+Pattern 655
+
+xXx
+x*x
+
+:2,1
+
+
+#            ...
+# Topology: ...
+#
+
+Pattern 661
+# FIXME: Do all patterns of this type.
+
+ ...
+...
+
+:2,2
+
+
+Pattern 662
+
+ x*x
+!.x
+ 
+:2,1
+
+
+Pattern 663
+
+ xXx
+!.x
+
+:1,1
+
+#            .
+# Topology: ....
+#            .
+
+Pattern 671
+
+ x
+x*x!
+ x
+
+:2,1
+
+
+#            .
+# Topology: ....
+#             .
+
+Pattern 672
+
+ x
+xX*!
+  x
+
+:2,1
+
+
+#           ..
+# Topology: ...
+#            .
+
+
+Pattern 681
+# This pattern must be matched before 682.
+
+XX
+X.X
+ X
+
+:2,2
+
+
+Pattern 682
+
+xx
+x*x
+ x
+
+:2,1
+
+
+Pattern 683
+
+xx
+xXx
+ x
+
+:1,1
+
+
+#
+# Trivially dead patterns
+#
+
+Pattern 691
+
+ !
+!.!
+.!
+
+:0,0
+
+
+###############################
+#          7 elements         #
+###############################
+
+#            .
+# Topology: ......
+#
+
+Pattern 701
+
+ x
+!*xxx!
+
+:2,1
+
+
+#             .
+# Topology: ......
+#
+
+Pattern 702
+
+  !
+@..xxx
+
+:2,1
+
+
+Pattern 703
+
+  x
+!x*xx!
+
+:2,1
+
+
+#           ...
+# Topology: ....
+#
+
+Pattern 704
+
+x.x
+x..@
+
+:2,1
+
+
+#            ..
+# Topology: .....
+#
+
+Pattern 705
+
+ ..
+.X*.!
+
+:2,1
+
+
+Pattern 706
+
+ ..
+.*..!
+
+:2,1
+
+
+#            . .
+# Topology: .....
+#
+
+Pattern 707
+
+ . !
+!*..!
+
+:2,1
+
+
+#             .
+# Topology:   .
+#           .....
+
+Pattern 721
+
+  @
+  .
+....!
+
+:2,1
+
+
+#             ...
+# Topology: ....
+#
+
+Pattern 722
+
+  x.!
+!.xx
+
+:1,1
+
+
+#            .
+# Topology:  ..
+#           ....
+
+Pattern 723
+
+ !
+ .x
+!.*x
+
+:2,1
+
+
+#            .
+# Topology: .....
+#            .
+
+Pattern 724
+
+ x
+x*X.!
+ x 
+
+:2,1
+
+
+Pattern 725
+
+ x
+x..x@
+ x 
+
+:2,1
+
+
+# ..!
+# !.!
+#  ! 
+
+
+#           ..
+# Topology: .....
+#
+
+Pattern 726
+# This pattern must be matched before 727.
+
+XX
+X.x.!
+
+:2,2
+
+Pattern 727
+
+Xx
+x.x.@
+
+:2,1
+
+###############################
+#          8 elements         #
+###############################
+
+#           ....
+# Topology:  ....
+#
+
+Pattern 801
+
+!...
+ ...!
+
+:1,1
+
+
+#             .
+# Topology:   .
+#           ......
+
+Pattern 802
+
+  ! 
+  . 
+!.*..!
+
+:2,1
+
+
+Pattern 803
+
+  !
+  .
+!.*Xxx
+
+:2,1
+
+
+Pattern 804
+
+  !
+  .
+!.X*Xx
+
+:2,1
+
+
+Pattern 805
+
+  !
+  .
+!.x..x
+
+:2,2
+
+
+#             ..
+# Topology: ......
+#
+
+Pattern 806
+
+  ..
+@....!
+
+:2,1
+
+
+Pattern 807
+
+  ..
+!.X*.!
+
+:2,1
+
+
+#            ..
+# Topology: ......
+#
+
+Pattern 808
+
+ xx
+!.*x.!
+
+:2,1
+
+
+###############################
+#          9 elements         #
+###############################
+
+
+Pattern 901
+
+@....
+  ...!
+
+:2,1
+
+
+Pattern 902
+
+  ! .
+!...*.!
+
+:2,1
+
+
+Pattern 903
+
+  !
+  .
+ .*
+!...!
+
+:2,1
+
+
+Pattern 904
+
+ !
+ ..
+!.*..!
+
+:2,1
+
+
+Pattern 905
+
+ .....@
+!..
+
+:2,1
+
+ 
+
+###############################
+#         10 elements         #
+###############################
+
+
+Pattern 1001
+
+ !
+ .
+ *.
+xX.
+ x.
+  !
+
+:2,1
+
+
+Pattern 1002
+
+   !
+ ! .
+ ..*
+!...
+
+:2,1
+
+
+Pattern 1003
+
+
+  !
+  ..
+  .*
+!...!
+
+:2,1
+
+
+Pattern 1004
+
+   !
+  ..
+  *.
+!.x.!
+
+:2,1
+
+
+Pattern 1005
+
+  !
+@..
+  .
+ ..
+!..
+
+:2,1

@@ -1,0 +1,212 @@
+\input texinfo @c -*-Texinfo-*-
+@c %**start of header
+@setfilename gnugo.info
+@settitle GNU Go Documentation
+@c %**end of header
+
+@set EDITION 1.0
+@set VERSION 2.6
+
+@titlepage
+@title{GNU GO}
+@subtitle Documentation for the GNU Go Project
+@subtitle Edition @value{EDITION}
+@subtitle January, 2000
+@vskip 0pt plus 1filll
+@image{gnugo}
+@vskip 0pt plus 1filll
+@author By Daniel Bump, David Denholm, Jerome Dumonteil, 
+@author Gunnar Farneback, Thomas Traber, Tanguy Urvoy, Inge Wallin
+@sp 1
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2000 Free Software Foundation, Inc.
+@sp 2
+
+This is Edition @value{EDITION} of @cite{The GNU Go Project documentation}, @*
+for the @value{VERSION} version of the GNU GO program.
+
+@sp 2
+Published by the Free Software Foundation @*
+675 Massachusetts Avenue @*
+Cambridge, MA 02139-3309 USA @*
+Phone: +1-617-876-3296 @*
+
+Permission is granted to make and distribute verbatim
+copies of this manual provided the Copyright Notice and
+this Permission Notice are preserved on all copies.
+
+Permission is granted to copy and distribute modified
+versions of this Manual under the Conditions for
+verbatim copying, provided also that the sections
+entitled ``Copying'' and ``Gnu General Public License''
+are included exactly as in the original, and provided
+that the entire resulting derived work is distributed
+under the terms of a permission notice identical to this
+one.
+
+Permission is granted to copy and distribute
+translations of this Manual into another language,
+under the above conditions for modified versions,
+except that this Permission Notice may be stated in a
+translation approved by the Free Software Foundation.
+@end titlepage
+
+@node    Top, Introduction, (dir), (dir)
+@comment node-name, next,         previous, up
+@ifinfo
+@unnumbered GNU GO
+
+This file documents @code{GNU Go}, a Go program and its sources.
+This is Edition @value{EDITION} of the @cite{GNU Go Program Documentation}
+
+Copyright 1999 and 2000 Free Software Foundation, Inc.
+     
+Permission is granted to make and distribute verbatim
+copies of this manual provided the copyright notice and
+this permission notice are preserved on all copies.
+
+@ignore
+Permission is granted to process this file through TeX
+and print the results, provided the printed document
+carries a copying permission notice identical to this
+one except for the removal of this paragraph (this
+paragraph not being relevant to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified
+versions of this manual under the conditions for
+verbatim copying, provided also that the sections
+entitled ``Copying'' and ``GNU General Public License''
+are included exactly as in the original, and provided
+that the entire resulting derived work is distributed
+under the terms of a permission notice identical to this
+one.
+
+Permission is granted to copy and distribute
+translations of this manual into another language,
+under the above conditions for modified versions,
+except that this permission notice may be stated in a
+translation approved by the Free Software Foundation.
+
+@end ifinfo
+
+@menu
+* Introduction::                What is GNU Go ?
+* Copying::                     The GNU General Public License
+* User Guide::                  How to install and use GNU Go
+* Overview::                    Overview of the GNU Go engine
+* Analyzing::                   Analyzing an sgf game with GNU Go
+* Dragon::                      Dragons and Worms
+* Eyes::                        Eyes and half eyes
+* Moyo::                        Estimation of Moyos : Bouzy's 5/21 algorithm
+* Patterns::                    Pattern database
+* Reading::                     GNU Go's reading
+* Utility Functions::           Functions from @file{utils.c}
+* End Game::                    The end game strategy
+* Regression::                  Regression testing
+* Concept Index::               Concept Index
+* Functions Index::             Functions Index
+
+@end menu
+
+@node    Introduction, Copying, Top, Top
+@comment node-name,    next,        previous,     up
+@chapter Introduction
+
+@include introduction.texi
+
+@node Copying, User Guide, Introduction, Top
+@comment node-name,    next,        previous,     up
+
+@include copying.texi
+
+@node    User Guide, Overview, Copying, Top
+@comment node-name,    next,        previous,     up
+@chapter Using GNU Go
+
+@include using.texi
+
+@node    Overview, Analyzing, User Guide, Top
+@comment node-name,    next,             previous,    up
+@chapter GNU Go engine overview
+
+@include overview.texi
+
+@node    Analyzing, Dragon, Overview, Top
+@comment  node-name,  next,  previous,  up
+@chapter Analyzing games stored in SGF files using GNU Go
+
+@include analyze.texi
+
+@node    Dragon, Eyes, Analyzing, Top
+@comment node-name,    next,            previous,      up
+@chapter Worms and Dragons
+
+@include dragon.texi
+
+@node  Eyes, Moyo, Dragon, Top
+@comment  node-name,  next,  previous,  up
+@chapter Eyes and Half Eyes
+
+@include eyes.texi
+
+@node Moyo, Patterns, Eyes, Top
+@comment  node-name,  next,  previous,  up
+@chapter Moyo
+
+@include moyo.texi
+
+@node Patterns, Reading, Moyo, Top
+@comment  node-name,  next,  previous,  up
+@chapter The Pattern Code
+
+@include patterns.texi
+
+@node Reading, Utility Functions, Patterns, Top
+@comment  node-name,  next,  previous,  up
+@chapter Reading
+
+@include reading.texi
+
+@node Utility Functions, End Game, Reading, Top
+@comment  node-name,  next,  previous,  up
+@chapter Utility Functions
+
+@include utils.texi
+
+@node End Game, Regression, Utility Functions, Top
+@comment  node-name,  next,  previous,  up
+@chapter End Game Patterns
+
+@include endgame.texi
+
+@node Regression, Concept Index, End Game, Top
+@comment  node-name,  next,  previous,  up
+@chapter Regression testing
+
+@include regression.texi
+
+@c ------------------------
+@c *  END OF THE DOCUMENT *
+@c ------------------------
+
+
+@node    Concept Index, Functions Index, Regression, Top
+@comment node-name,    next,  previous,      up
+@unnumbered Concept Index
+
+@printindex cp
+
+@node  Functions Index,  , Concept Index, Top
+@comment  node-name,  next,  previous,  up
+@unnumbered Functions Index
+
+@printindex fn
+
+@contents
+@bye
+
+
+
+

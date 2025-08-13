@@ -1,0 +1,78 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 1999 and 2000 by the Free Software Foundation.      #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
+
+
+(;GM[1]FF[3]
+RU[Japanese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[1999-05-27]
+SY[Cgoban 1.9.2]TM[5:00:00(5x1:00)];B[qd]
+(;W[od]
+(;B[oc]LB[mg:A]C[80
+]
+(;W[nc]LB[lg:A]C[82
+];B[pc]LB[mf:A]C[85
+]
+(;W[nd]LB[lg:A]C[82
+];B[qf]LB[mh:A]C[82
+];W[jd]LB[if:A]C[82
+])
+
+(;W[md]LB[jg:A]C[82
+];B[qf]LB[mh:A]C[82
+];W[ic]LB[hf:A]C[82
+])
+)
+
+(;W[pd]LB[mh:A]C[0
+];B[pc]LB[nf:A]C[90
+];W[qe]LB[ng:A]C[90
+];B[qc]
+LB[ng:A]C[85
+];W[nd]LB[mg:A]C[85
+];B[mc]LB[lg:A]C[85
+];W[pf]LB[lg:A]
+C[85
+])
+)
+
+(;B[pf]LB[lh:A]C[80
+];W[qc]LB[lh:A]C[82
+];B[rc]LB[lh:A]C[82
+];W[pc]
+LB[lh:A]C[82
+];B[re]LB[lh:A]C[90
+];W[kc]LB[jg:A]C[82
+])
+)
+
+(;W[oc];B[pe]LB[mi:A]C[80
+];W[md]C[79
+];B[pc]LB[jh:A]C[80
+])
+
+)

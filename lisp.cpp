@@ -23,6 +23,18 @@
 #include <fstream>
 using namespace std;
 
+extern void ttt1();
+
+extern "C"
+{
+    void gnugo1();
+}
+
+extern "C"
+{
+    void gnugo2();
+}
+
 // #define null(x) ((x) == NULL || (x) == NIL)
 #define EOL(x) (null((x)) || (x) == EMPTY_LIST)
 #define error(x)                    \
@@ -744,7 +756,7 @@ struct object *read_quote(FILE *in)
     return cons(QUOTE, cons(read_exp(in), NIL));
 }
 
-int depth = 0;
+int depthh = 0;
 
 struct object *read_exp(FILE *in)
 {
@@ -758,7 +770,7 @@ struct object *read_exp(FILE *in)
             if ((c == '\n' || c == '\r') && in == stdin)
             {
                 int i;
-                for (i = 0; i < depth; i++)
+                for (i = 0; i < depthh; i++)
                     printf("..");
             }
             continue;
@@ -776,12 +788,12 @@ struct object *read_exp(FILE *in)
             return read_quote(in);
         if (c == '(')
         {
-            depth++;
+            depthh++;
             return read_list(in);
         }
         if (c == ')')
         {
-            depth--;
+            depthh--;
             return EMPTY_LIST;
         }
         if (isdigit(c))
@@ -1200,32 +1212,23 @@ struct object *edit(struct object *args)
         return NIL;
     }
 
-    initEditor();
     char *fileName = (car(args))->string; // write lines to buffer
 
-    if (file_exists(fileName))
-    {
-        editorOpen(fileName);
-    }
+    edit1(fileName);
 
-    while (1)
-    {
-        editorRefreshScreen();
+    return NIL;
+}
 
-        char a = editorProcessKeypress();
-        if (a == 's')
-        {
-            editorSave(fileName);
-        }
-        else if (a == 'q')
-        {
-            break;
-        }
-    }
+struct object *ttt(struct object *args)
+{
+    ttt1();
 
-    CKernel::Get()->clear(); // if not clear,the history command's result will not appear too
+    return NIL;
+}
 
-    CKernel::Get()->restoreMode();
+struct object *gnugo(struct object *args)
+{
+    gnugo1();
 
     return NIL;
 }
@@ -1293,7 +1296,11 @@ void init_env()
     add_prim("cd", cd);
     add_prim("mkdir", mkdirWarper);
     add_prim("unlink", unlinkk);
+
     add_prim("cat", cat);
     add_prim("edit", edit);
-}
 
+    add_prim("ttt", ttt);
+    //add_prim("tttc", tttC);
+    add_prim("go", gnugo);
+}

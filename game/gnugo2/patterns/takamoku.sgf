@@ -1,0 +1,97 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# This is GNU GO, a Go program. Contact gnugo@gnu.org, or see   #
+# http://www.gnu.org/software/gnugo/ for more information.      #
+#                                                               #
+# Copyright 1999 and 2000 by the Free Software Foundation.      #
+#                                                               #
+# This program is free software; you can redistribute it and/or #
+# modify it under the terms of the GNU General Public License   #
+# as published by the Free Software Foundation - version 2.     #
+#                                                               #
+# This program is distributed in the hope that it will be       #
+# useful, but WITHOUT ANY WARRANTY; without even the implied    #
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR       #
+# PURPOSE.  See the GNU General Public License in file COPYING  #
+# for more details.                                             #
+#                                                               #
+# You should have received a copy of the GNU General Public     #
+# License along with this program; if not, write to the Free    #
+# Software Foundation, Inc., 59 Temple Place - Suite 330,       #
+# Boston, MA 02111, USA                                         #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+
+
+
+(;GM[1]FF[3]
+RU[Japanese]SZ[19]HA[0]KM[5.5]
+PW[White]
+PB[Black]
+GN[White (W) vs. Black (B)]
+DT[1999-05-27]
+SY[Cgoban 1.9.2]TM[5:00:00(5x1:00)];B[od];W[qd]
+(;B[qc]C[80
+]LB[mf:A];W[rc]LB[mf:A]C[82
+];B[pc]LB[mf:A]C[82
+];W[re]
+LB[mf:A]C[82
+];B[kc]LB[je:A]C[82
+];W[pf]LB[nh:A]C[82
+])
+
+(;B[qe]C[80
+]LB[mg:A];W[re]LB[mg:A]C[82
+];B[pe]LB[mg:A]C[82
+];W[qf]
+LB[mh:A]C[82
+];B[rf]LB[mh:A]C[82
+];W[rg]LB[mh:A]C[82
+];B[rd]LB[mh:A]
+C[82
+];W[sf]LB[mh:A]C[90
+];B[qc]LB[mf:A]C[82
+])
+
+(;B[pf]C[80
+]LB[li:A]
+(;W[oc]C[82
+]LB[li:A]
+(;B[nc]LB[ki:A]C[85
+];W[pc]LB[li:A]C[85
+];B[nd]LB[li:A]C[85
+]
+(;W[rf]LB[li:A]C[78
+])
+
+(;W[tt];B[re]LB[li:A]C[82
+])
+)
+
+(;B[pd]LB[ki:A]C[85
+];W[pc]LB[li:A]C[85
+];B[qc]LB[li:A]C[85
+];W[rc]
+LB[li:A]C[85
+];B[qb]LB[li:A]C[85
+];W[rb]LB[ki:A]C[85
+];B[qe]LB[ki:A]
+C[85
+];W[rd]LB[ki:A]C[90
+];B[nc]LB[ki:A]C[85
+];W[pb]C[
+];B[ob]LB[ki:A]
+C[82
+];W[qa]
+(;B[md])
+
+(;B[md]LB[ki:A]C[85
+])
+)
+)
+
+(;W[tt];B[qc]LB[li:A]C[85
+])
+)
+
+)

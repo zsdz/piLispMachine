@@ -1,0 +1,29 @@
+
+the @option{--mode test} option of gnugo allows for testing of moves.
+
+generated moves are tested against annotations and actual moves
+
+@example
+
+/* ANNOTATION PROPERTIES:
+* Circle:   Good Move
+* Triangle: OK move
+* Square:   Bad move   (Mark too... cgoban writes MA instead of SQ)
+* Move that was made:  considered good unless annotated (BM, TE)
+*/
+@end example
+
+
+@section Example
+
+The regression directory contains an example @file{test-tree.sgf} which shows
+how the testing works.  Look at it with your favorite editor, then run it
+through the test to see how it performs.
+
+A sample test run:
+
+@example
+gnugo --mode test --testmode annotation --infile test-tree.sgf --quiet
+@end example
+
+

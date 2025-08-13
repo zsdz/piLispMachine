@@ -1,0 +1,162 @@
+
+@menu
+* Traces::			Analyzing traces in GNU Go 2.6
+* Output File::			The Output File
+* Decidestring::		Checking the reading code
+* Scoring::                     Finding out the winner of the game
+* Colored Display::             Colored Display
+@end menu
+
+@node Traces, Output File, Analyzing, Analyzing
+@comment  node-name,  next,  previous,  up
+@section Interpreting Traces
+
+A quick way to find out roughly the reason for a move is to run
+
+@example
+gnugo -l @var{filename} -t -a -w -L @var{move number}
+@end example
+
+(You may also want to add @option{--quiet} to suppress the copyright
+message.) In GNU Go 2.6, the weights with which each move is proposed
+are listed.
+
+@node Output File, Decidestring, Traces, Analyzing
+@comment  node-name,  next,  previous,  up
+@section The Output File
+
+If GNU Go is invoked with the option @option{-o filename} it will
+produce an output file. This option can be added at the command line
+in the Go Modem Protocol Setup Window of CGoban. The output file will
+show the locations of the moves considered and their weights. It is
+worth noting that by enlarging the CGoban window to its fullest size
+it can display 3 digit numbers. Dragons with status @code{DEAD} are
+labelled with an `X', and dragons with status @code{CRITICAL} are
+labelled with a `?'.
+
+Another type of SGF output file is provided by @option{--analyzerfile}
+(@pxref{Invoking GNU Go}).
+
+@node Decidestring, Scoring, Output File, Analyzing
+@comment  node-name,  next,  previous,  up
+@section Checking the reading code
+
+The @option{--decidestring} option is used to check the reading code.
+This option takes an argument, which is a location on the board in the
+usual algebraic notation (e.g. @option{--decidestring C17}). This will
+tell you whether the reading code believes the string can be captured,
+and if so, whether it believes it can be defended, which moves it finds
+to attack or defend the move, how many nodes it searched in coming to
+these conclusions. Note that when GNU Go runs normally (not with
+@option{--decidestring}) the points of attack and defense are cached in
+@code{worm.attack} and @code{worm.defend}. Later, however, they may be
+moved, for example during @code{shapes()} in response to a @code{D}
+pattern, so the final points of attack and defense which are found may
+differ from those found by @option{--decidestring}.
+
+If used with an output file (@option{-o @var{filename}}) 
+@option{--decidestring} will produce a variation tree showing
+all the variations which are considered. 
+
+@node Scoring, Colored Display, Decidestring, Analyzing
+@comment  node-name,  next,  previous,  up
+@section Scoring the game
+
+GNU Go can score the game. If done at the last move, this is usually
+accurate unless there is a seki. Normally GNU Go will report its
+opinion about the score at the end of the game, but if you want this
+information about a game stored in a file, use the @option{--score}
+option.
+
+@example
+gnugo --score last -l filename
+@end example
+
+loads the sgf file and estimates the winner after the last stored move
+by measuring the influence.
+
+@example
+gnugo --score end -l filename
+@end example
+
+loads the sgf file and GNU Go continues to play after the last stored
+move by itself up to the very end.  Then the winner is determined by
+counting the territory.
+
+@example
+gnugo --score L10 -l filename
+@end example
+
+loads the sgf file until a stone is placed on L10. Now the winner will
+be estimated as with @command{gnugo --score last}.
+
+@example
+gnugo --score 100 -l filename
+@end example
+
+loads the sgf file until move number 100. Now the winner will be estimated
+as with @command{gnugo --score last}.
+
+If the option @option{-o @var{outputfilename}} is provided, the results
+will also be written as comment at the end of the output file.
+
+If the option @option{--analyzerfile @var{outputfilename}} is provided,
+the results will be written as comment at the end of the output file,
+the result property will be set and the territory will be marked.
+
+@node  Colored Display,  , Scoring, Analyzing
+@comment  node-name,  next,  previous,  up
+@section Colored Display
+
+@subsection Dragon Display
+
+You can get a colored ASCII display of the board in which each dragon
+is assigned a different letter; and the different @code{safety} values
+(@code{ALIVE}, @code{DEAD}, @code{UNKNOWN}, @code{CRITICAL}) have different
+colors. This is very handy for debugging.
+
+Save a game in sgf format using CGoban, or using the @option{-o} option with
+GNU Go itself.
+
+Open an @command{rxvt} window. (Xterm will not work. You may also use the
+Linux console.) 
+
+Execute:
+
+@command{gnugo -l [filename] -L [movenum] -T} to get the colored display.
+
+The color scheme: Green = @code{ALIVE}; Yellow = @code{UNKNOWN}; 
+White = @code{DEAD} and Red = @code{CRITICAL}. Worms which have been
+amalgamated into the same dragon are labelled with the same letter.
+
+Other useful colored displays may be obtained by using instead:
+
+@subsection Eye Space Display
+
+Instead of @option{-T}, try this with @option{-E}. This gives a colored
+display of the eyespaces, with marginal eye spaces marked @samp{!}
+(@pxref{Eyes}).
+
+@subsection Moyo Display
+
+The option @option{-m @var{level}} can give colored displays of the
+various quantities which are computed in @file{engine/moyo.c}.
+
+The moyos found by GNU Go can be displayed from an rxvt window or from the
+Linux console using the @option{-m} option. This takes a parameter:
+
+@example
+@option{-m @var{level}}
+   use cumulative values for printing these debug reports :
+    1 = ascii printing of territorial evaluation (5/21)
+    2 = table of delta_terri values
+    4 = ascii printing of moyo evaluation (5/10)
+    8 = table of delta_moyo values
+   16 = ascii printing of area (weak groups?) (4/0)
+   32 = list of area characteristics
+   64 = table of meta_connect values
+  128 = trace -p fearless option (big_move priority)
+@end example
+
+Definitions of these fields is given elsewhere (@pxref{Moyo}).
+

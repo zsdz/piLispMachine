@@ -1,0 +1,457 @@
+# Makefile - makefile for MS NMAKE 
+# Copyright 2000 by the Free Software Foundation
+#
+# This file is free for unrestricted use.
+#
+# Programmed by
+#  HL: Heikki Levanto, Index Data  (heikki@indexdata.dk)
+# 
+#
+#  07-Feb-2000 HL: Moved /D's from compiler options into a new config.h
+#               
+# Missing
+# - Add dependencies for include files
+#
+# Environment problems
+# - You need to have the proper path and environment for VC set
+#   up. There is a bat file VCVARS32.BAT that sets most of it up
+#   for you. You can find this somewhere near DevStudio\VC\BIN
+#
+
+###########################################################
+############### Parameters 
+###########################################################
+
+DEBUG=1   # 0 for release, 1 for debug
+
+
+default: all
+
+all: dirs gnugo 
+
+generate: generated_files
+
+###########################################################
+############### Directories
+###########################################################
+# The current directory is supposed to be something like
+# ..../GnuGo-x.y.z/Win, everything is relative to that
+ROOTDIR=..   # The home of GNU Go
+
+INCLDIR=$(ROOTDIR)\include  # our includes
+LIBDIR=$(ROOTDIR)\lib       # We produce .lib, .exp etc there
+BINDIR=$(ROOTDIR)\bin       # We produce exes and dlls there
+WINDIR=$(ROOTDIR)\win       # all these Win make things
+OBJDIR=$(WINDIR)\obj        # where we store intermediate files
+UNIXDIR=$(ROOTDIR)\unix     # corresponding unix things
+SRCDIR=$(ROOTDIR)           # for the case we move them under src
+
+# Various modules
+ENGDIR=$(SRCDIR)\engine
+PATDIR=$(SRCDIR)\patterns
+UTILDIR=$(SRCDIR)\utils
+INTERFACEDIR=$(SRCDIR)\interface
+REGRESSIONDIR=$(SRCDIR)\regression
+SGFDIR=$(SRCDIR)\sgf
+
+TMPDIR=$(ROOTDIR)\win\tmp
+TMP=$(TMPDIR)
+
+###########################################################
+############### Targets - what to make
+###########################################################
+
+GNUGO=$(WINDIR)\gnugo.exe
+MKPAT=$(TMPDIR)\mkpat.exe
+MKEYES=$(TMPDIR)\mkeyes.exe
+JOSEKI=$(TMPDIR)\joseki.exe
+
+# shortcut names defined here
+gnugo : $(GNUGO) 
+generated: $(EYES_C) $(CONN_C) $(PATTERNS_C)
+
+###########################################################
+############### Compiler and linker options 
+###########################################################
+
+
+### C and CPP compiler  (the same thing)
+# Note: $(CPP) has already been defined in the environment
+# (if you set things up right!)
+
+COMMON_C_OPTIONS=          \
+  /nologo /W3 /GX /FD /c   \
+  /D HAVE_CONFIG_H         \
+  /FR"$(OBJDIR)\\"         \
+  /Fo"$(OBJDIR)\\"         \
+  /Fd"$(OBJDIR)\\" 
+
+
+COMMON_C_INCLUDES= \
+  /I"$(SRCDIR)\engine" \
+  /I"$(SRCDIR)\sgf"     \
+  /I"$(SRCDIR)\patterns" \
+  /I"$(SRCDIR)\utils"    \
+  /I"$(SRCDIR)\interface" \
+  /I"$(WINDIR)" \
+  /I"$(TMPDIR)"
+
+DEBUG_C_OPTIONS=  \
+  /D "_DEBUG"      \
+  /MDd  /Od /YX /Zi /Gm
+
+RELEASE_C_OPTIONS=  \
+  /D "NDEBUG"        \
+  /MD /O2
+
+# /W3 or /W1 = warning level - should be made to compile with /W3
+# /GX  = Enable exception handling
+# /FD  = Generate file dependencies (what ever they are)
+# /c   = compile without linking
+# /FR  = Generate browse info (.sbr file that gets combined into .bsc)
+# /Fo  = object file name (or at least path)
+# /Fd  = debug database name (or path)
+# /MD  = Runtime library: Multithread DLL
+# /MDd = Runtime library: Multithread DLL (debug)
+# /Od  = Disable optimising (debug)
+# /O2  = Optimize for speed
+# /YX  = Automatic use of precomipled headers
+# /Gm  = Minimal rebuild (some cpp class stuff)
+# /Zi  = Program database for debuggers
+# /ZI  = Pgm database with special "edit&continue" stuff - not available in C5
+
+
+### Linker options
+LINK=link.exe
+
+LINK_LIBS= kernel32.lib user32.lib   gdi32.lib   winspool.lib \
+	   comdlg32.lib advapi32.lib shell32.lib ole32.lib    \
+	   oleaut32.lib uuid.lib     odbc32.lib  odbccp32.lib \
+	   wsock32.lib  advapi32.lib
+
+COMMON_LNK_OPTIONS= /nologo \
+		    /subsystem:console \
+		    /machine:i386 \
+		    /incremental:no
+
+DEBUG_LNK_OPTIONS= /debug 
+
+RELEASE_LNK_OPTIONS=  /pdb:none
+
+
+# Final opt variables
+!if $(DEBUG)
+COPT=   $(COMMON_C_OPTIONS)   $(DEBUG_C_OPTIONS)     $(COMMON_C_INCLUDES)
+LNKOPT= $(COMMON_LNK_OPTIONS) $(DEBUG_LNK_OPTIONS)   $(LNK_LIBS)
+
+!else
+COPT=   $(COMMON_C_OPTIONS)   $(RELEASE_C_OPTIONS)   $(COMMON_C_INCLUDES) 
+LNKOPT= $(COMMON_LNK_OPTIONS) $(RELEASE_LNK_OPTIONS) $(LNK_LIBS)
+!endif
+
+
+
+###########################################################
+###############  Source and object modules
+###########################################################
+
+# Note: Ordinary source files are not specified here at 
+# all, make finds them in suitable dirs. The object modules
+# need to be specified, though
+
+ENG_OBJS= \
+  $(OBJDIR)\attdef.obj \
+  $(OBJDIR)\dragon.obj \
+  $(OBJDIR)\filllib.obj \
+  $(OBJDIR)\fuseki.obj \
+  $(OBJDIR)\genmove.obj \
+  $(OBJDIR)\globals.obj \
+  $(OBJDIR)\hash.obj \
+  $(OBJDIR)\matchpat.obj \
+  $(OBJDIR)\moyo.obj \
+  $(OBJDIR)\optics.obj \
+  $(OBJDIR)\reading.obj \
+  $(OBJDIR)\semeai.obj \
+  $(OBJDIR)\sethand.obj \
+  $(OBJDIR)\shapes.obj \
+  $(OBJDIR)\showbord.obj \
+  $(OBJDIR)\utils.obj \
+  $(OBJDIR)\worm.obj \
+
+UTIL_OBJS= \
+  $(OBJDIR)\getopt.obj \
+  $(OBJDIR)\getopt1.obj
+
+SGF_OBJS= \
+  $(OBJDIR)\sgf_utils.obj \
+  $(OBJDIR)\sgf.obj \
+  $(OBJDIR)\sgfana.obj \
+  $(OBJDIR)\ttsgf.obj \
+  $(OBJDIR)\ttsgf_read.obj \
+  $(OBJDIR)\ttsgf_write.obj \
+
+PAT_OBJS= \
+  $(OBJDIR)\helpers.obj \
+  $(OBJDIR)\connections.obj
+
+INTERFACE_OBJS= \
+  $(OBJDIR)\gmp.obj \
+  $(OBJDIR)\interface.obj \
+  $(OBJDIR)\main.obj \
+  $(OBJDIR)\play_ascii.obj \
+  $(OBJDIR)\play_gmp.obj \
+  $(OBJDIR)\play_solo.obj \
+  $(OBJDIR)\play_test.obj
+
+
+GENERATED_OBJS= \
+  $(OBJDIR)\conn.obj \
+  $(OBJDIR)\patterns.obj 
+
+###  $(OBJDIR)\eyes.obj \   - not compiled directly, included in optics
+
+
+REAL_GNUGO_OBJS= \
+  $(UTIL_OBJS) \
+  $(ENG_OBJS) \
+  $(SGF_OBJS) \
+  $(PAT_OBJS) \
+  $(INTERFACE_OBJS)
+
+GNUGO_OBJS= \
+  $(GENERATED_OBJS) \
+  $(REAL_GNUGO_OBJS) 
+
+
+MKPAT_OBJS= \
+  $(OBJDIR)\mkpat.obj \
+  $(OBJDIR)\getopt.obj
+  
+
+MKEYES_OBJS= \
+  $(OBJDIR)\mkeyes.obj \
+  $(OBJDIR)\getopt.obj
+  
+JOSEKI_OBJS= \
+  $(OBJDIR)\joseki.obj
+
+ALL_OBJS= \
+	$(GNUGO_OBJS)  \
+	$(MKPAT_OBJS)  \
+	$(MKEYES_OBJS) \
+	$(JOSEKI_OBJS)
+
+
+###########################################################
+############### Generated C and DB files
+###########################################################
+
+### Patterns
+PATTERNS_C=$(TMPDIR)\patterns.c
+PATTERNS_DB=$(PATDIR)\patterns.db
+
+$(PATTERNS_C) : $(MKPAT) $(PATTERNS_DB)
+	@echo Making $(PATTERNS_C) from $(PATTERNS_DB)
+	type $(PATTERNS_DB) | $(MKPAT) pat > $(PATTERNS_C)
+
+### Connections
+CONN_C=$(TMPDIR)\conn.c
+CONN_DB=$(PATDIR)\conn.db
+
+$(CONN_C) : $(MKPAT) $(CONN_DB)
+	@echo Making conn $(CONN_C) from $(CONN_DB)
+	type $(CONN_DB) | $(MKPAT) -c conn > $(CONN_C)
+
+### Eyes
+EYES_C=$(TMPDIR)\eyes.c
+EYES_DB=$(PATDIR)\eyes.db
+
+$(EYES_C) : $(MKEYES) $(EYES_DB)
+	@echo Making eyes $(EYES_C) from $(EYES_DB)
+	type $(EYES_DB) | $(MKEYES) > $(EYES_C)
+
+
+### Joseki databases
+HOSHI_DB=$(WINDIR)\hoshi.db
+HOSHI_SGF=$(PATDIR)\hoshi.sgf
+$(HOSHI_DB): $(JOSEKI) $(HOSHI_SGF)
+	@echo Making hoshi joseki $(HOSHI_DB) from $(HOSHI_SGF)
+	$(JOSEKI) JH < $(HOSHI_SGF) > $(HOSHI_DB)
+
+KOMOKU_DB=$(WINDIR)\komoku.db
+KOMOKU_SGF=$(PATDIR)\komoku.sgf
+$(KOMOKU_DB): $(JOSEKI) $(KOMOKU_SGF)
+	@echo Making komoku joseki $(KOMOKU_DB) from $(KOMOKU_SGF)
+	$(JOSEKI) JK < $(KOMOKU_SGF) > $(KOMOKU_DB)
+
+SANSAN_DB=$(WINDIR)\sansan.db
+SANSAN_SGF=$(PATDIR)\sansan.sgf
+$(SANSAN_DB): $(JOSEKI) $(SANSAN_SGF)
+	@echo Making sansan joseki $(SANSAN_DB) from $(SANSAN_SGF)
+	$(JOSEKI) JS < $(SANSAN_SGF) > $(SANSAN_DB)
+
+MOKUHAZUSHI_DB=$(WINDIR)\mokuhazushi.db
+MOKUHAZUSHI_SGF=$(PATDIR)\mokuhazushi.sgf
+$(MOKUHAZUSHI_DB): $(JOSEKI) $(MOKUHAZUSHI_SGF)
+	@echo Making MOKUHAZUSHI joseki $(MOKUHAZUSHI_DB) from $(MOKUHAZUSHI_SGF)
+	$(JOSEKI) JM < $(MOKUHAZUSHI_SGF) > $(MOKUHAZUSHI_DB)
+
+TAKAMOKU_DB=$(WINDIR)\takamoku.db
+TAKAMOKU_SGF=$(PATDIR)\takamoku.sgf
+$(TAKAMOKU_DB): $(JOSEKI) $(TAKAMOKU_SGF)
+	@echo Making TAKAMOKU joseki $(TAKAMOKU_DB) from $(TAKAMOKU_SGF)
+	$(JOSEKI) JT < $(TAKAMOKU_SGF) > $(TAKAMOKU_DB)
+
+ALL_JOSEKI_DB= \
+  $(HOSHI_DB) \
+  $(KOMOKU_DB) \
+  $(SANSAN_DB) \
+  $(MOKUHAZUSHI_DB) \
+  $(TAKAMOKU_DB)
+
+
+###########################################################
+############### Compiling 
+###########################################################
+
+# Note: This defines where to look for the necessary
+# source files. Funny way of doing it, but it works.
+
+# Engine 
+{$(ENGDIR)}.c{$(OBJDIR)}.obj:
+	@echo "compiling $< in $(ENGDIR)"
+	@$(CPP) $(COPT) \
+	/D "BUILDING_GNUGO_ENGINE" \
+	$<
+
+# pattern stuff (real files)
+{$(PATDIR)}.c{$(OBJDIR)}.obj:
+	@echo "compiling $< in $(PATDIR)"
+	@$(CPP) \
+	/D "BUILDING_GNUGO_ENGINE" \
+	$(COPT) $<
+
+# pattern stuff (generated files)
+{$(PATDIR)}.c{$(TMPDIR)}.obj:
+	@echo "compiling $< in $(PATDIR)"
+	@$(CPP) $(COPT) $<
+
+# utilities
+{$(UTILDIR)}.c{$(OBJDIR)}.obj:
+	@echo "compiling $< in $(UTILDIR)"
+	@$(CPP) $(COPT) $<
+
+# sgf
+{$(SGFDIR)}.c{$(OBJDIR)}.obj:
+	@echo "compiling $< in $(SGFDIR)"
+	@$(CPP) $(COPT) $<
+
+# interface stuff
+{$(INTERFACEDIR)}.c{$(OBJDIR)}.obj:
+	@echo "compiling $< in $(INTERFACEDIR)"
+	@$(CPP) \
+	$(COPT) $<
+
+###	/D "BUILDING_GNUGO_ENGINE" \
+
+# generated files (mostly patters)
+{$(TMPDIR)}.c{$(OBJDIR)}.obj:
+	@echo "compiling $< in $(TMPDIR)"
+	@$(CPP) $(COPT) \
+	/D "BUILDING_GNUGO_ENGINE" \
+	$<
+
+###########################################################
+############### Linking
+###########################################################
+
+
+$(GNUGO) : $(GNUGO_OBJS) 
+	@echo Linking gnugo itself $(GNUGO)
+	@echo OBJS: $(GNUGO_OBJS)
+	$(LINK) @<<
+	$(LNKOPT) 
+		$(GNUGO_LINK_OPTIONS)
+		$(LINK_LIBS) 
+		$(IMPLIB)
+		$(GNUGO_OBJS)
+		/out:$(GNUGO)
+<<
+
+$(MKPAT) : $(MKPAT_OBJS) 
+	@echo Linking mkpat ($(MKPAT))
+	@echo from $(MKPAT_OBJS)
+	$(LINK) @<<
+	$(LNKOPT) 
+		$(HELPER_LINK_OPTIONS)
+		$(LINK_LIBS) 
+		$(IMPLIB)
+		$(MKPAT_OBJS)
+		/out:$(MKPAT)
+<<
+
+$(MKEYES) : $(MKEYES_OBJS) 
+	@echo Linking mkeyes ($(MKEYES))
+	@echo from $(MKEYES_OBJS)
+	$(LINK) @<<
+	$(LNKOPT) 
+		$(HELPER_LINK_OPTIONS)
+		$(LINK_LIBS) 
+		$(IMPLIB)
+		$(MKEYES_OBJS)
+		/out:$(MKEYES)
+<<
+
+$(JOSEKI) : $(JOSEKI_OBJS) 
+	@echo Linking joseki ($(JOSEKI))
+	@echo from $(JOSEKI_OBJS)
+	$(LINK) @<<
+	$(LNKOPT) 
+		$(HELPER_LINK_OPTIONS)
+		$(LINK_LIBS) 
+		$(IMPLIB)
+		$(JOSEKI_OBJS)
+		/out:$(JOSEKI)
+<<
+
+###########################################################
+############### Special operations
+###########################################################
+
+
+############## clean
+clean:
+	del $(GNUGO) 
+	del $(OBJDIR)\*.OBJ
+	del $(OBJDIR)\*.SBR
+	del $(OBJDIR)\VC*.*
+	del $(TMPDIR)\mk*.*
+	del $(TMPDIR)\*.c
+	del $(TMPDIR)\joseki.*
+	del $(WINDIR)\*.db
+	del $(WINDIR)\*.pch
+
+# Unfortunately DOS cannot delete a list of files, and wants
+# to ask for confirmation for deleting *.* (with different
+# responses in various national languages!!!)
+
+
+########### check directories and create if needed
+dirs: $(OBJDIR) $(WINDIR) $(LIBDIR) $(BINDIR) $(TMPDIR)
+
+$(OBJDIR) $(WINDIR) $(LIBDIR) $(BINDIR) $(TMPDIR):
+	if not exist "$@/$(NUL)" mkdir "$@"
+
+
+###########################################################
+############### Explicit dependencies
+###########################################################
+
+# Make sure we generate before compiling
+$(ENG_OBJS) : $(GENERATED_OBJS) $(TMPDIR)\eyes.c
+
+
+# all depend on the makefile, while editing it :-)
+$(ALL_OBJS): makefile.win
+
+

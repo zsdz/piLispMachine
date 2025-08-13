@@ -1,0 +1,62 @@
+                 GNU Go Installation Instructions
+
+Get the most recent tar file from ftp.gnu.org or a mirror (see
+http://www.gnu.org/order/ftp.html for a list).
+
+Untar the sources, change to the directory gnugo-2.5.xx. Now do:
+
+   ./configure
+   make
+
+This makes a binary called interface/gnugo. Now (running as root) type
+
+   make install
+
+to install gnugo in /usr/local/bin. This will also install the man
+page gnugo.6 into /usr/man/man6.
+
+There are two methods of using GNU Go. You may run it from the
+command line by just typing:
+
+   gnugo
+
+but it is nicer to run it under X-Windows using CGoban.
+
+Obtain the most recent version of CGoban from Bill Shubert's web site:
+http://www.inetarena.com/~wms/comp/cgoban. The CGoban version number
+MUST be 1.9.1 at least or it won't work.
+
+See the README file for instructions on how to run GNU Go from Cgoban.
+
+
+                          PROBLEMS
+
+On one GNU/Linux machine compilation failed because it had an
+incompatible /usr/include/curses.h (from BSD) which had declarations
+inconsistent with those in /usr/include/term.h. The symptom of this
+problem is compilation errors in src/moyo.c and src/showbord.c.
+
+In this case, the correct curses.h was found in /usr/include/ncurses
+and a correct compilation was obtained after changing
+
+     #include <curses.h>
+
+to
+
+     #include <ncurses/curses.h>
+
+in src/moyo.c and src/showbord.c. If you have a problem with errors in
+src/moyo.c and src/showbord.c caused by curses you should try such a
+remedy first. If this doesn't work, you shouldn't curse. Run
+'configure --disable-color' to turn off the color option and compile
+again. Another alternative if you want color is 'configure
+--without-curses --enable-color'.
+
+
+                        THE MANUAL
+
+You can obtain a printed copy of the manual by running
+'make gnugo.dvi' in the doc/ directory, then printing the
+resulting .dvi file. The manual contains a great deal of
+information about the algorithms of GNU Go.
+

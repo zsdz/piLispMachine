@@ -1,0 +1,700 @@
+
+This document is an overview of the GNU Go internals. Further 
+documentation of how any one module or routine works may be found in
+the comments in the source files.
+
+@menu
+* Definitions::                Some words used in this documentation.
+* Move Generation::            How GNU Go generates the (supposedly) 
+                               optimal move.
+* Roadmap::                    Description of the different files.
+* Data Structures::            Description of the data structures. 
+* Coding Styles::              Coding conventions.
+@end menu
+
+@node    Definitions,  Move Generation,            ,  Overview
+@comment node-name,    next,             previous,    up
+@section Definitions
+
+In this document wherever we define a concept we use CAPITAL LETTERS
+for the term being defined.
+
+A WORM is a maximal set of vertices on the board which are connected
+along the horizontal and vertical lines, and are of the same color,
+which can be @code{BLACK}, @code{WHITE} or @code{EMPTY}. The term 
+@code{EMPTY} applied to a worm means that the worm consists of empty
+(unoccupied) vertices. It does NOT mean that that the worm is the empty set. A
+STRING is a nonempty worm. An empty worm is called a CAVITY.  If a subset of
+vertices is contained in a worm, there is a unique worm containing it; this is
+its WORM CLOSURE.
+
+A DRAGON is a union of strings of the same color which will be treated
+as a unit. The dragons are recomputed. If two strings are in the same
+dragon, it is the computer's working hypothesis that they will live or
+die together and are effectively connected.
+
+@node    Move Generation, Roadmap,       Definitions,  Overview
+@comment node-name,       next,          previous,     up
+@section Move Generation
+
+The engine of GNU Go takes a positions and a color to move and
+generates the (supposedly) optimal move.  This is done by the function
+@code{genmove()} in @file{engine/genmove.c}.
+
+The move generation is done in two passes:
+
+@enumerate
+@item information gathering
+@item actual move generation based on the information gathered in pass 1.
+@end enumerate
+
+@subsection Information gathering
+
+First we have to collect as much information as possible about the
+current position.  Such information could be life and death of the
+groups, moyo status, connection of groups and so on. Information
+gathering are performed by the following functions, called in this
+order: 
+
+- @code{make_worms()}
+@quotation
+Collect information about all connected sets of stones
+(strings) and cavities.  This information is stored in
+the @code{worm[][]} array.
+@end quotation
+
+- @code{make_dragons}	
+@quotation
+Collect information about connected strings, which are
+called dragons.  Important information here is number
+of eyes, life status, and connectedness between
+string. 
+@end quotation
+
+- @code{make_moyo()}
+@quotation
+Calculate the "territory", "moyo" and "area" for both
+sides.  "Territory," as used here, is not solid,
+incontestible territory, but rather the regions
+which are deemed likely to become actual territory.
+"Moyo" is the larger region of strong influence which could 
+become territory if the other side does nothing about it.
+"Area" is a still larger region of general influence. 
+This function also assigns "weakness" to groups which
+are strategically vulnerable because of strong opposing
+influence. Weakness is accounted for in the field 
+@code{dragon.safety} (see @pxref{Dragon}).
+@end quotation
+
+@xref{Dragon}, for @code{make_worms()} and @code{make_dragons()} more detailed
+documentation.
+@xref{Moyo}, for the algorithms in make_moyo.
+
+@subsection Move generation in GNU Go 2.6
+
+Once we have found out all about the position it is time to generate
+the best move.  Moves are proposed by a number of different move
+generators with a value attached to them.  The values are compared and
+the best move is picked.  If two or more moves have the same value,
+one of them is picked at random.  
+
+The move generators in version 2.6 are:
+
+- @code{fuseki()}
+@quotation
+Generate a move in the early fuseki. This module
+is undocumented but will be replaced by something
+better in the future.
+@end quotation
+
+- @code{semeai()}
+@quotation
+Find out if two dead groups of opposite colors are
+next to each other and, if so, try to kill the other
+group. This module is probably the one in the worst
+condition currently and badly in need of improvement.
+@end quotation
+
+- @code{shapes()}
+@quotation
+Find patterns from @file{patterns/patterns.db} in
+the current position.  Each pattern is matched in each
+of the 8 possible orientations obtainable by rotation and
+reflection. If the pattern matches, a so called "constraint"
+may be tested which makes use of reading to determine if the
+pattern should be used in the current situation.  Such
+constraints can make demands on number of liberties of
+strings, life and death status, and reading out ladders,
+etc. The patterns may call helper functions, which may
+be hand coded (in @file{patterns/helpers.c}) or 
+autogenerated.
+@end quotation
+
+The patterns can be of a number of different classes
+with different goals.  There are e.g. patterns which
+try to attack or defend groups, patterns which try to
+connect or cut groups, and patterns which simply try
+to make good shape.  
+
+@xref{Patterns}, for a complete documentation of patterns.
+
+- @code{attacker()}
+@quotation
+Looks for strings of the opposite color with four liberties 
+or less and tries to kill them.
+@end quotation
+
+- @code{defender()}
+@quotation
+Looks for strings of my color with four liberties or less and tries to
+defend them.
+@end quotation
+
+- @code{eye_finder()}
+@quotation
+Finds groups of either color which can make two eyes
+in the next move and looks for the vital point in the
+eye shapes.
+@end quotation
+
+- @code{revise_semeai()}
+@quotation
+If no move is found yet, change status of opponent
+groups involved in a semeai from @code{DEAD} to @code{UNKNOWN}.
+After this, genmove runs shapes again to see if a new
+move turns up.
+@end quotation
+
+- @code{fill_liberty()}
+@quotation
+Fill a common liberty. This is only used at the end
+of the game. If necessary a backfilling or backcapturing 
+move is generated.
+@end quotation
+
+
+@node    Roadmap,       Data Structures, Move Generation, Overview
+@comment node-name,     next,            previous,        up
+@section Roadmap
+
+The GNU Go engine is contained in two directories, @file{engine/} and
+@file{patterns/}. Code related to the user interface, reading and
+writing of smart go format files and testing are found in 
+the directories @file{interface/}, @file{sgf/} and
+@file{regression/}. Code borrowed from other GNU programs is
+contained in @file{utils/}. Documentation is in @file{docs/}.
+
+In this document we will describe the all individual files comprising
+the engine code in @file{engine/} and @file{patterns/}. In @file{interface/} 
+we mention one file:
+
+@file{gmp.c}      : 
+@quotation
+This is the Go Modem Protocol interface (courtesy of 
+William Shubert and others). This takes care of all the 
+details of exchanging setup and moves with Cgoban, or any 
+other driving program recognizing the Go Modem Protocol.
+@end quotation
+
+In @file{engine/} there are the following files:
+
+@file{attdef.c}    : 
+@quotation
+This file contains @code{attacker()}, @code{defender()} and 
+@code{eye_finder()}, three of the move generators called by 
+@code{genmove()}. The module @code{attacker()} proposes moves which 
+attack enemy strings, while @code{defender()} proposes moves 
+which defend friendly strings. The reading necessary to 
+decide whether a string can be captured or defended is
+contained in @file{reading.c}, and has already been called
+by @code{make_worms()}. If a string can be defended, there
+may be different possible defensive moves, and some 
+of the patterns found by @code{shapes()} may move the points 
+of defense. This is the only case where data compiled 
+by @code{make_worms()} and @code{make_dragons()} is changed by a later 
+routine. Because of this feature, @code{shapes()} is called 
+before @code{defender()}.           
+
+Also in @file{attdef.c} is @code{eye_finder()}. This module looks
+for dragons having one and a half eyes. If such a
+dragon (of either color) is found, @code{eye_finder()}
+proposes making or destroying the half eye.
+@end quotation
+
+@file{dragon.c}    : 
+@quotation
+This contains @code{make_worms()} and @code{make_dragons()}. These
+routines are executed before the move-generating
+modules @code{shapes()}, @code{attacker()}, @code{defender()}, 
+@code{semeai()} and @code{eye_finder()}. They find all the
+worms and dragons and collect important information about
+them, such as how many liberties each has, whether (in GNU
+Go's opinion) the string or dragon can be captured, etc.
+This information remains unchanged until the next move, with
+one exception: some patterns can move the point of defense
+of a friendly worm which is under attack.
+@end quotation
+
+@file{filllib.c}   :
+@quotation 
+Code to force filling of dame (backfilling if necessary)
+at the end of the game.
+@end quotation
+
+@file{fuseki.c}    :
+@quotation 
+This module generates fuseki (large scale opening)
+moves at the beginning of the game. This file is
+undocumented but will be replaced by something better
+in the future.
+@end quotation
+
+@file{genmove.c}   : 
+@quotation
+This file contains @code{genmove()}, is the routine responsible
+for generating the next move. Opening moves are
+generated directly in this file, but it calls on
+other modules for other moves. The modules called
+by genmove are @code{shapes()} (in @file{shapes.c}),
+@code{attacker()} and @code{defender()} (in @file{attdef.c}), 
+@code{semeai()} (in @file{semeai.c})
+and @code{eye_finder()} (in @file{attdef.c}). Each module proposes
+moves, each with a value, and @code{genmove()} selects the
+one with the highest value.
+@end quotation
+
+@file{hash.c}      : 
+@quotation
+Hashing code used by for reading. (@pxref{Hashing})
+@end quotation
+
+@file{hash.h}      : 
+@quotation
+header file for hash.c.
+@end quotation
+
+@file{liberty.h}   : 
+@quotation
+Header file for the whole program. 
+@end quotation
+
+@file{main.c}      : 
+@quotation
+Miscellaneous book-keeping (parsing args, signal
+handlers, etc.) sgf file interfaces (reading and writing)
+high level game playing (collecting moves from @code{genmove()},
+keeping track of passes, etc.) Contains very little
+knowledge about go : only that each side plays
+alternately, and that two passes marks the end of the
+game.
+@end quotation
+              
+@file{matchpat.c}  : 
+@quotation
+This file contains @code{matchpat()}, which looks for
+patterns at a particular board location.
+@end quotation
+
+@file{moyo.c}      :
+@quotation 
+This file contains code to estimate territory and
+influence. @xref{Moyo}, for details.
+@end quotation
+
+@file{reading.c}   :
+@quotation 
+This file contains code to determine whether any given
+string can be attacked or defended. @xref{Reading},
+for details.
+@end quotation
+
+@file{semeai.c}    :
+@quotation 
+This contains @code{semeai()}, the module which tries to
+win capturing races.
+@end quotation
+
+@file{sethand.c}   :
+@quotation 
+Initially populate the board with handicap stones.
+@end quotation
+
+@file{showbord.c}  :
+@quotation 
+This contains @code{showboard()}, which draws an ASCII
+representation of the board, depicting dragons (stones 
+with same letter) and status (color). This was the 
+primary interface in GNU Go 1.2, but is now a debugging 
+aid.
+@end quotation
+
+@file{shapes.c}    :
+@quotation 
+This file contains @code{shapes()}, the module called by @code{genmove()}
+which tries to find moves which match a pattern. The pattern matcher has some
+sophisticated features. (@pxref{Patterns}).  Briefly, the pattern may take
+into account both friendly and opposing strength in the area, a string's
+escape potential, whether or not the pattern makes or breaks a valuable
+connection, whether it involves a dragon classified as dead, and it can also
+call a helper function hand tailored to the program which typically does some
+further reading to decide whether the pattern is appropriate.  
+@end quotation
+
+@file{optics.c}    :
+@quotation 
+This contains the code to recognize eye shapes,
+documented in @xref{Eyes}.
+@end quotation
+
+@file{worm.c}      :
+@quotation 
+This file contains code which is run at the beginning
+of each move cycle, before the code in @file{dragon.c}, to
+determine the attributes of every string.
+@end quotation
+
+@file{utils.c}     : 
+@quotation
+An assortment of utilities, described in greater
+detail below.
+@end quotation
+
+The directory @file{patterns/} contains files related to pattern matching.
+Currently search for 3 types of patterns: move generation patterns
+(in @file{patterns.db} and similar files such as hoshi.db, autogenerated
+from @file{hoshi.sgf} @xref{Patterns}, for details); eyeshape
+patterns (@xref{Eyes}, for @file{eyes.db}) and connection patterns
+(@xref{Dragon}, for @file{conn.db}).
+
+The following list contains, in addition to distributed source files 
+some intermediate automatically generated files such as patterns.c.
+These are C source files produced by "compiling" various pattern
+databases, or in some cases (such as @file{hoshi.db}) themselves 
+automatically generated pattern databases produced by "compiling"
+joseki files in Smart Go Format.
+
+@file{conn.db}     : 
+@quotation 
+Database of connection patterns.
+@end quotation
+
+@file{conn.c}      : 
+@quotation 
+Automatically generated file, containing connection
+patterns in form of struct arrays, compiled by @command{mkpat}
+from @file{conn.db}.
+@end quotation
+
+@file{eyes.c}      : 
+@quotation 
+Automatically generated file, containing eyeshape
+patterns in form of struct arrays, compiled by @command{mkpat} 
+from @file{eyes.db}.
+@end quotation
+
+@file{eyes.h}      : 
+@quotation 
+Header file for @file{eyes.c}.
+@end quotation
+
+@file{eyes.db}     : 
+@quotation 
+Database of eyeshape patterns. @xref{Eyes}, for
+details.
+@end quotation
+
+@file{helpers.c}   : 
+@quotation 
+These are helper functions to assist in evaluating
+moves by matchpat.
+@end quotation
+
+@file{hoshi.sgf}   : 
+@quotation 
+Smart Go Format file containing 4-4 point openings
+@end quotation
+
+@file{hoshi.db}    : 
+@quotation 
+Automatically generated database of 4-4 point opening
+patterns, make by compiling @file{hoshi.sgf}
+@end quotation
+
+@file{joseki.c}    : 
+@quotation 
+Joseki compiler, which takes a joseki file in
+Smart Go Format, and produces a pattern database.
+@end quotation
+
+@file{komoku.sgf}  :
+@quotation  
+Smart Go Format file containing 3-4 point openings
+@end quotation
+
+@file{komoku.db}   : 
+@quotation 
+Automatically generated database of 3-4 point opening
+patterns, make by compiling @file{komoku.sgf}
+@end quotation
+
+@file{mkeyes.c}    : 
+@quotation 
+Pattern compiler for the eyeshape databases. This
+program takes @file{eyes.db} as input and produces @file{eyes.c}
+as output.
+@end quotation
+
+@file{mkpat.c}     : 
+@quotation 
+Pattern compiler for the move generation and connection
+databases. Takes the file @code{patterns.db} together with
+the autogenerated Joseki pattern files @code{hoshi.db}, @code{komoku.db},
+@code{sansan.db}, @file{mokuhadzushi.db}, @file{takamoku.db} and produces 
+@file{patterns.c}, or takes @file{conn.db} and produces @file{conn.c}.
+@end quotation
+
+@file{mokuhazushi.sgf} : 
+@quotation 
+Smart Go Format file containing 5-3 point openings
+@end quotation
+
+@file{mokuhazushi.db}  :
+@quotation 
+Pattern database compiled from mokuhadzushi.sgf
+@end quotation
+
+@file{sansan.sgf}       : 
+@quotation 
+Smart Go Format file containing 3-3 point openings
+@end quotation
+
+@file{sansan.db}        : 
+@quotation 
+Pattern database compiled from @file{sansan.sgf}
+@end quotation
+
+@file{takamoku.sgf}     : 
+@quotation 
+Smart Go Format file containing 5-4 point openings
+@end quotation
+
+@file{takamoku.db}      : 
+@quotation 
+Pattern database compiled from takamoku.sgf.
+@end quotation
+
+@file{patterns.c}  : 
+@quotation 
+Pattern data, compiled from patterns.db by mkpat.
+@end quotation
+
+@file{patterns.h}  : 
+@quotation 
+Header file relating to the pattern databases.
+@end quotation
+
+@file{patterns.db} : 
+@quotation 
+This contains the pattern database in human
+readable form. See PATTERNS for documentation.
+@end quotation
+
+@subsection Utility files and routines in @file{engine/utils.c}
+
+Only a portion of these functions are documented here. Others
+are discussed elsewhere @pxref{Utility Functions}.
+
+@code{legal()}        : 
+@quotation 
+Determines whether a move is legal.
+@end quotation
+
+@code{trymove()}      : 
+@quotation 
+Pushes the board position on the stack,
+increments stackp, places the stone on the board if 
+the move is legal, removes captures and increments 
+stackp.
+@end quotation
+
+@code{pushgo()}       : 
+@quotation 
+Pushes the board position on the stack and
+increments stackp.
+@end quotation
+
+@code{popgo()}        : 
+@quotation 
+Pops the stack.
+@end quotation
+
+@code{gprintf()} : 
+@quotation 
+printf-like fn (see below under TRACING)
+@end quotation
+
+@code{TRACE}, @code{VTRACE}, @code{DEBUG} ()  - see below under Tracing.
+
+@code{abortgo()}  : 
+@quotation 
+Wrapper around @code{abort()} which dumps the stack. Usually
+this is invoked by means of the macro ASSERT (see
+ASSERTIONS) below.
+@end quotation
+
+@file{utils.c} :  
+@quotation 
+Board utility functions :
+@end quotation
+
+----
+
+@code{approxlib()} : 
+@quotation 
+Counts liberties, but as an optimisation, can be given
+an upper limit, above which it can stop counting.
+@end quotation
+
+@code{count()} : 
+@quotation 
+Low level helper for @file{approxlib()}, but is used by other fns
+@end quotation
+
+@code{updateboard()} : 
+@quotation 
+Place a piece on the board, remove captures, and update
+state information (for ko)
+@end quotation
+
+@node    Data Structures, Coding Styles, Roadmap,         Overview
+@comment node-name,       next,          previous,        up
+@section Data structures
+
+
+The most important global variable is @code{p[][]}, which is the go board.
+Each element contains @code{EMPTY}, @code{WHITE} or @code{BLACK}. 
+
+@code{stackp} is the STACK POINTER. When this is zero, @code{p[][]}
+contains the actual board position. When @code{trymove()} is
+called, it generates a new board position by placing a stone on
+the board and calling @code{updateboard()}. Then @code{stackp}
+is incremented. The old position is saved on the stack. 
+
+Thus the value @code{stackp} equals the ply below the
+current position at which the reading code is thinking.
+
+The state of the board can be saved and restored using @code{pushgo()}
+and @code{popgo()}.
+
+@code{p[][]} should not be written to directly. Trial moves should
+be made using trymove(), which pushes the board, places the
+piece, checks the move is legal, and updates the board.
+@code{popgo()} undoes the move.  When a move is actually made,
+@code{updateboard()} places the piece and removes prisoners.
+
+@code{approxlib()} and @code{count()} can be called without
+actually placing a piece. They report what the number of
+liberties would be if a given piece was placed.
+
+Other important data structures are @code{dragon[][]} and
+@code{worm[][]}.  These contain information about groups of
+stones, whether they are alive or dead, where they can be
+attacked, whether they are cutting groups (split enemy
+groups), etc.
+
+@code{size}, @code{lib}, and @code{libi[]}, @code{libj[]}
+are global variables written to by @code{count()} and
+@code{approxlib()}. They return the size of the group, and the
+number and positions of the liberties.
+
+*NOTE* : if the count is truncated because it reaches the
+limit on the number of liberties, then @code{size} and
+@code{lib} may be smaller than the true value.
+
+
+
+@node    Coding Styles,,               Data Structures, Overview
+@comment node-name,     next,          previous,        up
+@section Coding styles and conventions
+
+              
+@subsection Tracing
+
+A function @code{gprintf()} is provided. It is a cut-down
+@code{printf}, supporting only @code{%c}, @code{%d},
+@code{%s}, and without field widths, etc. It does, however,
+add two useful facilities :
+
+  @code{%m} : 
+@quotation
+takes two parameters, and displays a formatted board co-ordinate
+@end quotation
+
+  indentation : 
+@quotation
+trace messages are automatically indented to reflect
+the current stack depth, so it is clear during read-ahead
+when it puts a move down or takes one back.
+@end quotation
+
+As a workaround, "outdent" @code{%o} at the beginning of the
+format string suppresses the indentation.
+
+@code{gprintf()} is intended to be wrapped by one of the following:
+
+@code{TRACE(fmt, ...)}  : 
+@quotation
+print the message if the 'verbose' variable > 0.
+(verbose is set by @command{-t} on the command line)
+@end quotation
+
+@code{VTRACE(fmt, ...)} : 
+@quotation
+Verbose trace, only if @code{verbose} > 1
+(not currently used)
+@end quotation
+
+@code{DEBUG(flags, fmt, ...)} : 
+@quotation
+while @code{TRACE} is intended to afford an overview
+of what GNU Go is considering, @code{DEBUG} allows occassional
+in depth study of a module, usually needed when something
+goes wrong. 'flags' is one of the @code{DEBUG_*} symbols in
+@file{engine/liberty.h}.  The @code{DEBUG} macro tests to
+see if that bit is set in the 'debug' variable, and prints
+the message if it is.  The debug variable is set using the
+@command{-d} command-line option.  
+@end quotation
+
+The variable @code{verbose} controls the tracing. It
+can equal 0 (no trace), 1, 2, 3 or 4 for increasing
+levels of tracing. In practice levels 3 and 4 should
+only be used when running inside @command{gdb} because
+the volume of tracing is prohibitive. You can set the
+trace level at the command line by @option{-t} for
+@code{verbose=1}, @option{-t -t} for @code{verbose=2},
+etc.
+
+@subsection Assertions
+
+Related to tracing are assertions. Developers are strongly encouraged
+to pepper their code with assertions to ensure that data structures
+are as they expect. For example, the helper functions make assertions
+about the contents of the board in the vicinity of the move they
+are evaluating.
+
+@code{ASSERT()} is a wrapper around the standard C
+@code{assert()} function.  In addition to the test, it takes
+an extra pair of parameters which are the co-ordinates of a
+"relevant" board position.
+
+If an assertion fails, the board position is included in the
+trace output, and @code{showboard()} and @code{popgo()} are
+called to unwind and display the stack.
+
+
+
+@subsection Fixme
+
+We have adopted the convention of putting the word FIXME
+in comments to denote known bugs, etc.

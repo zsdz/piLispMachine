@@ -1,0 +1,577 @@
+@menu
+* Installation::             Installation
+* Documentation::            Documentation
+* CGoban::                   Running GNU Go with CGoban
+* Ascii::                    The Ascii Interface
+* Emacs::                    GNU Go mode in Emacs
+* Jago::                     Jago
+* GMP::                      The Go Modem Protocol
+* SGF::                      The Smart Go Format
+* Invoking GNU Go::          Command line options
+@end menu
+
+@node Installation, Documentation, User Guide, User Guide
+@comment  node-name,  next,  previous,  up
+@section Installation
+
+In short, @command{./configure; make} will build GNU Go; optionally (running
+as root) @code{make install} will put it into @file{/usr/local/bin} and also
+install the man page. You also will probably want to install CGoban.
+
+Get the most recent tar file from @url{ftp.gnu.org} or a mirror. A list
+of mirrors may be found at:
+
+@quotation
+  @url{http://www.gnu.org/order/ftp.html}
+@end quotation
+
+Untar the sources, change to the directory @file{gnugo-2.6/}. Now do:
+
+@example
+  ./configure
+  make
+@end example
+
+@paragraphindent 0
+This makes a binary called @file{interface/gnugo}. Now (running as root) type
+
+@example
+  make install
+@end example
+
+This will install gnugo in @file{/usr/local/bin/}, and also install the man
+page @file{gnugo.6} into @file{/usr/man/man6/}.
+
+@paragraphindent 3
+There are two methods of using GNU Go. You may run it from the
+command line by just typing @command{gnugo}, but it is nicer to run it under
+X-Windows using CGoban.
+
+Obtain the most recent version of CGoban from Bill Shubert's web site:
+
+@quotation
+  @url{http://www.inetarena.com/~wms/comp/cgoban}
+@end quotation 
+
+@paragraphindent 0
+The CGoban version number MUST be 1.9.1 at least or it won't work.
+Instructions for using CGoban are elsewhere in this document
+@pxref{CGoban}.
+
+@subsection Problems
+
+@paragraphindent 3
+On one GNU/Linux machine an incompatible @file{/usr/include/curses.h} (from
+BSD) had declarations inconsistent with those in
+@file{/usr/include/term.h}. The symptom of this problem is compilation errors
+in @file{engine/moyo.c} and @file{engine/showbord.c}.
+
+In this case, the correct @file{curses.h} was found in @file{/usr/include/ncurses}
+and a correct compilation was obtained after changing
+
+@example
+  #include <curses.h>
+@end example
+
+@paragraphindent 0
+to
+
+@example
+  #include <ncurses/curses.h>
+@end example
+
+@paragraphindent 0
+in @file{engine/moyo.c} and @file{engine/showbord.c}. If you have a problem
+with errors in @file{engine/moyo.c} and @file{engine/showbord.c} caused by
+curses you should try such a remedy first. If this doesn't work, you shouldn't
+curse. Run @command{configure --disable-color} to turn off the color option and
+compile again. Another alternative if you want color is 
+@command{configure --without-curses --enable-color}. This will substitute
+ansi escape sequences for curses.
+
+@node Documentation, CGoban, Installation, User Guide
+@comment  node-name,  next,  previous,  up
+@section Documentation
+
+@paragraphindent 3
+Documentation in @file{doc/} consists of a man page @file{gnugo.6}, the 
+info files @file{gnugo.info}, @file{gnugo.info-1}, ... and the 
+Texinfo files from which the info files are built. The Texinfo
+documentation contains this User's Guide and extensive information
+about the algorithms of GNU Go, for developers.
+
+If you want a typeset copy of the Texinfo documentation, you can
+@command{make gnugo.dvi} or @command{make gnugo.ps} in the @file{doc/}
+directory. 
+
+You can make an HTML version with the command @command{makeinfo --html
+gnugo.texi}. Better HTML documentation may be obtained using
+@command{texi2html -split_chapter gnugo.html}.  You can obtain the
+@command{texi2html} utility from
+@url{http://www.mathematik.uni-kl.de/~obachman/Texi2html/}. (See also
+@url{http://texinfo.org/texi2html/}.) Unfortunately Version 1.58 of
+@command{texi2html} does not support the @code{@@option} and @code{@@command}
+tags. These are supported in Version 1.60-Beta. However our current
+recommendation is to use Version 1.58, and to add the lines
+
+@example
+	      'command', 'CODE',
+	      'option', 'SAMP',
+@end example
+
+to the @code{style_map} around line 178 of the perl script.
+
+User documentation can be obtained by running @command{gnugo --help} 
+or @command{man gnugo} from any terminal, or from the Texinfo
+documentation.
+
+Documentation for developers is in the Texinfo documentation, and in comments
+throughout the source. Contact us at @email{gnugo@@gnu.org} if you are
+interested in helping to develop this program.
+
+@node CGoban, Ascii, Documentation, User Guide
+@comment  node-name,  next,  previous,  up
+@section Running GNU Go via CGoban
+
+This is an extremely nice way to run GNU Go. CGoban provides a
+beautiful graphic user interface under X-Windows.
+
+Start CGoban. When the CGoban Control panel comes up, select ``Go
+Modem''. You will get the Go Modem Protocol Setup. Choose one (or
+both) of the players to be ``Program,'' and fill out the box with the
+path to gnugo. After clicking OK, you get the Game Setup window.
+Choose ``Rules Set'' to be Japanese (otherwise handicaps won't work).
+Set the board size and handicap if you want. Click OK and you are
+ready to go.
+
+In the Go Modem Protocol Setup window, when you specify the path to
+GNU Go, you can give it command line options, such as --quiet to
+suppress most messages. Since the Go Modem Protocol preempts standard
+I/O other messages are sent to stderr, even if they are not error
+messages. These will appear in the terminal from which you started
+CGoban.
+
+Other command line options can be listed by typing @command{gnugo --help} 
+-or- @command{man gnugo} from any terminal.
+
+@node Ascii, Emacs, CGoban, User Guide
+@comment  node-name,  next,  previous,  up
+@section Ascii Interface
+
+Even if you do not have CGoban installed you can play with GNU Go
+using its default Ascii interface. Simply type @command{gnugo}
+at the command line, and GNU Go will draw a board. Typing
+@command{help} will give a list of options. At the end of the
+game, pass twice, and GNU Go will prompt you through the
+counting. You and GNU Go must agree on the dead groups---you
+can toggle the status of groups to be removed, and when you
+are done, GNU Go will report the score.
+
+@node Emacs, Jago, Ascii, User Guide
+@comment  node-name,  next,  previous,  up
+@section GNU Go mode in Emacs
+
+You can run GNU Go from Emacs. This has the advantage 
+that you place the stones using the cursor arrow keys.
+This may require Emacs 20.4 or later---it has been 
+tested with Emacs 20.4 but does not work with Emacs 19
+or Emacs 20.2.
+
+Load @file{interface/gnugo.el}, either by @command{M-x load-file},
+or by copying the file into your @file{site-lisp} directory and
+adding a line
+
+@example
+(autoload 'gnugo "gnugo" "GNU Go" t)
+@end example
+
+@paragraphindent 0
+in your @file{.emacs} file. 
+
+@paragraphindent 3
+Now you may start GNU Go by @command{M-x gnugo}. You will be prompted for
+command line options @pxref{Invoking GNU Go}. Using these, you may set the
+handicap, board size, color and komi.
+
+You can enter commands from the GNU Go ASCII interface after
+typing @samp{:}. For example, to take a move back, type
+@samp{:back}, or to list all commands, type @samp{:help}.
+
+Here are the default keybindings:
+
+@itemize @bullet
+@item @samp{Return} or @samp{Space}
+@quotation
+Select point as the next move.  An error is signalled
+for invalid locations.  Illegal locations, on the other
+hand, show up in the GNUGO Console buffer.
+@end quotation
+@item @samp{q} or @samp{Q}
+@quotation
+Quit. Both Board and Console buffers are deleted.
+@end quotation
+@item @samp{R}
+@quotation
+Resign.
+@end quotation
+@item @samp{C-l}
+@quotation
+Refresh.  Includes restoring default window configuration.
+@end quotation
+@item @samp{M-_}
+@quotation
+Bury both Board and Console buffers (when the boss is near).
+@end quotation
+@item @samp{p}
+@quotation
+Pass; i.e., select no location for your move.
+@end quotation
+@item @samp{:}
+@quotation
+Extended command.  Type in a string to be passed directly to the inferior
+GNUGO process."
+@end quotation
+@end itemize
+
+@node Jago, GMP, Emacs, User Guide
+@comment  node-name,  next,  previous,  up
+@section Running GNU Go via Jago
+
+Jago, like CGoban is a client capable of providing GNU Go with a
+graphical user interface. Unlike CGoban, it does not require 
+X-Windows, so it is an attractive alternative under Windows.
+You will need a Java runtime environment. Obtain Jago at
+
+@url{http://mathsrv.ku-eichstaett.de/MGF/homes/grothmann/jago/Go.html}
+
+@paragraphindent 0
+and follow the links there for the Java runtime environment.
+
+@node GMP, SGF, Jago, User Guide
+@comment  node-name,  next,  previous,  up
+@section Go Modem Protocol
+
+@paragraphindent 3
+The Go Modem Protocol (GMP) was developed by Bruce Wilcox with input from
+David Fotland, Anders Kierulf and others, according to the history in
+
+@url{ftp://www.joy.ne.jp/welcome/igs/Go/programs/protocol.Z}
+
+Any Go program @emph{should} use this protocol since it is
+standard. Since CGoban supports this protocol, the user interface for
+any Go program can be done entirely through CGoban. The programmer can
+concentrate on the real issues without worrying about drawing stones,
+resizing the board and other distracting issues.
+
+@node SGF, Invoking GNU Go, GMP, User Guide
+@comment  node-name,  next,  previous,  up
+@section Smart Go Format
+
+The Smart Go Format (SGF), is the standard format for storing Go games. 
+GNU Go supports both reading and writing SGF files. The SGF specification
+(FF[4]) is at:
+
+@url{http://www.red-bean.com/sgf/}
+
+@node Invoking GNU Go, , SGF, User Guide
+@comment  node-name,  next,  previous,  up
+@section Invoking GNU Go: Command line options
+
+@subsection Some basic options
+@itemize
+@item @option{--quiet}
+@quotation
+Don't print copyright and other messages
+@end quotation
+@item @option{-l}, @option{--infile @var{filename}}
+@quotation
+Load the named SGF file
+@end quotation
+@item @option{-L}, @option{--until @var{move}}
+@quotation
+Stop loading just before the indicated move is played. @var{move} can
+be either the move number or location.
+@end quotation
+@item @option{-o}, @option{--outfile @var{filename}}
+@quotation
+Write sgf output to file
+@end quotation
+@item @option{--mode @var{mode}} 
+@quotation
+Force the playing mode ('ascii', 'test' or 'gmp'). The default is
+ASCII, but if no terminal is detected GMP (Go Modem Protocol) will be
+assumed. In practice this is usually what you want, so you may never
+need this option.
+@end quotation
+@end itemize
+
+@subsection Options affecting strength and speed
+@itemize
+@item @option{-p} @option{--playstyle @var{style}}
+@quotation
+Select a style of opening play. The possibilities are:
+@itemize
+@item    @option{standard} (default opening)
+@item    @option{no_fuseki} (fuseki module turned off)
+@item    @option{tenuki} (often plays elsewhere in the opening)
+@item    @option{fearless} (risky style of play)
+@item    @option{aggressive} (tenuki and fearless)
+@end itemize
+@end quotation
+@item @option{-D}, @option{--depth @var{depth}}
+@quotation
+Deep reading cutoff. When reading beyond this depth (default 14) GNU
+Go assumes that any string which can obtain 3 liberties is alive. Thus
+GNU Go can read ladders to an arbitrary depth, but will miss other
+types of capturing moves.
+@end quotation
+@item @option{-B}, @option{--backfill_depth @var{depth}}
+@quotation
+Deep reading cutoff. Beyond this depth (default 9) GNU Go will no 
+longer try backfilling moves in its reading.
+@end quotation
+@item @option{-F}, @option{--fourlib_depth @var{depth}}
+@quotation
+Deep reading cutoff. When reading beyond this depth (default 5) GNU
+Go assumes that any string which can obtain 4 liberties is alive.
+@end quotation
+@item @option{-K}, @option{--ko_depth @var{depth}}
+@quotation
+Deep reading cutoff. Beyond this depth (default 8) GNU Go no longer
+tries very hard to analyze kos.
+@end quotation
+@item @option{-M}, @option{--memory @var{megs}} 
+@quotation
+Memory in megabytes used for hashing (default 8). GNU Go stores
+results of its reading calculations in a Hash table. If the
+Hash table gets full, the reading continues, but more slowly.
+The symptoms of this is that (1) there is an unusually
+complicated situation on the board and (2) GNU Go is playing
+slowly. Normally 8 megabytes is adequate to prevent
+this. However if you have ample memory, or if you have increased
+the reading depth using the @option{-D}, @option{-B}, @option{-F}
+or @option{-K} you may want to increase the size of the Hash
+cache using this option.
+@end quotation
+@end itemize
+
+@subsection Ascii mode options:
+@itemize
+@item @option{--boardsize @var{size}}:  Set the board size
+@item @option{--color @var{color}}:  Choose your color ('black' or 'white')
+@item @option{--handicap @var{number}}:  Choose the number of handicap stones (0--9)
+@item @option{--komi @var{num}} Set the komi
+@end itemize
+
+@subsection Development options:
+
+@itemize
+@item @option{--testmode @var{mode}} 
+@quotation
+This option requires @option{-l @var{filename}}, implies test mode. The
+mode can be:
+@itemize
+@item move: test at move node only
+@item annotation: test at annotation node only
+@item both: test at move and annotation nodes
+@item game: test to see if gnugo considered each move made
+@end itemize
+@xref{Regression}.
+@end quotation
+@item @option{-a}, @option{--allpats}
+@quotation
+Test all patterns, even those smaller in value than the largest move
+found so far. This should never affect GNU Go's final move, and it
+will make it run slower. However this can be very useful when "tuning"
+GNU Go. It causes both the traces and the output file (@option{-o}) to
+be more informative.
+@end quotation
+@item @option{-T}, @option{--printboard}: colored display of dragons.
+@quotation
+Use RXVT or Linux Console. (@pxref{Colored Display})
+@end quotation
+@item @option{-E}: colored display of eye spaces
+@quotation
+Use RXVT or Linux Console. (@pxref{Colored Display})
+@end quotation
+@item @option{-d}, @option{--debug @var{level}}
+@quotation
+Produce debugging output. The debug level is given in hexadecimal, using the
+bits defined in the following table from @file{engine/liberty.h}.
+
+@itemize
+@item DEBUG_GENERAL  0x0001
+@item DEBUG_COUNT    0x0002
+@item DEBUG_BOARD    0x0004
+@item DEBUG_CAPTURE  0x0008
+@item DEBUG_STACK    0x0010
+@item DEBUG_WIND     0x0020
+@item DEBUG_HELPER   0x0040
+@item DEBUG_LOADSGF  0x0080
+@item DEBUG_WORMS    0x0100
+@item DEBUG_LADDER   0x0200
+@item DEBUG_MATCHER  0x0400
+@item DEBUG_DEFENDER 0x0800
+@item DEBUG_ATTACKER 0x1000
+@item DEBUG_BORDER   0x2000
+@item DEBUG_DRAGONS  0x4000
+@item DEBUG_SAVESGF  0x8000
+@item DEBUG_HEY      0x10000
+@item DEBUG_SEMEAI   0x20000
+@item DEBUG_EYES     0x40000
+@end itemize
+@end quotation
+@item @option{-H}, @option{--hash @var{level}} 
+@quotation
+hash (see liberty.h for bits).
+@end quotation
+@item @option{-w}, @option{--worms}
+@quotation
+Print more information about worm data.
+@end quotation
+@item @option{-m}, @option{--moyo @var{level}} 
+@quotation
+moyo debugging, show moyo board. The @var{level} is fully
+documented elsewhere (@pxref{Colored Display}).
+@end quotation
+@item @option{-b}, @option{--benchmark @var{number}} 
+@quotation
+benchmarking mode - can be used with @option{-l}.
+@end quotation
+@item @option{-s}, @option{--stack}
+@quotation
+stack trace (for debugging purposes).
+@end quotation
+@item @option{-S}, @option{--statistics}
+@quotation
+Print statistics (for debugging purposes).
+@end quotation
+@item @option{-t}, @option{--trace}
+@quotation
+Print debugging information. Use twice for more detail.
+@end quotation
+@item @option{-r}, @option{--seed @var{seed}}
+@quotation
+Set random number seed. This can be used to guarantee that GNU Go will make
+the same decisions on multiple runs through the same game. If @code{seed} is
+zero, GNU Go will play a different game each time.
+@end quotation
+@item @option{--decidestring @var{location}}
+@quotation
+Analyze whether the string at @var{location} can be captured, and if so,
+whether it can be defended. If used with @option{-o}, this will produce
+a variation tree in SGF.
+@end quotation
+@item @option{--score @var{until}}
+@quotation
+Requires @option{-l}. @var{until} can be "end", "last" or a move. 
+@itemize
+@item end  - finish the game by selfplaying from the end of the file until two passes
+@item last - estimate territorial balance at the end of the of the file
+@item move - load file until move is reached and estimate territorial balance
+@end itemize
+@end quotation
+@item @option{--printsgf @var{output file}} 
+@quotation
+load SGF file, output final position (requires @option{-l}).
+@end quotation
+@end itemize
+
+@subsection Using @option{--analyze}:
+
+The analyze options allow analysis of a game stored as sgf file by using
+@option{--testmode}.  When using @option{--testmode} with @option{--analyze} 
+move tree variations are ignored.
+
+The @option{--analyze} option also works with @option{--benchmark} and
+@option{--score}.  The analyze functions will be executed on every move
+in @option{--benchmark} and @option{--testmode game}.
+
+If used with @option{--analyzerfile @var{filename}}, the results
+of the analysis are written to the file @var{filename}.
+
+Analyzed board states on other modes:
+
+@option{--score end}:
+gnugo analyzes every move it makes at the end of the
+file until the game is finished.
+
+@option{--score last}:
+board state at the end of the file will be analyzed
+
+@option{--score @var{move number}}:
+board state just before @var{movenum} will be analyzed
+
+@option{--score @var{position}}:
+board state just before @var{position} is occupied will be analyzed
+
+@option{--testmode annotation}:
+board state just before the annotated node is reached will be
+analyzed
+
+
+@subsection description of @option{--analyze} options:
+
+@itemize @bullet
+@item areacolor: show color of influence
+@item all: switch on all analyze options
+@item capture: show capturing move for all caputurable worms
+@item considered: show considered moves an their values
+@item defense: show defending move for all caputurable worms
+@item dragoninfo: show dragon info
+@item dragonstatus: the dragons are marked, status indicated
+@item eyeinfo: show eye info
+@item eyes: show eye space and the attacking points
+@item gameinfo: show misc info (captured, territory, move values, ...)
+@item moyocolor: show moyos by color
+@item recommended: show moves recommended by the various modules:
+      A = attacker
+      B = very big move
+      D = defender
+      E = eyefinder
+      F = fuseki
+      L = liberty filling
+      P = pattern
+      p = reconsidered pattern
+      S = semeai
+@item terri: show territory from moyo.c
+@item territory:show territory from dragons
+@item worminfo: show worm info
+@item wormliberties: show the number of liberties for each worm
+@end itemize
+
+You can give more than one @option{--analyze} option also by
+concatenating with "" or by using commas without space.
+
+@subsection Usage examples:
+
+@example
+gnugo --score end --analyzerfile outputfile -l inputfile
+@end example
+will create outputfile and writes the inputfile to it plus the 
+endgame moves for scoring and adds the result property.  If you want
+to overwrite an already existing result property use 
+@option{--analyze overwrite}. This also overwrites DT, AP and RU.
+
+@example
+gnugo --score end --analyzerfile outputfile -l inputfile \
+          --analyze dragonstatus
+@end example
+same as above, but writes to outputfile the dragonstatus for every
+move gnugo made from the last move in inputfile to the end of the
+game.
+
+@example
+gnugo --testmode game --analyzerfile outputfile -l inputfile \
+         --analyze wormliberties
+@end example
+loads inputfile and writes to outputfile the number of liberties for each worm on
+every move.
+
+@example
+gnugo --testmode annotation --analyzerfile outputfile -l inputfile \ 
+          --analyze capture
+@end example
+loads inputfile and writes to outputfile the capturing move for each
+weak group on every move followed by a annotation (@pxref{Regression})
+

@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "main.h": "c",
+        "liberty.h": "c",
+        "hash.h": "c",
+        "patterns.h": "c",
+        "sgf.h": "c",
+        "algorithm": "c",
+        "random": "c",
+        "ostream": "c",
+        "utility": "c"
+    }
+}
