@@ -10,6 +10,8 @@ It seems start with gnugo2.6,it can play well(campare with me...I played not wel
 
 2. If I try to use this project's MAKEFILE (which is also the `circle-stdlib`'s sample's MAKEFILE),there is also many place to change,and meat many errors...
 
+The structure of gnugo2.6+ is complicated:there is more than one exe files:except gnugo,there is sgfgen under `sgf` floder,`joseki,myeyes,mkpat` under `patterns` floder.These program will do some data management as MAKEFILE said.and eyes.c will be generated under pattern floder
+
 so port gnugo2.6 is failed,maybe it's easy for experts.I remain the gnugo2.6's code here,may be some day I can port this
 
 but use c's go program is not a good idea with this project:this project means it support only scheme,and app should all write in scheme.It should not as a 'c program's wapper'
