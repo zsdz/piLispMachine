@@ -179,8 +179,6 @@ there is no error report on screen(in original microlisp either)
 
 some tiny lisp interpreter like [Mal](https://github.com/kanaka/mal)'s c edition can show the error message
 
-and the microlisp seems read the expression from stdin every single char,better to make it faster
-
 - [ ] The lisp interpreter itself can manage the memery,need to learn the detail,and let the lisp's memery manage way to be the OS's memery manage way
 
 - [ ] It's better be a chess and a go game,start it using (chess) and (go)
