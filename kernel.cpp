@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
+
 #include <unistd.h>
 
 #include "kernel.h"
@@ -45,25 +46,37 @@ CStdlibApp::TShutdownMode CKernel::Run(void)
     init_env();
     struct object *exp;
 
-    printf(
-        "Microlisp intrepreter - (c) Michael Lazear 2016-2019, MIT License\n");
+    printf("piLispMachine\n");
 
     load_file(cons(make_symbol("lib.scm"), NIL));
 
+    printf("\n");//need this empty line
+
+    #define RED "\033[31m"
+    #define GREEN "\033[32m"
+    #define YELLOW "\033[33m"
+    #define BLUE "\033[34m"
+    #define MAGENTA "\033[35m"
+    #define CYAN "\033[36m"
+    #define RESET "\033[0m"
+    #define BOLD "\033[1m"
+    
+    printf(GREEN"HELP:Use (ls),(cd \"folderName\"),(mkdir \"folderName\"),(unlink \"fileOrFolderName\") to manage FileSystem\n");
+    printf(GREEN"(ls) can only display files in current folder.\"folderName\" should write in double quotation marks,which microlisp needed\n");
+
     printf("\n");
 
-    printf("HELP:Use (ls),(cd \"folderName\"),(mkdir \"folderName\"),(unlink \"fileOrFolderName\") to manage FileSystem\n");
-    printf("(ls) can only display files in current folder.\"folderName\" should write in double quotation marks,which microlisp needed\n");
+    printf(CYAN"Use (edit \"fileName\") to create&edit or open&edit a file.Ctrl+s to save,Ctrl+q to quit.(There is no prompt now)\n");
 
     printf("\n");
 
-    printf("Use (edit \"fileName\") to create&edit or open&edit a file.Ctrl+s to save,Ctrl+q to quit.(There is no prompt now)\n");
+    printf(BOLD"Use (go) to play gnugo1.2.(print exit to exit the program).Use (ttt) to play TicTacToe"RESET"\n");
 
-    printf("\n");
+    printf("\n");//need this empty line
 
-    printf("Use (go) to play gnugo1.2.(print exit to exit the program).Use (ttt) to play TicTacToe");
+    printf("Color Test:"RED"Red "GREEN"Green "YELLOW"Yellow "BLUE"Blue "MAGENTA"Magentam "CYAN"Cyan "BOLD"Bold"RESET"\n");
 
-    printf("\n");
+    printf("\n");//need this empty line
 
     string prompt;
     char buf[1024];

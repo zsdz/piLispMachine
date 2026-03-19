@@ -30,11 +30,6 @@ extern "C"
     void gnugo1();
 }
 
-extern "C"
-{
-    void gnugo2();
-}
-
 // #define null(x) ((x) == NULL || (x) == NIL)
 #define EOL(x) (null((x)) || (x) == EMPTY_LIST)
 #define error(x)                    \
@@ -1092,7 +1087,6 @@ struct object *ls(struct object *args)
     char buf[1024];
     getcwd(buf, sizeof(buf));
     DIR *const dir = opendir(buf);
-    ;
 
     // circle-stdlib's sample03 code
     /*
@@ -1155,7 +1149,7 @@ struct object *load_file(struct object *args)
     struct object *exp;
     struct object *ret = NULL;
     char *filename = car(args)->string;
-    printf("Evaluating file %s\n", filename);
+    //printf("Evaluating file %s\n", filename);
     FILE *fp = fopen(filename, "r");
     if (fp == NULL)
     {
