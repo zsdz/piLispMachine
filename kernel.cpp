@@ -19,6 +19,7 @@
 
 #include "kernel.h"
 #include "lisp.h"
+#include "util.h"
 
 #include <iostream>
 using namespace std;
@@ -51,44 +52,35 @@ CStdlibApp::TShutdownMode CKernel::Run(void)
     load_file(cons(make_symbol("lib.scm"), NIL));
 
     printf("\n");//need this empty line
-
-    #define RED "\033[31m"
-    #define GREEN "\033[32m"
-    #define YELLOW "\033[33m"
-    #define BLUE "\033[34m"
-    #define MAGENTA "\033[35m"
-    #define CYAN "\033[36m"
-    #define RESET "\033[0m"
-    #define BOLD "\033[1m"
     
-    printf(GREEN"HELP:Use (ls),(cd \"folderName\"),(mkdir \"folderName\"),(unlink \"fileOrFolderName\") to manage FileSystem\n");
-    printf(GREEN"(ls) can only display files in current folder.\"folderName\" should write in double quotation marks,which microlisp needed\n");
+    printf(GREEN "HELP:Use (ls),(cd \"folderName\"),(mkdir \"folderName\"),(unlink \"fileOrFolderName\") to manage FileSystem\n");
+    printf(GREEN "(ls) can only display files in current folder.\"folderName\" should write in double quotation marks,which microlisp needed\n");
 
     printf("\n");
 
-    printf(CYAN"Use (edit \"fileName\") to create&edit or open&edit a file.Ctrl+s to save,Ctrl+q to quit.(There is no prompt now)\n");
+    printf(CYAN "Use (edit \"fileName\") to create&edit or open&edit a file.Ctrl+s to save,Ctrl+q to quit.(There is no prompt now)\n");
 
     printf("\n");
 
-    printf(BOLD"Use (go) to play gnugo1.2.(print exit to exit the program).Use (ttt) to play TicTacToe"RESET"\n");
+    printf(BOLD "Use (go) to play gnugo1.2.(print exit to exit the program).Use (ttt) to play TicTacToe" RESET "\n");
 
     printf("\n");//need this empty line
 
-    printf("Color Test:"RED"Red "GREEN"Green "YELLOW"Yellow "BLUE"Blue "MAGENTA"Magentam "CYAN"Cyan "BOLD"Bold"RESET"\n");
+    printf("Color Test:" RED "Red " GREEN "Green " YELLOW "Yellow " BLUE "Blue " MAGENTA "Magentam " CYAN "Cyan " BOLD "Bold" RESET "\n");
 
     printf("\n");//need this empty line
 
     string prompt;
-    char buf[1024];
+    char pathName[1024];
 
     for (;;)
     {
-        getcwd(buf, sizeof(buf));
+        getcwd(pathName, sizeof(pathName));
 
         prompt.clear();
 
         prompt.append("[");
-        prompt.append(buf);
+        prompt.append(pathName);
         prompt.append("]> ");
         // printf("user> ");
         cout << prompt;

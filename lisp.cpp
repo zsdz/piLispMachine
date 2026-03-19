@@ -1084,37 +1084,25 @@ struct object *cd(struct object *args)
 
 struct object *ls(struct object *args)
 {
-    char buf[1024];
-    getcwd(buf, sizeof(buf));
-    DIR *const dir = opendir(buf);
+    char pathName[1024];
+    getcwd(pathName, sizeof(pathName));
+    DIR *const dir = opendir(pathName);
 
-    // circle-stdlib's sample03 code
-    /*
-    while (true)
-    {
-        errno = 0;
-        struct dirent const * const dp = readdir (dir);
-        if (dp != nullptr)
-        {
-            printf ("\t%s\n", dp->d_name);
-        }
-        else
-        {
-            if (errno != 0 && errno != ENOENT)
-            {
-                fprintf (stderr,"readdir failed with errno %d\n",
-                errno);
-            }
-
-            break;
-        }
-    }
-    */
     struct dirent *dp;
+    struct stat statbuf;
 
     while ((dp = readdir(dir)) != nullptr)
-    {
-        printf("\t%s\n", dp->d_name);
+    {   
+        stat(dp->d_name, &statbuf);
+
+        if(S_ISDIR(statbuf.st_mode)){
+            printf("\t\033[35m%s\033[0m\n",dp->d_name);
+            //printf("\t%s %s\n",dp->d_name,MAGENTA "<DIR>" RESET);
+        }else
+        {
+            printf("\t%s\n",dp->d_name);
+        }   
+              
     }
 
     return NULL;

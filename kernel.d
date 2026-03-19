@@ -140,7 +140,7 @@ kernel.o kernel.d: kernel.cpp \
  ../../install/aarch64-none-circle/include/string.h \
  ../../install/aarch64-none-circle/include/sys/string.h \
  ../../install/aarch64-none-circle/include/stdlib.h \
- ../../install/aarch64-none-circle/include/machine/stdlib.h lisp.h \
+ ../../install/aarch64-none-circle/include/machine/stdlib.h lisp.h util.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/iostream \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/bits/requires_hosted.h \
  /home/wk/protool/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-elf/aarch64-none-elf/include/c++/13.2.1/aarch64-none-elf/bits/c++config.h \
