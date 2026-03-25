@@ -30,6 +30,10 @@ extern "C"
     void gnugo1();
 }
 
+extern "C" {
+	int add_numbers(int a, int b);
+}
+
 // #define null(x) ((x) == NULL || (x) == NIL)
 #define EOL(x) (null((x)) || (x) == EMPTY_LIST)
 #define error(x)                    \
@@ -1096,8 +1100,7 @@ struct object *ls(struct object *args)
         stat(dp->d_name, &statbuf);
 
         if(S_ISDIR(statbuf.st_mode)){
-            printf("\t\033[35m%s\033[0m\n",dp->d_name);
-            //printf("\t%s %s\n",dp->d_name,MAGENTA "<DIR>" RESET);
+            printf("\t" MAGENTA "%s" RESET "\n",dp->d_name);
         }else
         {
             printf("\t%s\n",dp->d_name);
@@ -1215,6 +1218,13 @@ struct object *gnugo(struct object *args)
     return NIL;
 }
 
+struct object *rust(struct object *args)
+{
+    printf("%d\n",add_numbers(1,2));
+
+    return NIL;
+}
+
 /* Initialize the global environment, add primitive functions and symbols */
 void init_env()
 {
@@ -1285,4 +1295,8 @@ void init_env()
     add_prim("ttt", ttt);
     //add_prim("tttc", tttC);
     add_prim("go", gnugo);
+    add_prim("rust",rust);
 }
+
+//mal's fac:(def! fac (fn* (x) (if (= x 1) 1 (* x (fac (- x 1))))))
+// (map (fn* (x) （+ x 1)) (quote (1 2 3)))
