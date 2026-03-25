@@ -1220,7 +1220,7 @@ struct object *gnugo(struct object *args)
 
 struct object *rust(struct object *args)
 {
-    printf("%d\n",add_numbers(1,2));
+    //printf("%d\n",add_numbers(1,2));
 
     return NIL;
 }
