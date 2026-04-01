@@ -6,6 +6,9 @@ piLispMachine is a toy lisp interpreter based on [Circle](https://github.com/rst
 ![1](./pic/basicUseSample1.jpg)
 ![1](./pic/basicUseSample2.jpg)
 
+## Use directly
+You can copy the files of folder to the sdcard that have been formated to FAT32,then you can use piLispMachine right now! 
+
 ## Build
 You have to make circle and circle-stdlib well(you can test the samples,especially [circle-stdlib sample2 02-stdio-hello](https://github.com/smuehlst/circle-stdlib/tree/master/samples/02-stdio-hello)).If everything is fine,copy or clone the project under the circle-stdlib's sample folder(to use the makefile and environment) ,first you may need `make clean` to delete useless files(like `kernel8-rpi4.map`,`kernel.d`,`main.d`),then `make`.The `kernel8-rpi4.img` is the result(I think you can use the `kernel8-rpi4.img` of the project already build directly,you may rename it to `kernel8.img`)
 
