@@ -1,0 +1,1 @@
+keymap=US width=640 height=480 logdev=ttyS1

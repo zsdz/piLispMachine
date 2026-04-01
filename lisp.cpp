@@ -21,6 +21,8 @@
 
 #include <iostream>
 #include <fstream>
+//#include <filesystem>
+
 using namespace std;
 
 extern void ttt1();
@@ -1064,16 +1066,18 @@ struct object *prim_exec(struct object *args)
     return NIL;
 }
 
-// Because I will display current floder name in every line of repl like linux shell,so I think there is no need of command pwd
-/*
+
 struct object *pwd(struct object *args) {
+
+    //std::filesystem::current_path();try to use c++17 std::filesystem,got error 'std::filesystem' has not been declared,even change config in Rules.mk and Config.mk,and use aarch-none-elf 15.2
+
     char buf[1024];
 
     getcwd(buf, sizeof(buf));
     printf("%s\n",buf);
     return NULL;
 }
-*/
+
 
 struct object *cd(struct object *args)
 {
@@ -1086,6 +1090,7 @@ struct object *cd(struct object *args)
     return NULL;
 }
 
+//unlike linux's ls command,this ls have no parameter
 struct object *ls(struct object *args)
 {
     char pathName[1024];
@@ -1140,7 +1145,7 @@ struct object *load_file(struct object *args)
     struct object *exp;
     struct object *ret = NULL;
     char *filename = car(args)->string;
-    //printf("Evaluating file %s\n", filename);
+    printf("Evaluating file %s\n", filename);
     FILE *fp = fopen(filename, "r");
     if (fp == NULL)
     {
@@ -1283,7 +1288,7 @@ void init_env()
     add_prim("vector-set", prim_vset);
 
     // FileSystemFunctions:
-    // add_prim("pwd", pwd);
+    add_prim("pwd", pwd);
     add_prim("ls", ls);
     add_prim("cd", cd);
     add_prim("mkdir", mkdirWarper);

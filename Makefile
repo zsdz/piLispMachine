@@ -9,7 +9,7 @@ NEWLIBDIR = ../../install/$(NEWLIB_ARCH)
 
 #OBJS	= main.o util.o game/TicTacToe/TicTacToe.o $(wildcard game/gnugo/*.o) editor.o lisp.o kernel.o
 
-OBJS	= main.o util.o game/TicTacToe/TicTacToe.o \
+#OBJS	= main.o util.o game/TicTacToe/TicTacToe.o \
 	game/gnugo/count.o \
 	game/gnugo/countlib.o \
 	game/gnugo/endgame.o \
@@ -35,6 +35,11 @@ OBJS	= main.o util.o game/TicTacToe/TicTacToe.o \
 	game/gnugo/suicide.o \
 	game/gnugo/gnugo.o \
 	editor.o lisp.o kernel.o
+
+GNUGODIR = game/gnugo
+GNUGOSRC = $(wildcard $(GNUGODIR)/*.c)
+
+OBJS = main.o util.o game/TicTacToe/TicTacToe.o $(GNUGOSRC:%.c=%.o) editor.o lisp.o kernel.o
 
 include $(CIRCLEHOME)/Rules.mk
 
